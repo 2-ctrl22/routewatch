@@ -1,46 +1,36 @@
 #!/usr/bin/env node
 /**
- * enrich-adb.mjs v2 - verrijking bovenop RouteWatch, budgetbewust
+ * enrich-adb.mjs v3 - verrijking bovenop RouteWatch, budgetbewust
  *
- * Raakt routewatch.mjs NIET aan. Schrijft losse cachebestanden:
- *
- *   data/airports-meta.json   baangegevens + metadata per veld   (Tier 1, 1 unit)
- *   data/aircraft-meta.json   toestel per registratie            (Tier 1, 1 unit)
- *   data/type-history.json    7 dagen typegebruik per vluchtnr   (Tier 2, 2 units)
+ * Raakt routewatch.mjs NIET aan. Schrijft:
+ *   data/airports-meta.json   baangegevens per veld            (Tier 1, 2 units/veld)
+ *   data/aircraft-meta.json   toestel per registratie          (Tier 1, 1 unit)
+ *   data/type-history.json    7 dagen typegebruik per vluchtnr (Tier 2, 2 units)
  *   data/enrich-cursor.json   waar de rotatie is gebleven
  *   data/last-enrich.md       samenvatting per run
  *
- * NIEUW IN v2: GEEN HANDMATIGE LIJST MEER NODIG
- * ---------------------------------------------------------------------------
- * De vluchtnummers worden automatisch uit data/ledger.json gehaald, in deze
- * prioriteitsorde:
- *   1. GEMENGDE VLOOT   meer dan 1 toesteltype gezien -> je matchstatus is hier
- *                       "per datum te bevestigen" en dat wil je opgelost hebben
- *   2. TYPE ONBEKEND    geen enkel type gezien -> matchStatus() geeft ONBEKEND
- *   3. REST             op aantal waargenomen dagen, drukste eerst
+ * ---------------------------------------------------------------- FIX v3 ---
+ * PROBLEEM 1: een 429 in de banensectie zette een globale vlag, waardoor de
+ *   vluchtnummer-sectie in dezelfde run helemaal werd overgeslagen. Zichtbaar
+ *   als "rotatie: 0 nummers deze run" terwijl er 2453 kandidaten waren.
+ *   NU: elke sectie heeft zijn eigen vlag. Alleen een 403 of een leeg quotum
+ *   stopt de hele run.
  *
- * Binnen elke groep draait een cursor rond: elke run pakt de volgende N
- * vluchtnummers op, dus over de weken komt alles langs zonder dat jij iets
- * hoeft bij te houden. Een vluchtnummer dat deze week al is opgehaald wordt
- * overgeslagen (cache), dus herhalen kost 0 units.
+ * PROBLEEM 2: de 429 kwam al na 2 tot 3 aanroepen ondanks pauzes van 2,7 s.
+ *   RapidAPI meet strenger dan 1 verzoek per seconde suggereert.
+ *   NU: pauze 3000 ms, en bij een 429 twee pogingen met 45 en 90 seconden wacht.
  *
- * WAAROM NIET ALLE 465 PAREN IN EEN KEER
- * ---------------------------------------------------------------------------
- * Je 254 bediende paren hebben elk meerdere operators, dus honderden unieke
- * vluchtnummers. Per vluchtnummer per week kost dat 2 units. Bij 400 nummers
- * is dat 800 units per week tegen een maandbudget van 600. Dat past niet.
- * Let op: voor "bestaat de route en met welk toestel" heb je dit NIET nodig -
- * collect-adb.mjs levert operator en type al voor elke waargenomen vlucht.
- * Deze sectie is het precisie-instrument voor typewisselingen per datum.
+ * PROBLEEM 3: 2453 unieke vluchtnummers x 25 per week is bijna twee jaar voor
+ *   een volledige ronde. Dat is geen dedup-fout, er zijn echt zoveel nummers.
+ *   NU: strakke prioritering, want alleen deze gevallen veranderen je matchstatus:
+ *     prio 0  meer dan 1 type gezien        -> "per datum te bevestigen"
+ *     prio 1  geen type bekend              -> matchStatus() geeft ONBEKEND
+ *     prio 2  NEAR-MATCH regel              -> kan bij een ander type MATCH worden
+ *     prio 3  de rest, drukste eerst        -> laagste waarde, komt zelden aan bod
+ *   De log meldt hoeveel weken een volledige ronde per prioriteit kost.
  *
- * BUDGET (AeroDataBox BASIC: 600 units/maand, 2400 requests, 1 req/seconde)
- *   Tier 1 = 1 unit, Tier 2 = 2, Tier 3 = 6, Tier 4 = 60.
- *   collect-adb wekelijks:   circa 355 units
- *   banen (eenmalig):        82 units, daarna 0
- *   registraties:            circa 20 units per maand
- *   deze rotatie:            25 nummers x 2 units x 4,33 runs = circa 216
- *   Samen na de eerste maand: circa 590 van 600. Zet ENRICH_FLIGHTS lager als
- *   je meer marge wilt.
+ * BUDGET (AeroDataBox BASIC: 600 units/maand, 2400 requests, Tier 1=1, Tier 2=2)
+ *   collect-adb wekelijks 82, banen eenmalig 82, rotatie 25 x 2 = 50 per week.
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -57,61 +47,84 @@ const CAP = Number(process.env.ENRICH_UNIT_CAP ?? 60);
 const FORCE = String(process.env.FORCE_REFRESH ?? "").toLowerCase() === "true";
 const N_FLIGHTS = Number(process.env.ENRICH_FLIGHTS ?? 25);
 const DO_RUNWAYS = String(process.env.ENRICH_RUNWAYS ?? "true").toLowerCase() !== "false";
+const SLEEP_MS = Number(process.env.ENRICH_SLEEP_MS ?? 3000);
+const BACKOFFS = [45000, 90000];
 
-let spent = 0, stopped = false;
+let spent = 0;
+let hardStop = false;             // 403 of unitplafond: hele run stopt
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const load = (p, d) => { try { return JSON.parse(readFileSync(p, "utf8")); } catch { return d; } };
 const iso = d => d.toISOString().slice(0, 10);
 
-function spend(units, label) {
-  if (stopped) return false;
+/* Retourwaarden van get():
+ *   object     gelukt
+ *   undefined  overslaan (404 of andere fout), sectie mag doorgaan
+ *   null       deze sectie stoppen (429 na alle pogingen)
+ *   false      hele run stoppen (403 of plafond)
+ */
+async function get(url, units, label) {
+  if (hardStop) return false;
   if (spent + units > CAP) {
     LOG(`unitplafond ${CAP} bereikt na ${spent} units - ${label} en de rest overgeslagen`);
-    stopped = true;
+    hardStop = true;
     return false;
   }
-  spent += units;
-  return true;
-}
-
-async function get(url, units, label) {
-  if (!spend(units, label)) return null;
-  try {
-    const res = await fetch(url, { headers: H });
-    if (res.status === 429) { LOG(`${label}: 429 - quotum of snelheidslimiet, stop`); stopped = true; return null; }
-    if (res.status === 403) { LOG(`${label}: 403 - sleutel niet geabonneerd, stop`); stopped = true; return null; }
-    if (res.status === 404) { LOG(`${label}: 404 - niet gevonden of endpointvorm klopt niet`); return undefined; }
-    if (!res.ok) { LOG(`${label}: HTTP ${res.status}`); return undefined; }
-    return await res.json();
-  } catch (e) { LOG(`${label} error:`, e.message); return undefined; }
-  finally { await sleep(1100); }
+  for (let attempt = 0; attempt <= BACKOFFS.length; attempt++) {
+    try {
+      const res = await fetch(url, { headers: H });
+      if (attempt === 0) spent += units;
+      if (res.status === 429) {
+        if (attempt < BACKOFFS.length) {
+          const w = BACKOFFS[attempt];
+          LOG(`${label}: 429 - ${Math.round(w / 1000)}s wachten, poging ${attempt + 2}`);
+          await sleep(w);
+          continue;
+        }
+        LOG(`${label}: 429 blijft - deze sectie stopt, andere secties gaan door`);
+        return null;
+      }
+      if (res.status === 403) { LOG(`${label}: 403 - sleutel niet geabonneerd, hele run stopt`); hardStop = true; return false; }
+      if (res.status === 404) { LOG(`${label}: 404 - niet gevonden of endpointvorm klopt niet`); return undefined; }
+      if (!res.ok) { LOG(`${label}: HTTP ${res.status}`); return undefined; }
+      return await res.json();
+    } catch (e) {
+      LOG(`${label} error:`, e.message);
+      return undefined;
+    } finally {
+      await sleep(SLEEP_MS);
+    }
+  }
+  return null;
 }
 
 const CFG = load("config/collection.json", null);
 if (!CFG?.airports?.length) { LOG("config/collection.json onbruikbaar of leeg"); process.exit(1); }
 mkdirSync("data", { recursive: true });
 
-// Controle van je config, zodat je in de log ziet of het goed staat.
 const MBS = CFG.settings?.missed_before_suspend;
 LOG(`config: ${CFG.airports.length} velden, missed_before_suspend = ${MBS ?? "niet gezet (script gebruikt 3)"}`);
-if (MBS === undefined) LOG("WAARSCHUWING: zet settings.missed_before_suspend op 6, anders schorst RouteWatch routes te snel door de roterende vensters");
-else if (MBS < 6) LOG(`WAARSCHUWING: missed_before_suspend staat op ${MBS}. Met roterende vensters is 6 of hoger nodig.`);
-if (CFG.settings?.watch_flights) LOG(`let op: settings.watch_flights staat nog in je config maar wordt door v2 genegeerd - de selectie gaat nu automatisch`);
+if ((MBS ?? 3) < 6) LOG(`WAARSCHUWING: missed_before_suspend is ${MBS ?? 3}. Met roterende vensters is 6 of hoger nodig.`);
 
-/* ============================== 1. BAANGEGEVENS + METADATA (Tier 1) ======= */
+/* ============================== 1. BAANGEGEVENS (Tier 1) ================== */
 
 const META = load("data/airports-meta.json", {});
-let metaNew = 0;
+let metaNew = 0, metaStopped = false;
+const missing = CFG.airports.filter(a => !META[a.icao] || FORCE);
 
-if (DO_RUNWAYS) {
-  for (const a of CFG.airports) {
-    if (stopped) break;
-    if (META[a.icao] && !FORCE) continue;
-
+if (!DO_RUNWAYS) {
+  LOG("banensectie staat uit (ENRICH_RUNWAYS=false)");
+} else if (!missing.length) {
+  LOG(`banensectie: alle ${CFG.airports.length} velden zitten al in de cache, 0 units`);
+} else {
+  LOG(`banensectie: nog ${missing.length} van ${CFG.airports.length} velden te doen`);
+  for (const a of missing) {
+    if (hardStop || metaStopped) break;
     const info = await get(`https://${HOST}/airports/icao/${a.icao}`, 1, `airport ${a.icao}`);
-    if (info === null) break;
+    if (info === false) break;
+    if (info === null) { metaStopped = true; break; }
     const rw = await get(`https://${HOST}/airports/icao/${a.icao}/runways`, 1, `runways ${a.icao}`);
-    if (rw === null) break;
+    if (rw === false) break;
+    if (rw === null) { metaStopped = true; break; }
 
     const runways = Array.isArray(rw) ? rw : (rw?.runways ?? []);
     const lengths = runways.map(r => Number(r?.length?.feet ?? r?.lengthFeet ?? 0)).filter(n => n > 0);
@@ -137,25 +150,26 @@ if (DO_RUNWAYS) {
     LOG(`${a.icao}: ${runways.length} banen, langste ${longest ?? "?"} ft (units ${spent}/${CAP})`);
   }
   writeFileSync("data/airports-meta.json", JSON.stringify(META, null, 1));
-  LOG(`airports-meta.json: ${Object.keys(META).length} van ${CFG.airports.length} velden, ${metaNew} nieuw`);
+  LOG(`airports-meta.json: ${Object.keys(META).length} van ${CFG.airports.length} velden, ${metaNew} nieuw` +
+      (metaStopped ? " (sectie gestopt op 429)" : ""));
 }
 
-/* ============================== 2. TOESTELLEN PER REGISTRATIE (Tier 1) ==== */
+/* ============================== 2. REGISTRATIES (Tier 1) ================== */
 
 const LEDGER = load("data/ledger.json", {});
 const ACM = load("data/aircraft-meta.json", {});
-
 const regs = new Set();
 for (const row of Object.values(LEDGER)) {
   for (const r of row?.regs ?? []) if (r) regs.add(String(r).toUpperCase());
 }
 
-let acNew = 0;
+let acNew = 0, acStopped = false;
 for (const reg of regs) {
-  if (stopped) break;
+  if (hardStop || acStopped) break;
   if (ACM[reg] !== undefined && !FORCE) continue;
   const j = await get(`https://${HOST}/aircrafts/reg/${encodeURIComponent(reg)}`, 1, `aircraft ${reg}`);
-  if (j === null) break;
+  if (j === false) break;
+  if (j === null) { acStopped = true; break; }
   const ac = Array.isArray(j) ? j[0] : j;
   ACM[reg] = ac ? {
     reg,
@@ -168,35 +182,36 @@ for (const reg of regs) {
   acNew++;
 }
 writeFileSync("data/aircraft-meta.json", JSON.stringify(ACM, null, 1));
-LOG(`aircraft-meta.json: ${Object.keys(ACM).length} registraties, ${acNew} nieuw`);
+LOG(`aircraft-meta.json: ${Object.keys(ACM).length} registraties, ${acNew} nieuw` +
+    (regs.size ? "" : " (geen registraties in de ledger)"));
 
-/* ===================== 3. TYPEVERIFICATIE, AUTOMATISCH GESELECTEERD ======= */
+/* ============ 3. TYPEVERIFICATIE, GEPRIORITEERD EN ROTEREND (Tier 2) ===== */
 
-/* Kandidaten uit de ledger, geprioriteerd. Elke ledgerregel heeft een sleutel
- * van de vorm "PAAR|airline|flight" en velden types, days en pair.
- * We kijken alleen naar echte vluchtnummers, niet naar de stand-ins met een *.
+/* Alleen deze gevallen veranderen je matchstatus, dus die gaan voor:
+ *   0  meer dan 1 type gezien   -> per datum te bevestigen
+ *   1  geen type bekend         -> ONBEKEND in de matrix
+ *   2  NEAR-MATCH               -> kan op een andere dag MATCH zijn
+ *   3  de rest                  -> alleen als er ruimte is
  */
-
 function candidates() {
-  const rows = [];
+  const best = new Map();
   for (const [key, r] of Object.entries(LEDGER)) {
     const fn = String(r?.flight ?? "").trim().toUpperCase();
-    if (!fn || fn === "?" || fn.includes("*")) continue;      // stand-in of onbekend
+    if (!fn || fn === "?" || fn.includes("*")) continue;
     if (r?.state === "suspended") continue;
     const types = Object.keys(r?.types ?? {});
-    rows.push({
+    const st = String(r?.status ?? "");
+    const prio = types.length > 1 ? 0
+               : types.length === 0 ? 1
+               : /NEAR/.test(st) ? 2 : 3;
+    const row = {
       fn,
-      pair: r?.pair ?? key.split("|")[0],
+      pair: r?.pair ?? String(key).split("|")[0],
       days: Array.isArray(r?.days) ? r.days.length : 0,
-      nTypes: types.length,
-      prio: types.length > 1 ? 0 : (types.length === 0 ? 1 : 2)
-    });
-  }
-  // dedupliceer op vluchtnummer, houd de regel met de meeste dagen
-  const best = new Map();
-  for (const r of rows) {
-    const cur = best.get(r.fn);
-    if (!cur || r.days > cur.days || r.prio < cur.prio) best.set(r.fn, r);
+      prio
+    };
+    const cur = best.get(fn);
+    if (!cur || row.prio < cur.prio || (row.prio === cur.prio && row.days > cur.days)) best.set(fn, row);
   }
   return [...best.values()].sort((a, b) =>
     a.prio - b.prio || b.days - a.days || a.fn.localeCompare(b.fn));
@@ -210,27 +225,34 @@ const from = iso(new Date(Date.now() - 7 * 864e5));
 const to = iso(new Date(Date.now() - 1 * 864e5));
 const weekKey = `${from}_${to}`;
 
-const mixed = ALLCAND.filter(c => c.prio === 0).length;
-const unknown = ALLCAND.filter(c => c.prio === 1).length;
-LOG(`kandidaten: ${ALLCAND.length} vluchtnummers (${mixed} gemengde vloot, ${unknown} zonder type)`);
+const byPrio = [0, 1, 2, 3].map(p => ALLCAND.filter(c => c.prio === p).length);
+LOG(`kandidaten: ${ALLCAND.length} unieke vluchtnummers ` +
+    `(gemengde vloot ${byPrio[0]}, zonder type ${byPrio[1]}, near-match ${byPrio[2]}, overig ${byPrio[3]})`);
+if (N_FLIGHTS > 0) {
+  const urgent = byPrio[0] + byPrio[1] + byPrio[2];
+  LOG(`bij ${N_FLIGHTS} per week: urgente groep rond in ${Math.ceil(urgent / N_FLIGHTS)} weken, ` +
+      `alles in ${Math.ceil(ALLCAND.length / N_FLIGHTS)} weken`);
+}
 
+let thNew = 0, thStopped = false;
 if (!ALLCAND.length) {
-  LOG("nog geen vluchtnummers in de ledger - draai eerst collect-adb en routewatch, dan vult dit zichzelf");
+  LOG("nog geen vluchtnummers in de ledger - draai eerst collect-adb en routewatch");
 } else {
-  let start = Number(CUR.index) || 0;
-  if (start >= ALLCAND.length) { start = 0; CUR.rounds = (Number(CUR.rounds) || 0) + 1; }
+  let i = Number(CUR.index) || 0;
+  if (i >= ALLCAND.length) { i = 0; CUR.rounds = (Number(CUR.rounds) || 0) + 1; }
+  let seen = 0;
 
-  let done = 0, i = start, seen = 0;
-  while (done < N_FLIGHTS && seen < ALLCAND.length && !stopped) {
+  while (thNew < N_FLIGHTS && seen < ALLCAND.length && !hardStop && !thStopped) {
     const c = ALLCAND[i % ALLCAND.length];
     i++; seen++;
 
     if (!TH[c.fn]) TH[c.fn] = {};
-    if (TH[c.fn][weekKey] && !FORCE) continue;               // deze week al gedaan, 0 units
+    if (TH[c.fn][weekKey] && !FORCE) continue;          // deze week al gedaan, 0 units
 
     const j = await get(`https://${HOST}/flights/number/${encodeURIComponent(c.fn)}/${from}/${to}`, 2, `flight ${c.fn}`);
-    if (j === null) break;
-    if (j === undefined) { done++; continue; }
+    if (j === false) break;
+    if (j === null) { thStopped = true; break; }
+    if (j === undefined) { thNew++; continue; }         // 404: geteld, anders blijven we hangen
 
     const legs = Array.isArray(j) ? j : (j?.flights ?? []);
     const byDay = {}, typeCount = {};
@@ -242,26 +264,24 @@ if (!ALLCAND.length) {
     }
     const types = Object.keys(typeCount);
     TH[c.fn][weekKey] = {
-      pair: c.pair,
-      legs: legs.length,
-      per_day: byDay,
-      type_count: typeCount,
+      pair: c.pair, prio: c.prio, legs: legs.length,
+      per_day: byDay, type_count: typeCount,
       mixed_fleet: types.length > 1,
       fetched: iso(new Date())
     };
-    done++;
-    LOG(`${c.fn} (${c.pair}): ${legs.length} legs, types ${types.join("/") || "?"}${types.length > 1 ? " - GEMENGDE VLOOT" : ""} (units ${spent}/${CAP})`);
+    thNew++;
+    LOG(`${c.fn} (${c.pair}, prio ${c.prio}): ${legs.length} legs, types ${types.join("/") || "?"}` +
+        `${types.length > 1 ? " - GEMENGDE VLOOT" : ""} (units ${spent}/${CAP})`);
   }
 
   CUR.index = i % ALLCAND.length;
   CUR.updated = new Date().toISOString();
   CUR.total_candidates = ALLCAND.length;
   writeFileSync("data/enrich-cursor.json", JSON.stringify(CUR, null, 1));
-  LOG(`rotatie: ${done} nummers deze run, cursor staat nu op ${CUR.index}/${ALLCAND.length}, ronde ${CUR.rounds}`);
+  LOG(`rotatie: ${thNew} nummers deze run, cursor ${CUR.index}/${ALLCAND.length}, ronde ${CUR.rounds}` +
+      (thStopped ? " (sectie gestopt op 429)" : ""));
 }
-
 writeFileSync("data/type-history.json", JSON.stringify(TH, null, 1));
-LOG(`type-history.json: ${Object.keys(TH).length} vluchtnummers in cache`);
 
 /* ============================== samenvatting ============================= */
 
@@ -270,20 +290,20 @@ const mixedFound = Object.entries(TH)
   .map(([fn]) => fn);
 
 const report = [
-  `# Verrijking ${new Date().toISOString().slice(0, 16)}`,
+  `# Enrichment ${new Date().toISOString().slice(0, 16)}`,
   ``,
-  `- velden met baangegevens: ${Object.keys(META).length} van ${CFG.airports.length} (${metaNew} nieuw)`,
-  `- registraties in cache: ${Object.keys(ACM).length} (${acNew} nieuw)`,
-  `- vluchtnummers in typehistorie: ${Object.keys(TH).length} van ${ALLCAND.length} kandidaten`,
-  `- cursor: ${CUR.index ?? 0}/${ALLCAND.length}, volledige rondes: ${CUR.rounds ?? 0}`,
-  `- verbruikte units deze run: ${spent} van plafond ${CAP}`,
-  stopped ? `- LET OP: vroegtijdig gestopt om je quotum te beschermen` : `- volledig afgerond`,
+  `- runway data: ${Object.keys(META).length} of ${CFG.airports.length} airports (${metaNew} new)${metaStopped ? " - section hit 429" : ""}`,
+  `- aircraft registrations cached: ${Object.keys(ACM).length} (${acNew} new)`,
+  `- flight numbers in type history: ${Object.keys(TH).length} of ${ALLCAND.length} candidates`,
+  `- rotation cursor: ${CUR.index ?? 0}/${ALLCAND.length}, full rounds: ${CUR.rounds ?? 0}`,
+  `- API units used this run: ${spent} of cap ${CAP}`,
+  hardStop ? `- NOTE: run stopped early to protect your quota` : `- completed`,
   ``,
-  `## Gemengde vloot vastgesteld (${mixedFound.length})`,
-  mixedFound.length ? mixedFound.slice(0, 40).map(f => `- ${f}`).join("\n") : `- nog geen`,
+  `## Mixed fleet confirmed (${mixedFound.length})`,
+  mixedFound.length ? mixedFound.slice(0, 40).map(f => `- ${f}`).join("\n") : `- none yet`,
   ``,
-  `Deze vluchtnummers wisselen binnen een week van toesteltype. Dat is precies de`,
-  `categorie die in je inventarisatie als "per datum te bevestigen" staat.`
+  `These flight numbers switch aircraft type within one week. That is exactly the`,
+  `category your inventory marks as "to be confirmed per date".`
 ].join("\n");
 writeFileSync("data/last-enrich.md", report + "\n");
 
