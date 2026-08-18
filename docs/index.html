@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>RouteWatch</title>
+<style>
+:root{--bg:#0f1115;--p:#171a21;--l:#262b36;--t:#e6e6e6;--d:#9aa5b1;--m:#9ece6a;--n:#e0af68;--x:#f7768e;--u:#7aa2f7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif}
+header{display:flex;gap:16px;align-items:center;padding:13px 20px;background:var(--p);border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
+header b{font-size:17px}nav a{color:var(--u);cursor:pointer;text-decoration:none;padding-bottom:2px}nav a.on{color:var(--t);border-bottom:2px solid var(--u)}
+main{padding:20px;max-width:1500px}h2{font-size:15px;color:var(--d);margin:24px 0 9px}h3{font-size:14px;margin:6px 0}
+.cards{display:flex;gap:11px;flex-wrap:wrap}.card{background:var(--p);border:1px solid var(--l);border-radius:10px;padding:11px 15px;min-width:145px}
+.card b{display:block;font-size:23px}.card span{color:var(--d);font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--l);vertical-align:top}
+th{color:var(--d);position:sticky;top:50px;background:var(--p)}tr:hover td{background:#151922}
+code{background:#1f2430;padding:1px 5px;border-radius:4px;font-size:12px}
+.m{color:var(--m)}.n{color:var(--n)}.x{color:var(--x)}.u{color:var(--u)}
+.high{border-left:3px solid var(--x)}.medium{border-left:3px solid var(--n)}.low{border-left:3px solid #565f89}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0;align-items:center}
+.chip{background:var(--p);border:1px solid var(--l);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:12px}.chip.on{border-color:var(--u);color:var(--u)}
+input{background:var(--p);border:1px solid var(--l);color:var(--t);padding:7px 10px;border-radius:7px;min-width:230px}
+.badge{background:var(--p);border:1px solid var(--l);border-radius:9px;padding:7px 12px;font-size:12px;color:var(--d)}.badge b{color:var(--t)}
+.muted{color:var(--d)}a{color:var(--u)}pre{background:var(--p);border:1px solid var(--l);padding:12px;border-radius:8px;overflow:auto}
+.buy{background:var(--p);border:1px solid var(--l);border-radius:11px;padding:14px 16px;margin:11px 0}
+.buy .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.buy .rank{font-size:20px;color:var(--u);font-weight:700}
+.gain{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;font-size:13px}
+.gain span b{color:var(--m);font-size:16px}
+.stores{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.stores a{background:#1f2430;border:1px solid var(--l);border-radius:7px;padding:5px 11px;font-size:12px;text-decoration:none}
+.tag{font-size:11px;border:1px solid var(--l);border-radius:20px;padding:2px 9px;color:var(--d)}
+</style></head><body>
+<header><b>RouteWatch</b>
+<nav id="nav"><a data-v="ov" class="on">Overzicht</a><a data-v="pr">Paarmatrix</a><a data-v="bu">Aankoopadvies</a><a data-v="ev">Wijzigingen</a><a data-v="se">Seizoenen</a><a data-v="fl">Vloot</a></nav>
+<span id="meta" class="badge">laden...</span></header>
+<main id="app">laden...</main>
+<script>
+let D=null,filter='all';
+const esc=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const cls=s=>!s?'u':s==='MATCH'?'m':s.startsWith('MATCH')?'n':s.startsWith('NEAR')?'n':s.startsWith('NO-')?'x':'u';
+const app=document.getElementById('app');
+function evTable(rows){if(!rows||!rows.length)return '<p class="muted">Nog geen wijzigingen.</p>';
+ return '<table><tr><th>Wanneer</th><th>Soort</th><th>Paar</th><th>Vlucht</th><th>Seizoen</th><th>Detail</th><th>Zekerheid</th></tr>'
+ +rows.map(e=>'<tr class="'+e.severity+'"><td>'+esc(String(e.at).slice(0,16))+'</td><td>'+esc(e.kind)+'</td>'
+ +'<td>'+esc(e.pair)+'</td><td>'+esc(e.airline)+' '+esc(e.flight)+'</td><td>'+esc(e.season)+'</td>'
+ +'<td><code>'+esc(JSON.stringify(e.detail))+'</code></td><td class="muted">'+esc(e.confidence)+'</td></tr>').join('')+'</table>';}
+function ov(){const s=D.summary;
+ app.innerHTML='<div class="cards">'+[['eigen luchthavens',s.airports],['kandidaten',s.candidates],
+  ['paren mogelijk',s.pairs_possible],['met verbinding',s.pairs_served],['zonder verbinding',s.pairs_unserved],
+  ['met MATCH',s.pairs_match],['simbaar',s.pairs_simmable],['vrachtparen',s.cargo_pairs],['opgeschort',s.suspended]]
+  .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
+ +'<h2>Wijzigingen bij de laatste run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
+ +'<p class="muted">De vergelijking loopt tegen een grondboek in de repo, niet tegen de dag ervoor. Een bron die '
+ +'een dag niets teruggeeft levert dus geen valse meldingen: afwezigheid wordt geteld en pas na drie gemiste '
+ +'gelegenheden volgt SUSPENDED.</p>';}
+function pr(){const f=filter,ps=D.pairs.filter(p=>f==='all'||(f==='served'&&p.status!=='GEEN VERBINDING')
+ ||(f==='unserved'&&p.status==='GEEN VERBINDING')||(f==='match'&&p.status.startsWith('MATCH'))
+ ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
+ app.innerHTML='<div class="chips">'+['all','served','unserved','match','simmable','cargo']
+  .map(x=>'<span class="chip '+(x===f?'on':'')+'" onclick="sf(\''+x+'\')">'+x+'</span>').join('')
+  +'<input id="q" placeholder="filter op ICAO of operator"></div><h2>Paarmatrix - '+ps.length+' regels</h2>'
+ +'<table id="t"><tr><th>Paar</th><th>Velden</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th><th>Simbaar</th></tr>'
+ +ps.map(p=>'<tr><td><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td><td>'+esc(p.from)+' - '+esc(p.to)+'</td>'
+ +'<td>'+p.nm+'</td><td>'+(esc(p.operators.join(', '))||'-')+'</td><td><code>'+(esc(p.types.join(', '))||'-')+'</code></td>'
+ +'<td class="'+cls(p.status)+'">'+esc(p.status)+'</td><td>'+(p.simmable?'ja':'nee')+'</td></tr>').join('')+'</table>';
+ document.getElementById('q').oninput=e=>{const v=e.target.value.toUpperCase();
+  Array.from(document.querySelectorAll('#t tr')).slice(1).forEach(tr=>tr.style.display=tr.textContent.toUpperCase().indexOf(v)>=0?'':'none');};}
+window.sf=x=>{filter=x;pr();};
+window.pd=p=>{const o=D.pairs.find(x=>x.pair===p);if(!o)return;
+ const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])),q=p.split('-');
+ app.innerHTML='<h2>'+p+' - '+o.nm+' NM</h2><p class="muted">Nachtbeperkingen: '
+ +q[0]+': '+esc((ap[q[0]]||{}).night||'niet vastgesteld')+' &middot; '+q[1]+': '+esc((ap[q[1]]||{}).night||'niet vastgesteld')+'</p>'
+ +'<h2>Vluchtregels</h2><table><tr><th>Operator</th><th>Vlucht</th><th>Types (keer gezien)</th><th>Status</th>'
+ +'<th>Dagen</th><th>STD</th><th>Bronnen</th><th>Gezien</th></tr>'
+ +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td>'+esc(l.flight)+'</td><td><code>'
+ +esc(Object.entries(l.types).map(x=>x[0]+' x'+x[1]).join(', '))+'</code></td>'
+ +'<td class="'+cls(l.status)+'">'+esc(l.status)+'</td><td>'+l.days+'</td><td>'+esc(l.std)+'</td>'
+ +'<td>'+esc((l.sources||[]).join(', '))+'</td><td>'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')+'</table>'
+ +'<h2>Per seizoen (waargenomen grenzen)</h2><table><tr><th>Seizoen</th><th>Vlucht</th><th>Van</th><th>Tot</th><th>Dagen</th><th>Types</th><th>STD</th></tr>'
+ +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td><td>'+esc(l.flight)+'</td>'
+ +'<td>'+esc(x[1].first)+'</td><td>'+esc(x[1].last)+'</td><td>'+x[1].days+'</td><td><code>'
+ +esc(Object.keys(x[1].types).join(', '))+'</code></td><td>'+esc(x[1].std)+'</td></tr>')).join('')+'</table>'
+ +'<h2>Wijzigingen op dit paar</h2>'+evTable(D.events.filter(e=>e.pair===p));};
+
+function bu(){
+ const cs=D.candidates||[];
+ if(!cs.length){app.innerHTML='<h2>Aankoopadvies</h2><p class="muted">Nog geen kandidaten gemeten. Zet in '
+  +'config/collection.json een veld met "candidate": true en draai de workflow.</p>';return;}
+ app.innerHTML='<h2>Aankoopadvies, gesorteerd op netwerkwinst</h2>'
+ +'<p class="muted">Gemeten, niet geschat: dit is het aantal paren met jouw huidige 31 velden waarop echt vluchten '
+ +'zijn waargenomen. RouteWatch zegt WAT je moet kopen; de prijsvergelijking staat bij elke kandidaat een klik weg.</p>'
+ +cs.map((c,i)=>'<div class="buy"><div class="top"><span class="rank">'+(i+1)+'</span>'
+  +'<h3>'+esc(c.icao)+' &middot; '+esc(c.name)+'</h3><span class="tag">'+esc(c.focus)+'</span>'
+  +(c.known_developers?'<span class="tag">'+esc(c.known_developers.join(' | '))+'</span>':'')+'</div>'
+  +'<p class="muted">'+esc(c.why)+'</p>'
+  +'<div class="gain"><span><b>'+c.gain.new_pairs+'</b> nieuwe paren</span>'
+  +'<span><b>'+c.gain.match_pairs+'</b> met MATCH</span>'
+  +'<span><b>'+c.gain.simmable_pairs+'</b> simbaar</span>'
+  +'<span><b>'+c.gain.cargo_pairs+'</b> vracht</span></div>'
+  +(c.gain.connects.length?'<p class="muted">Verbindt met: <code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
+  +(c.prices&&c.prices.length?'<table><tr><th>Winkel</th><th>Prijs</th></tr>'+c.prices.map(p=>
+    '<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a></td>'
+    +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</table>':'')
+  +'<div class="stores">'+Object.entries(c.price_search||{}).map(s=>
+    '<a href="'+esc(s[1])+'" target="_blank" rel="noopener">'+esc(s[0])+'</a>').join('')+'</div></div>').join('')
+ +'<p class="muted">'+esc(D.prices_note||'')+'</p>';}
+
+function ev(){app.innerHTML='<h2>Alle bewaarde wijzigingen ('+D.events.length+')</h2>'+evTable(D.events);}
+function se(){const s=D.summary;
+ app.innerHTML='<h2>Seizoenen</h2><p>Huidig: <b>'+esc(s.season.label)+'</b> '+s.season.start+' t/m '+s.season.end
+ +'. Tegenseizoen: <b>'+esc(s.counter_season)+'</b>.</p><p class="muted">IATA-regel: laatste zondag van maart tot de '
+ +'dag voor de laatste zondag van oktober. Werkt dus ook voor seizoenen die nog niet bestaan.</p>'
+ +'<h2>Seizoensevents</h2>'+evTable(D.events.filter(e=>String(e.kind).startsWith('SEASON')));}
+function fl(){app.innerHTML='<h2>Eigen vloot</h2><table><tr><th>Key</th><th>Naam</th><th>Rol</th><th>Bereik</th><th>Types</th></tr>'
+ +D.fleet.owned.map(f=>'<tr><td>'+esc(f.key)+'</td><td>'+esc(f.name)+'</td><td>'+esc(f.role)+'</td><td>'+f.range_nm+' NM</td>'
+ +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')+'</table>'
+ +'<h2>Near-match-regels</h2><table><tr><th>Type</th><th>Substituut</th><th>Concessie</th></tr>'
+ +Object.entries(D.fleet.near_match).map(x=>'<tr><td><code>'+esc(x[0])+'</code></td><td>'+esc(x[1].substitute)+'</td>'
+ +'<td>'+esc(x[1].concession)+'</td></tr>').join('')+'</table>';}
+const V={ov:ov,pr:pr,bu:bu,ev:ev,se:se,fl:fl};
+document.getElementById('nav').onclick=e=>{if(e.target.tagName!=='A')return;
+ Array.from(document.querySelectorAll('#nav a')).forEach(a=>a.classList.toggle('on',a===e.target));V[e.target.dataset.v]();};
+fetch('./data.json?'+Date.now()).then(r=>r.json()).then(d=>{D=d;
+ if(!d.summary.generated){app.innerHTML='<h2>Nog geen data</h2><p>Ga in je repo naar <b>Actions</b>, kies '
+  +'<b>RouteWatch</b>, klik <b>Run workflow</b> en vul bij backfill_days <code>14</code> in.</p>';return;}
+ document.getElementById('meta').innerHTML='<b>'+esc(d.summary.season.label)+'</b> &middot; bijgewerkt '
+  +esc(d.summary.generated.slice(0,16))+' &middot; '+d.summary.pairs_served+'/'+d.summary.pairs_possible+' paren bediend';
+ ov();}).catch(function(){app.innerHTML='<h2>Nog geen data</h2><p>Actions -> RouteWatch -> Run workflow (backfill_days 14).</p>';});
+</script></body></html>
