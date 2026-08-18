@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteWatch - Editor</title>
+<style>
+  :root{--bg:#0b0f14;--p:#121820;--p2:#182029;--l:#243040;--t:#e6edf3;--d:#8b98a8;
+    --u:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--r:12px}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--t);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
+    border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:10}
+  header>b{font-size:16px}
+  header a{color:var(--u);text-decoration:none;font-size:13.5px}
+  header a:hover{text-decoration:underline}
+  header .here{color:var(--t);border-bottom:2px solid var(--u);padding-bottom:2px}
+  #state{margin-left:auto;background:var(--p2);border:1px solid var(--l);border-radius:9px;
+    padding:6px 12px;font-size:12px;color:var(--d)}
+  main{padding:22px;max-width:1500px}
+  h2{font-size:13px;color:var(--d);margin:0;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+  .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+  .head{display:flex;gap:12px;align-items:center;justify-content:space-between;
+    padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
+  .tabs{display:flex;gap:7px;flex-wrap:wrap}
+  button{font-family:inherit;cursor:pointer}
+  button.tab{background:var(--p2);color:var(--d);border:1px solid var(--l);border-radius:999px;
+    padding:5px 13px;font-size:12.5px}
+  button.tab[aria-selected="true"]{color:var(--u);border-color:var(--u)}
+  button.tab:hover{color:var(--t)}
+  button.act{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:8px;
+    padding:6px 13px;font-size:13px}
+  button.act:hover{border-color:#31415a}
+  button.act.pri{border-color:var(--u);color:var(--u)}
+  button.del{background:none;border:1px solid var(--l);color:var(--d);border-radius:6px;
+    width:24px;height:24px;line-height:1;font-size:14px}
+  button.del:hover{border-color:var(--bad);color:var(--bad)}
+  .wrap{overflow:auto;max-height:60vh}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+  th,td{text-align:left;padding:5px 10px;border-bottom:1px solid var(--l);white-space:nowrap}
+  th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    background:var(--p2);position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--l)}
+  tbody tr:hover td{background:#151c25}
+  td input[type=text]{background:transparent;border:1px solid transparent;color:var(--t);
+    padding:3px 6px;border-radius:6px;font:inherit;font-size:12.5px;width:100%;min-width:80px}
+  td input[type=text]:hover{border-color:var(--l)}
+  td input[type=text]:focus{outline:none;border-color:var(--u);background:var(--p2)}
+  td.icao input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--u)}
+  td.num input{text-align:right}
+  .bad input{border-color:var(--bad)!important}
+  textarea{width:100%;min-height:300px;background:#0d131a;color:var(--t);border:none;
+    padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
+    line-height:1.5;resize:vertical}
+  textarea:focus{outline:none}
+  .msg{padding:10px 16px;font-size:13px;border-top:1px solid var(--l)}
+  .msg.ok{color:var(--ok)}
+  .msg.bad{color:var(--bad)}
+  .note{padding:14px 16px;color:var(--d);font-size:13px}
+  .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  code{background:var(--p2);padding:1px 5px;border-radius:4px;font-size:12px}
+  ol{margin:6px 0 0 18px;padding:0}
+  ol li{margin:3px 0}
+  footer{color:var(--d);font-size:12.5px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<header><b>RouteWatch</b>
+  <a href="index.html">Dashboard</a>
+  <a href="map.html">Map</a>
+  <span class="here">Editor</span>
+  <span id="state">loading config...</span>
+</header>
+
+<main>
+
+<div class="panel">
+  <div class="head">
+    <h2>Source</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="act" id="reload">Reload from GitHub</button>
+      <button class="act" id="pasteMode">Paste JSON instead</button>
+    </div>
+  </div>
+  <div class="note" id="srcNote">
+    Reading <code>config/collection.json</code>. Nothing is written back automatically:
+    you copy the result and commit it yourself.
+  </div>
+  <div id="pasteBox" hidden>
+    <textarea id="pasteIn" placeholder="Paste the full contents of config/collection.json here, then press Load"></textarea>
+    <div class="msg"><button class="act pri" id="pasteLoad">Load pasted JSON</button></div>
+  </div>
+</div>
+
+<div class="panel" id="editPanel" hidden>
+  <div class="head">
+    <h2>Lists</h2>
+    <div class="tabs" id="tabs"></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span class="pill" id="rowCount"></span>
+      <button class="act" id="addRow">Add row</button>
+    </div>
+  </div>
+  <div class="wrap">
+    <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+  </div>
+  <div class="note" id="tabNote"></div>
+</div>
+
+<div class="panel" id="outPanel" hidden>
+  <div class="head">
+    <h2>Result</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="act pri" id="copy">Copy JSON</button>
+      <button class="act" id="download">Download</button>
+      <button class="act" id="revert">Revert all edits</button>
+    </div>
+  </div>
+  <textarea id="out" spellcheck="false" readonly></textarea>
+  <div class="msg" id="outMsg"></div>
+  <div class="note">
+    <b>How to commit</b>
+    <ol>
+      <li>Press <b>Copy JSON</b>.</li>
+      <li>Open <code>config/collection.json</code> on GitHub and click the pencil icon.</li>
+      <li>Select everything, paste, and commit to <code>main</code>.</li>
+      <li>The next scheduled run picks up the change; no workflow edit needed.</li>
+    </ol>
+  </div>
+</div>
+
+<footer>
+  Field order and unknown keys are preserved exactly as they appear in the source file,
+  so anything this editor does not display is still written back untouched.
+</footer>
+
+</main>
+
+<script>
+const RAW="https://raw.githubusercontent.com/2-ctrl22/routewatch/main/config/collection.json";
+const $=id=>document.getElementById(id);
+let ORIG=null, DATA=null, SECTIONS=[], cur=0;
+
+const isObj=v=>v&&typeof v==="object"&&!Array.isArray(v);
+const isRowArray=v=>Array.isArray(v)&&v.length>0&&v.every(isObj);
+
+/* Walk the parsed config and collect every array-of-objects, at any depth.
+   That way the editor adapts to whatever keys collection.json actually uses. */
+function findSections(node,path,out){
+  if(isRowArray(node)){out.push({path:path.slice(),label:path.join(".")||"root",ref:node});return;}
+  if(Array.isArray(node))return;
+  if(isObj(node)) for(const k of Object.keys(node)) findSections(node[k],path.concat(k),out);
+}
+const keysOf=rows=>{const s=[];for(const r of rows)for(const k of Object.keys(r))if(!s.includes(k))s.push(k);return s;};
+
+function kindOf(rows,key){
+  let n=0,b=0,a=0,seen=0;
+  for(const r of rows){
+    const v=r[key]; if(v===undefined||v===null) continue;
+    seen++;
+    if(typeof v==="number")n++;
+    else if(typeof v==="boolean")b++;
+    else if(Array.isArray(v))a++;
+  }
+  if(!seen)return"text";
+  if(b===seen)return"bool";
+  if(n===seen)return"num";
+  if(a===seen)return"list";
+  return"text";
+}
+
+function render(){
+  const sec=SECTIONS[cur];
+  const rows=sec.ref, keys=keysOf(rows);
+  $("tabs").innerHTML=SECTIONS.map((s,i)=>
+    '<button class="tab" role="tab" aria-selected="'+(i===cur)+'" data-i="'+i+'">'+
+    s.label+' <span style="opacity:.6">'+s.ref.length+'</span></button>').join("");
+  $("tabs").querySelectorAll("button").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;render();});
+
+  $("thead").innerHTML='<tr><th style="width:34px"></th>'+
+    keys.map(k=>'<th>'+k+'</th>').join("")+'</tr>';
+
+  $("tbody").innerHTML=rows.map((row,ri)=>'<tr>'+
+    '<td><button class="del" data-r="'+ri+'" title="Remove this row">&times;</button></td>'+
+    keys.map(k=>{
+      const kind=kindOf(rows,k), v=row[k];
+      const cls=kind==="num"?"num":(k.toLowerCase()==="icao"?"icao":"");
+      if(kind==="bool")
+        return '<td><input type="checkbox" data-r="'+ri+'" data-k="'+k+'" data-t="bool"'+
+               (v?" checked":"")+'></td>';
+      const show = Array.isArray(v) ? v.join(", ") : (v===undefined||v===null?"":String(v));
+      return '<td class="'+cls+'"><input type="text" data-r="'+ri+'" data-k="'+k+'" data-t="'+kind+'" '+
+             'value="'+show.replace(/"/g,"&quot;")+'"></td>';
+    }).join("")+'</tr>').join("");
+
+  $("tbody").querySelectorAll("button.del").forEach(b=>b.onclick=()=>{
+    rows.splice(+b.dataset.r,1); render(); emit();
+  });
+  $("tbody").querySelectorAll("input").forEach(inp=>{
+    const ev = inp.type==="checkbox" ? "change" : "input";
+    inp.addEventListener(ev,()=>{
+      const row=rows[+inp.dataset.r], k=inp.dataset.k, t=inp.dataset.t;
+      inp.parentElement.classList.remove("bad");
+      if(t==="bool"){row[k]=inp.checked;}
+      else if(t==="num"){
+        const s=inp.value.trim();
+        if(s===""){delete row[k];}
+        else{const n=Number(s); if(Number.isNaN(n)){inp.parentElement.classList.add("bad");return;} row[k]=n;}
+      }
+      else if(t==="list"){
+        const parts=inp.value.split(",").map(x=>x.trim()).filter(Boolean);
+        row[k]=parts;
+      }
+      else{
+        const s=inp.value;
+        if(s===""){delete row[k];} else {row[k]=s;}
+      }
+      emit();
+    });
+  });
+
+  $("rowCount").textContent=rows.length+" rows, "+keys.length+" fields";
+  $("tabNote").innerHTML="Editing <code>"+sec.label+"</code>. "+
+    "Empty a text field to drop that key from the row. "+
+    "List fields are comma separated. Numbers must parse or the field turns red and is not stored.";
+  emit();
+}
+
+function addRow(){
+  const rows=SECTIONS[cur].ref, keys=keysOf(rows), tpl={};
+  for(const k of keys){
+    const kind=kindOf(rows,k);
+    tpl[k]= kind==="bool"?false : kind==="num"?0 : kind==="list"?[] : "";
+  }
+  rows.push(tpl); render();
+  const tb=$("tbody"); const last=tb.rows[tb.rows.length-1];
+  if(last){const f=last.querySelector("input"); if(f)f.focus();}
+}
+
+function emit(){
+  let txt;
+  try{ txt=JSON.stringify(DATA,null,2)+"\n"; }
+  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Cannot serialize: "+e.message; return; }
+  $("out").value=txt;
+  try{ JSON.parse(txt); }
+  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Invalid JSON: "+e.message; return; }
+  const total=SECTIONS.reduce((n,s)=>n+s.ref.length,0);
+  const changed=txt!==JSON.stringify(ORIG,null,2)+"\n";
+  $("outMsg").className="msg ok";
+  $("outMsg").textContent="Valid JSON, "+txt.length.toLocaleString("en")+" bytes, "+total+
+    " rows across "+SECTIONS.length+" lists"+(changed?" - edited, ready to commit":" - unchanged");
+}
+
+function load(obj,how){
+  ORIG=JSON.parse(JSON.stringify(obj));
+  DATA=obj;
+  SECTIONS=[]; findSections(DATA,[],SECTIONS);
+  if(!SECTIONS.length){
+    $("state").textContent="no editable lists found";
+    $("srcNote").innerHTML="Loaded, but found no array of objects to edit. "+
+      "The raw JSON is still shown below so you can edit it by hand.";
+    $("outPanel").hidden=false; emit(); return;
+  }
+  cur=0;
+  $("editPanel").hidden=false; $("outPanel").hidden=false;
+  $("state").textContent=how+" - "+SECTIONS.length+" lists";
+  render();
+}
+
+function fetchConfig(){
+  $("state").textContent="loading config...";
+  fetch("../config/collection.json?"+Date.now())
+    .then(r=>r.ok?r.json():Promise.reject())
+    .then(d=>load(d,"loaded from repo path"))
+    .catch(()=>fetch(RAW+"?"+Date.now())
+      .then(r=>r.ok?r.json():Promise.reject())
+      .then(d=>load(d,"loaded from raw.githubusercontent"))
+      .catch(()=>{
+        $("state").textContent="could not load";
+        $("srcNote").innerHTML="Could not read <code>config/collection.json</code>. "+
+          "On GitHub Pages only the <code>docs</code> folder is served, so the relative path fails "+
+          "and the raw fallback was blocked too. Use <b>Paste JSON instead</b>.";
+        $("pasteBox").hidden=false;
+      }));
+}
+
+$("reload").onclick=fetchConfig;
+$("pasteMode").onclick=()=>{$("pasteBox").hidden=!$("pasteBox").hidden;};
+$("pasteLoad").onclick=()=>{
+  try{ load(JSON.parse($("pasteIn").value),"loaded from paste"); $("pasteBox").hidden=true; }
+  catch(e){ alert("That is not valid JSON: "+e.message); }
+};
+$("addRow").onclick=addRow;
+$("copy").onclick=()=>{
+  navigator.clipboard.writeText($("out").value)
+    .then(()=>{const b=$("copy");b.textContent="Copied";setTimeout(()=>b.textContent="Copy JSON",1200);})
+    .catch(()=>{$("out").removeAttribute("readonly");$("out").select();});
+};
+$("download").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([$("out").value],{type:"application/json"}));
+  a.download="collection.json"; a.click(); URL.revokeObjectURL(a.href);
+};
+$("revert").onclick=()=>{ if(ORIG) load(JSON.parse(JSON.stringify(ORIG)),"reverted"); };
+
+fetchConfig();
+</script>
+</body>
+</html>
