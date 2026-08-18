@@ -1,135 +1,272 @@
 <!doctype html>
-<html lang="nl"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>RouteWatch</title>
 <style>
-:root{--bg:#0f1115;--p:#171a21;--l:#262b36;--t:#e6e6e6;--d:#9aa5b1;--m:#9ece6a;--n:#e0af68;--x:#f7768e;--u:#7aa2f7}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--t);font:14px/1.55 -apple-system,Segoe UI,Roboto,sans-serif}
-header{display:flex;gap:18px;align-items:center;padding:13px 20px;background:var(--p);border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
+:root{--bg:#0b0f14;--p:#121820;--p2:#182029;--l:#243040;--t:#e6edf3;--d:#8b98a8;
+  --m:#3fb950;--n:#d29922;--x:#f85149;--u:#58a6ff;--r:12px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--t);
+  font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
+  border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
 header>b{font-size:16px;letter-spacing:-.2px}
-#nav{display:flex;gap:16px;flex-wrap:wrap}
-#nav a{color:var(--u);cursor:pointer;text-decoration:none;padding:2px 0;border-bottom:2px solid transparent}
-#nav a:hover{border-bottom-color:#3b4a63}
+#nav{display:flex;gap:18px;flex-wrap:wrap}
+#nav a{color:var(--d);cursor:pointer;text-decoration:none;padding:3px 0;
+  border-bottom:2px solid transparent;font-size:13.5px}
+#nav a:hover{color:var(--t)}
 #nav a.on{color:var(--t);border-bottom-color:var(--u)}
-a.ext{color:var(--u);text-decoration:none;font-size:14px;white-space:nowrap}
+a.ext{color:var(--u);text-decoration:none;font-size:13.5px;white-space:nowrap}
 a.ext:hover{text-decoration:underline}
 #meta{margin-left:auto}
-main{padding:20px;max-width:1500px}h2{font-size:15px;color:var(--d);margin:24px 0 9px}h3{font-size:14px;margin:6px 0}
-.cards{display:flex;gap:11px;flex-wrap:wrap}.card{background:var(--p);border:1px solid var(--l);border-radius:10px;padding:11px 15px;min-width:145px}
-.card b{display:block;font-size:23px}.card span{color:var(--d);font-size:12px}
-table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:6px 9px;border-bottom:1px solid var(--l);vertical-align:top}
-th{color:var(--d);position:sticky;top:50px;background:var(--p)}tr:hover td{background:#151922}
-code{background:#1f2430;padding:1px 5px;border-radius:4px;font-size:12px}
+main{padding:22px;max-width:1500px}
+h2{font-size:13px;color:var(--d);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+h2:first-child{margin-top:0}
+h3{font-size:14px;margin:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
+.card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
+.card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
+.card span{color:var(--d);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--l);vertical-align:top}
+th{color:var(--d);position:sticky;top:49px;background:var(--p2);font-weight:500;
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+tbody tr:last-child td{border-bottom:none}
+tr:hover td{background:#151c25}
+code{background:#1c2430;padding:1px 5px;border-radius:4px;font-size:12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .m{color:var(--m)}.n{color:var(--n)}.x{color:var(--x)}.u{color:var(--u)}
-.high{border-left:3px solid var(--x)}.medium{border-left:3px solid var(--n)}.low{border-left:3px solid #565f89}
-.chips{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0;align-items:center}
-.chip{background:var(--p);border:1px solid var(--l);border-radius:20px;padding:4px 12px;cursor:pointer;font-size:12px}.chip.on{border-color:var(--u);color:var(--u)}
-input{background:var(--p);border:1px solid var(--l);color:var(--t);padding:7px 10px;border-radius:7px;min-width:230px}
-.badge{background:var(--p);border:1px solid var(--l);border-radius:9px;padding:7px 12px;font-size:12px;color:var(--d)}.badge b{color:var(--t)}
-.muted{color:var(--d)}a{color:var(--u)}pre{background:var(--p);border:1px solid var(--l);padding:12px;border-radius:8px;overflow:auto}
-.buy{background:var(--p);border:1px solid var(--l);border-radius:11px;padding:14px 16px;margin:11px 0}
-.buy .top{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
-.buy .rank{font-size:20px;color:var(--u);font-weight:700}
-.gain{display:flex;gap:16px;flex-wrap:wrap;margin:8px 0;font-size:13px}
-.gain span b{color:var(--m);font-size:16px}
-.stores{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.stores a{background:#1f2430;border:1px solid var(--l);border-radius:7px;padding:5px 11px;font-size:12px;text-decoration:none}
-.tag{font-size:11px;border:1px solid var(--l);border-radius:20px;padding:2px 9px;color:var(--d)}
+.high{box-shadow:inset 3px 0 0 var(--x)}.medium{box-shadow:inset 3px 0 0 var(--n)}
+.low{box-shadow:inset 3px 0 0 #3d4759}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;align-items:center}
+.chip{background:var(--p);border:1px solid var(--l);border-radius:999px;padding:5px 13px;
+  cursor:pointer;font-size:12.5px;color:var(--d);user-select:none}
+.chip:hover{border-color:#31415a;color:var(--t)}
+.chip.on{border-color:var(--u);color:var(--u)}
+input{background:var(--p);border:1px solid var(--l);color:var(--t);padding:6px 11px;
+  border-radius:8px;min-width:230px;font:inherit;font-size:12.5px}
+input:focus{outline:none;border-color:var(--u)}
+.badge{background:var(--p2);border:1px solid var(--l);border-radius:9px;padding:6px 12px;
+  font-size:12px;color:var(--d)}
+.badge b{color:var(--t)}
+.muted{color:var(--d)}
+.small{font-size:12.5px}
+a{color:var(--u)}
+.tag{font-size:10.5px;border:1px solid var(--l);border-radius:999px;padding:2px 9px;color:var(--d);
+  white-space:nowrap}
+.rank{color:var(--u);font-weight:700;font-variant-numeric:tabular-nums}
+.gain b{font-size:15px;font-weight:650}
+details{margin-top:6px}
+summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
+.stores{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.stores a{background:var(--p2);border:1px solid var(--l);border-radius:7px;padding:4px 10px;
+  font-size:11.5px;text-decoration:none;color:var(--d)}
+.stores a:hover{color:var(--t);border-color:#31415a}
+.more{display:block;width:100%;background:var(--p2);border:none;border-top:1px solid var(--l);
+  color:var(--u);padding:10px;cursor:pointer;font:inherit;font-size:12.5px}
+.more:hover{background:#1d2733}
+.nowrap{white-space:nowrap}
 </style></head><body>
 <header><b>RouteWatch</b>
-<nav id="nav"><a data-v="ov" class="on">Overzicht</a><a data-v="pr">Paarmatrix</a><a data-v="bu">Aankoopadvies</a><a data-v="ev">Wijzigingen</a><a data-v="se">Seizoenen</a><a data-v="fl">Vloot</a></nav>
-<a href="map.html" style="color:#58a6ff;text-decoration:none;font-size:14px">Kaart</a>
-<span id="meta" class="badge">laden...</span></header>
-<main id="app">laden...</main>
+<nav id="nav"><a data-v="ov" class="on">Overview</a><a data-v="pr">Pair matrix</a><a data-v="bu">Buy advice</a><a data-v="ev">Changes</a><a data-v="se">Seasons</a><a data-v="fl">Fleet</a></nav>
+<a class="ext" href="map.html">Map</a>
+<a class="ext" href="editor.html">Editor</a>
+<span id="meta" class="badge">loading...</span></header>
+<main id="app">loading...</main>
 <script>
-let D=null,filter='all';
+let D=null, filter='all', prPage=1;
+const PAGE=200;
 const esc=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 const cls=s=>!s?'u':s==='MATCH'?'m':s.startsWith('MATCH')?'n':s.startsWith('NEAR')?'n':s.startsWith('NO-')?'x':'u';
 const app=document.getElementById('app');
-function evTable(rows){if(!rows||!rows.length)return '<p class="muted">Nog geen wijzigingen.</p>';
- return '<table><tr><th>Wanneer</th><th>Soort</th><th>Paar</th><th>Vlucht</th><th>Seizoen</th><th>Detail</th><th>Zekerheid</th></tr>'
- +rows.map(e=>'<tr class="'+e.severity+'"><td>'+esc(String(e.at).slice(0,16))+'</td><td>'+esc(e.kind)+'</td>'
- +'<td>'+esc(e.pair)+'</td><td>'+esc(e.airline)+' '+esc(e.flight)+'</td><td>'+esc(e.season)+'</td>'
- +'<td><code>'+esc(JSON.stringify(e.detail))+'</code></td><td class="muted">'+esc(e.confidence)+'</td></tr>').join('')+'</table>';}
-function ov(){const s=D.summary;
- app.innerHTML='<div class="cards">'+[['eigen luchthavens',s.airports],['kandidaten',s.candidates],
-  ['paren mogelijk',s.pairs_possible],['met verbinding',s.pairs_served],['zonder verbinding',s.pairs_unserved],
-  ['met MATCH',s.pairs_match],['simbaar',s.pairs_simmable],['vrachtparen',s.cargo_pairs],['opgeschort',s.suspended]]
-  .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
- +'<h2>Wijzigingen bij de laatste run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
- +'<p class="muted">De vergelijking loopt tegen een grondboek in de repo, niet tegen de dag ervoor. Een bron die '
- +'een dag niets teruggeeft levert dus geen valse meldingen: afwezigheid wordt geteld en pas na drie gemiste '
- +'gelegenheden volgt SUSPENDED.</p>';}
-function pr(){const f=filter,ps=D.pairs.filter(p=>f==='all'||(f==='served'&&p.status!=='GEEN VERBINDING')
- ||(f==='unserved'&&p.status==='GEEN VERBINDING')||(f==='match'&&p.status.startsWith('MATCH'))
- ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
- app.innerHTML='<div class="chips">'+['all','served','unserved','match','simmable','cargo']
-  .map(x=>'<span class="chip '+(x===f?'on':'')+'" onclick="sf(\''+x+'\')">'+x+'</span>').join('')
-  +'<input id="q" placeholder="filter op ICAO of operator"></div><h2>Paarmatrix - '+ps.length+' regels</h2>'
- +'<table id="t"><tr><th>Paar</th><th>Velden</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th><th>Simbaar</th></tr>'
- +ps.map(p=>'<tr><td><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td><td>'+esc(p.from)+' - '+esc(p.to)+'</td>'
- +'<td>'+p.nm+'</td><td>'+(esc(p.operators.join(', '))||'-')+'</td><td><code>'+(esc(p.types.join(', '))||'-')+'</code></td>'
- +'<td class="'+cls(p.status)+'">'+esc(p.status)+'</td><td>'+(p.simmable?'ja':'nee')+'</td></tr>').join('')+'</table>';
- document.getElementById('q').oninput=e=>{const v=e.target.value.toUpperCase();
-  Array.from(document.querySelectorAll('#t tr')).slice(1).forEach(tr=>tr.style.display=tr.textContent.toUpperCase().indexOf(v)>=0?'':'none');};}
-window.sf=x=>{filter=x;pr();};
-window.pd=p=>{const o=D.pairs.find(x=>x.pair===p);if(!o)return;
- const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])),q=p.split('-');
- app.innerHTML='<h2>'+p+' - '+o.nm+' NM</h2><p class="muted">Nachtbeperkingen: '
- +q[0]+': '+esc((ap[q[0]]||{}).night||'niet vastgesteld')+' &middot; '+q[1]+': '+esc((ap[q[1]]||{}).night||'niet vastgesteld')+'</p>'
- +'<h2>Vluchtregels</h2><table><tr><th>Operator</th><th>Vlucht</th><th>Types (keer gezien)</th><th>Status</th>'
- +'<th>Dagen</th><th>STD</th><th>Bronnen</th><th>Gezien</th></tr>'
- +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td>'+esc(l.flight)+'</td><td><code>'
- +esc(Object.entries(l.types).map(x=>x[0]+' x'+x[1]).join(', '))+'</code></td>'
- +'<td class="'+cls(l.status)+'">'+esc(l.status)+'</td><td>'+l.days+'</td><td>'+esc(l.std)+'</td>'
- +'<td>'+esc((l.sources||[]).join(', '))+'</td><td>'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')+'</table>'
- +'<h2>Per seizoen (waargenomen grenzen)</h2><table><tr><th>Seizoen</th><th>Vlucht</th><th>Van</th><th>Tot</th><th>Dagen</th><th>Types</th><th>STD</th></tr>'
- +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td><td>'+esc(l.flight)+'</td>'
- +'<td>'+esc(x[1].first)+'</td><td>'+esc(x[1].last)+'</td><td>'+x[1].days+'</td><td><code>'
- +esc(Object.keys(x[1].types).join(', '))+'</code></td><td>'+esc(x[1].std)+'</td></tr>')).join('')+'</table>'
- +'<h2>Wijzigingen op dit paar</h2>'+evTable(D.events.filter(e=>e.pair===p));};
+const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="muted">+'+(a.length-n)+'</span>';};
+
+/* ------------------------------------------------------------ changes ---- */
+function evTable(rows){
+  if(!rows||!rows.length) return '<p class="muted small">No changes recorded yet.</p>';
+  return '<div class="panel"><table><tr><th>When</th><th>Kind</th><th>Pair</th><th>Flight</th>'
+   +'<th>Season</th><th>Detail</th><th>Confidence</th></tr>'
+   +rows.map(e=>'<tr class="'+esc(e.severity)+'"><td class="nowrap">'+esc(String(e.at).slice(0,16))+'</td>'
+   +'<td class="nowrap">'+esc(e.kind)+'</td><td class="nowrap">'+esc(e.pair)+'</td>'
+   +'<td class="nowrap">'+esc(e.airline)+' '+esc(e.flight)+'</td><td>'+esc(e.season)+'</td>'
+   +'<td><code>'+esc(JSON.stringify(e.detail))+'</code></td>'
+   +'<td class="muted small">'+esc(e.confidence)+'</td></tr>').join('')+'</table></div>';
+}
+
+/* ----------------------------------------------------------- overview ---- */
+function ov(){
+  const s=D.summary;
+  app.innerHTML='<div class="cards">'+[
+    ['airports owned',s.airports],['candidates',s.candidates],
+    ['pairs possible',s.pairs_possible],['served',s.pairs_served],['unserved',s.pairs_unserved],
+    ['with MATCH',s.pairs_match],['simmable',s.pairs_simmable],['cargo pairs',s.cargo_pairs],
+    ['suspended',s.suspended]]
+    .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
+   +'<h2>Changes in the latest run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
+   +'<p class="muted small">Comparison runs against a baseline ledger in the repository, not against '
+   +'yesterday. A source that returns nothing for one day therefore produces no false alarms: absence is '
+   +'counted and SUSPENDED only follows after several missed opportunities.</p>';
+}
+
+/* --------------------------------------------------------- pair matrix --- */
+function pr(){
+  const f=filter;
+  const ps=D.pairs.filter(p=>f==='all'||(f==='served'&&p.status!=='GEEN VERBINDING')
+   ||(f==='unserved'&&p.status==='GEEN VERBINDING')||(f==='match'&&p.status.startsWith('MATCH'))
+   ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
+  const shown=ps.slice(0,PAGE*prPage);
+  app.innerHTML='<div class="chips">'
+   +[['all','All'],['served','Served'],['unserved','Unserved'],['match','MATCH'],
+     ['simmable','Simmable'],['cargo','Cargo']]
+     .map(x=>'<span class="chip '+(x[0]===f?'on':'')+'" onclick="sf(\''+x[0]+'\')">'+x[1]+'</span>').join('')
+   +'<input id="q" placeholder="filter by ICAO, operator or type"><span id="qn" class="muted small"></span></div>'
+   +'<h2>Pair matrix &middot; '+ps.length+' rows</h2>'
+   +'<div class="panel"><table id="t"><tr><th>Pair</th><th>Airports</th><th>NM</th><th>Operators</th>'
+   +'<th>Types</th><th>Status</th><th>Simmable</th></tr>'
+   +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td>'
+   +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="nowrap">'+p.nm+'</td>'
+   +'<td>'+(cut(p.operators,6)||'-')+'</td><td><code>'+(cut(p.types,3)||'-')+'</code></td>'
+   +'<td class="'+cls(p.status)+' nowrap">'+esc(p.status)+'</td>'
+   +'<td>'+(p.simmable?'<span class="m">yes</span>':'<span class="muted">no</span>')+'</td></tr>').join('')
+   +'</table>'
+   +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
+     +' more ('+shown.length+' of '+ps.length+')</button>':'')
+   +'</div>';
+  const q=document.getElementById('q'), qn=document.getElementById('qn');
+  q.oninput=e=>{const v=e.target.value.toUpperCase();let n=0;
+    Array.from(document.querySelectorAll('#t tr')).slice(1).forEach(tr=>{
+      const hit=tr.textContent.toUpperCase().indexOf(v)>=0;
+      tr.style.display=hit?'':'none'; if(hit)n++;});
+    qn.textContent=v?n+' matching':'';};
+}
+window.sf=x=>{filter=x;prPage=1;pr();};
+window.prMore=()=>{prPage++;pr();};
+
+/* --------------------------------------------------------- pair detail --- */
+window.pd=p=>{
+  const o=D.pairs.find(x=>x.pair===p); if(!o) return;
+  const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])), q=p.split('-');
+  app.innerHTML='<h2>'+p+' &middot; '+o.nm+' NM &middot; '+esc(o.status)+'</h2>'
+   +'<p class="muted small">Night restrictions &mdash; '+q[0]+': '+esc((ap[q[0]]||{}).night||'not established')
+   +' &middot; '+q[1]+': '+esc((ap[q[1]]||{}).night||'not established')+'</p>'
+   +'<h2>Flight-level rows</h2><div class="panel"><table><tr><th>Operator</th><th>Flight</th>'
+   +'<th>Types (times seen)</th><th>Status</th><th>Days</th><th>STD</th><th>Sources</th><th>Seen</th></tr>'
+   +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td class="nowrap">'+esc(l.flight)+'</td>'
+   +'<td><code>'+esc(Object.entries(l.types).map(x=>x[0]+' x'+x[1]).join(', '))+'</code></td>'
+   +'<td class="'+cls(l.status)+' nowrap">'+esc(l.status)+'</td><td>'+l.days+'</td>'
+   +'<td class="nowrap">'+esc(l.std)+'</td><td class="small">'+esc((l.sources||[]).join(', '))+'</td>'
+   +'<td class="nowrap small">'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')+'</table></div>'
+   +'<h2>Per season (observed boundaries)</h2><div class="panel"><table><tr><th>Season</th><th>Flight</th>'
+   +'<th>From</th><th>To</th><th>Days</th><th>Types</th><th>STD</th></tr>'
+   +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td>'
+   +'<td class="nowrap">'+esc(l.flight)+'</td><td class="nowrap">'+esc(x[1].first)+'</td>'
+   +'<td class="nowrap">'+esc(x[1].last)+'</td><td>'+x[1].days+'</td>'
+   +'<td><code>'+esc(Object.keys(x[1].types).join(', '))+'</code></td>'
+   +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')+'</table></div>'
+   +'<h2>Changes on this pair</h2>'+evTable(D.events.filter(e=>e.pair===p));
+};
+
+/* ---------------------------------------------------------- buy advice --- */
+/* Store search links: the config already holds price_search per candidate. We keep
+ * those, but add a second query based on the airport name because searching on a
+ * bare IATA code returns noise in most shops. Real product URLs would require a
+ * catalogue feed from each store, which does not exist - FSAddonCompare is the
+ * actual price comparison tool. */
+const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
+  simmarket:'https://secure.simmarket.com/?s=',contrail:'https://contrail.co.uk/?s=',
+  orbx:'https://orbxdirect.com/search?q=',inibuilds:'https://www.inibuilds.com/search?q=',
+  aerosoft:'https://www.aerosoft.com/en/search?q=',
+  justflight:'https://www.justflight.com/searchresults?searchterm='};
+const cityOf=n=>String(n||'').split(/[\s\/-]+/)[0];
 
 function bu(){
- const cs=D.candidates||[];
- if(!cs.length){app.innerHTML='<h2>Aankoopadvies</h2><p class="muted">Nog geen kandidaten gemeten. Zet in '
-  +'config/collection.json een veld met "candidate": true en draai de workflow.</p>';return;}
- app.innerHTML='<h2>Aankoopadvies, gesorteerd op netwerkwinst</h2>'
- +'<p class="muted">Gemeten, niet geschat: dit is het aantal paren met jouw huidige 31 velden waarop echt vluchten '
- +'zijn waargenomen. RouteWatch zegt WAT je moet kopen; de prijsvergelijking staat bij elke kandidaat een klik weg.</p>'
- +cs.map((c,i)=>'<div class="buy"><div class="top"><span class="rank">'+(i+1)+'</span>'
-  +'<h3>'+esc(c.icao)+' &middot; '+esc(c.name)+'</h3><span class="tag">'+esc(c.focus)+'</span>'
-  +(c.known_developers?'<span class="tag">'+esc(c.known_developers.join(' | '))+'</span>':'')+'</div>'
-  +'<p class="muted">'+esc(c.why)+'</p>'
-  +'<div class="gain"><span><b>'+c.gain.new_pairs+'</b> nieuwe paren</span>'
-  +'<span><b>'+c.gain.match_pairs+'</b> met MATCH</span>'
-  +'<span><b>'+c.gain.simmable_pairs+'</b> simbaar</span>'
-  +'<span><b>'+c.gain.cargo_pairs+'</b> vracht</span></div>'
-  +(c.gain.connects.length?'<p class="muted">Verbindt met: <code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
-  +(c.prices&&c.prices.length?'<table><tr><th>Winkel</th><th>Prijs</th></tr>'+c.prices.map(p=>
-    '<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a></td>'
-    +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</table>':'')
-  +'<div class="stores">'+Object.entries(c.price_search||{}).map(s=>
-    '<a href="'+esc(s[1])+'" target="_blank" rel="noopener">'+esc(s[0])+'</a>').join('')+'</div></div>').join('')
- +'<p class="muted">'+esc(D.prices_note||'')+'</p>';}
+  const cs=D.candidates||[];
+  if(!cs.length){app.innerHTML='<h2>Buy advice</h2><p class="muted small">No candidates measured yet. '
+   +'Add an airport with <code>"candidate": true</code> in config/collection.json and run the workflow.</p>';return;}
+  app.innerHTML='<h2>Buy advice, ranked by network gain</h2>'
+   +'<p class="muted small">Measured, not estimated: the number of pairs with your current fleet and '
+   +'airports where flights were actually observed. RouteWatch tells you WHAT to buy; price comparison '
+   +'is one click away per candidate.</p>'
+   +'<div class="panel"><table><tr><th>#</th><th>Airport</th><th>Focus</th><th>New pairs</th>'
+   +'<th>MATCH</th><th>Simmable</th><th>Cargo</th><th>Connects with</th></tr>'
+   +cs.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
+    +'<td class="nowrap"><a onclick="cd(\''+esc(c.icao)+'\')"><code>'+esc(c.icao)+'</code></a> '+esc(c.name)+'</td>'
+    +'<td><span class="tag">'+esc(c.focus)+'</span></td>'
+    +'<td class="gain"><b>'+c.gain.new_pairs+'</b></td>'
+    +'<td class="gain m"><b>'+c.gain.match_pairs+'</b></td>'
+    +'<td>'+c.gain.simmable_pairs+'</td><td>'+c.gain.cargo_pairs+'</td>'
+    +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')+'</table></div>'
+   +'<p class="muted small">Click an ICAO code for the rationale and store links. '+esc(D.prices_note||'')+'</p>';
+}
 
-function ev(){app.innerHTML='<h2>Alle bewaarde wijzigingen ('+D.events.length+')</h2>'+evTable(D.events);}
-function se(){const s=D.summary;
- app.innerHTML='<h2>Seizoenen</h2><p>Huidig: <b>'+esc(s.season.label)+'</b> '+s.season.start+' t/m '+s.season.end
- +'. Tegenseizoen: <b>'+esc(s.counter_season)+'</b>.</p><p class="muted">IATA-regel: laatste zondag van maart tot de '
- +'dag voor de laatste zondag van oktober. Werkt dus ook voor seizoenen die nog niet bestaan.</p>'
- +'<h2>Seizoensevents</h2>'+evTable(D.events.filter(e=>String(e.kind).startsWith('SEASON')));}
-function fl(){app.innerHTML='<h2>Eigen vloot</h2><table><tr><th>Key</th><th>Naam</th><th>Rol</th><th>Bereik</th><th>Types</th></tr>'
- +D.fleet.owned.map(f=>'<tr><td>'+esc(f.key)+'</td><td>'+esc(f.name)+'</td><td>'+esc(f.role)+'</td><td>'+f.range_nm+' NM</td>'
- +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')+'</table>'
- +'<h2>Near-match-regels</h2><table><tr><th>Type</th><th>Substituut</th><th>Concessie</th></tr>'
- +Object.entries(D.fleet.near_match).map(x=>'<tr><td><code>'+esc(x[0])+'</code></td><td>'+esc(x[1].substitute)+'</td>'
- +'<td>'+esc(x[1].concession)+'</td></tr>').join('')+'</table>';}
+window.cd=icao=>{
+  const c=(D.candidates||[]).find(x=>x.icao===icao); if(!c) return;
+  const city=cityOf(c.name);
+  app.innerHTML='<h2>'+esc(c.icao)+' &middot; '+esc(c.name)+'</h2>'
+   +'<div class="cards">'+[['new pairs',c.gain.new_pairs],['with MATCH',c.gain.match_pairs],
+     ['simmable',c.gain.simmable_pairs],['cargo',c.gain.cargo_pairs]]
+     .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
+   +'<h2>Why</h2><p class="small">'+esc(c.why||'')+'</p>'
+   +(c.known_developers?'<p class="muted small">Known developers: '+esc(c.known_developers.join(' | '))+'</p>':'')
+   +(c.gain.connects.length?'<h2>Connects with</h2><p><code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
+   +(c.prices&&c.prices.length?'<h2>Prices found</h2><div class="panel"><table><tr><th>Store</th><th>Price</th></tr>'
+     +c.prices.map(p=>'<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a></td>'
+     +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</table></div>':'')
+   +'<h2>Search by code</h2><div class="stores">'
+   +Object.entries(c.price_search||{}).map(s=>'<a href="'+esc(s[1])+'" target="_blank" rel="noopener">'
+     +esc(s[0])+'</a>').join('')+'</div>'
+   +'<h2>Search by city name</h2><div class="stores">'
+   +Object.entries(TPL).map(s=>'<a href="'+s[1]+encodeURIComponent(city)+'" target="_blank" rel="noopener">'
+     +s[0]+'</a>').join('')+'</div>'
+   +'<p class="muted small">Searching a bare IATA code returns noise in most shops, so the second row '
+   +'searches on "'+esc(city)+'" instead. Direct product URLs are not possible without a catalogue feed '
+   +'from each store.</p>'
+   +'<p><a onclick="V.bu()">&larr; back to buy advice</a></p>';
+};
+
+/* ------------------------------------------------- changes, seasons, fleet */
+function ev(){app.innerHTML='<h2>All stored changes ('+D.events.length+')</h2>'+evTable(D.events);}
+
+function se(){
+  const s=D.summary;
+  app.innerHTML='<h2>Seasons</h2><p class="small">Current: <b>'+esc(s.season.label)+'</b> '
+   +s.season.start+' through '+s.season.end+'. Counter season: <b>'+esc(s.counter_season)+'</b>.</p>'
+   +'<p class="muted small">IATA rule: last Sunday of March through the day before the last Sunday of '
+   +'October. This also works for seasons that do not exist yet.</p>'
+   +'<h2>Season events</h2>'+evTable(D.events.filter(e=>String(e.kind).startsWith('SEASON')));
+}
+
+function fl(){
+  app.innerHTML='<h2>Owned fleet</h2><div class="panel"><table><tr><th>Key</th><th>Name</th><th>Role</th>'
+   +'<th>Range</th><th>Types</th></tr>'
+   +D.fleet.owned.map(f=>'<tr><td><code>'+esc(f.key)+'</code></td><td>'+esc(f.name)+'</td>'
+   +'<td>'+esc(f.role)+'</td><td class="nowrap">'+f.range_nm+' NM</td>'
+   +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')+'</table></div>'
+   +'<h2>Near-match rules</h2><div class="panel"><table><tr><th>Type</th><th>Substitute</th>'
+   +'<th>Concession</th></tr>'
+   +Object.entries(D.fleet.near_match).map(x=>'<tr><td><code>'+esc(x[0])+'</code></td>'
+   +'<td><code>'+esc(x[1].substitute)+'</code></td><td class="small">'+esc(x[1].concession)+'</td></tr>').join('')
+   +'</table></div>'
+   +'<p class="muted small">Edit fleet and airports in the <a href="editor.html">Editor</a>, '
+   +'which produces valid JSON for config/collection.json.</p>';
+}
+
 const V={ov:ov,pr:pr,bu:bu,ev:ev,se:se,fl:fl};
-document.getElementById('nav').onclick=e=>{if(e.target.tagName!=='A')return;
- Array.from(document.querySelectorAll('#nav a')).forEach(a=>a.classList.toggle('on',a===e.target));V[e.target.dataset.v]();};
-fetch('./data.json?'+Date.now()).then(r=>r.json()).then(d=>{D=d;
- if(!d.summary.generated){app.innerHTML='<h2>Nog geen data</h2><p>Ga in je repo naar <b>Actions</b>, kies '
-  +'<b>RouteWatch</b>, klik <b>Run workflow</b> en vul bij backfill_days <code>14</code> in.</p>';return;}
- document.getElementById('meta').innerHTML='<b>'+esc(d.summary.season.label)+'</b> &middot; bijgewerkt '
-  +esc(d.summary.generated.slice(0,16))+' &middot; '+d.summary.pairs_served+'/'+d.summary.pairs_possible+' paren bediend';
- ov();}).catch(function(){app.innerHTML='<h2>Nog geen data</h2><p>Actions -> RouteWatch -> Run workflow (backfill_days 14).</p>';});
+window.V=V;
+document.getElementById('nav').onclick=e=>{
+  if(e.target.tagName!=='A') return;
+  Array.from(document.querySelectorAll('#nav a')).forEach(a=>a.classList.toggle('on',a===e.target));
+  prPage=1; V[e.target.dataset.v]();
+};
+
+fetch('./data.json?'+Date.now()).then(r=>r.json()).then(d=>{
+  D=d;
+  if(!d.summary.generated){app.innerHTML='<h2>No data yet</h2><p class="small">Open <b>Actions</b> in your '
+   +'repository, pick <b>RouteWatch</b>, click <b>Run workflow</b> and set backfill_days to <code>1</code>.</p>';return;}
+  document.getElementById('meta').innerHTML='<b>'+esc(d.summary.season.label)+'</b> &middot; updated '
+   +esc(d.summary.generated.slice(0,16))+' &middot; '+d.summary.pairs_served+'/'+d.summary.pairs_possible+' pairs served';
+  ov();
+}).catch(function(){app.innerHTML='<h2>No data yet</h2><p class="small">Actions &rarr; RouteWatch &rarr; '
+  +'Run workflow (backfill_days 1).</p>';});
 </script></body></html>
