@@ -1,4 +1,4 @@
-name: RouteWatch
+name: .github/workflows/routewatch.yml
 
 on:
   schedule:
