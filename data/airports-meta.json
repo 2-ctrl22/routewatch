@@ -113,5 +113,37 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-08-18"
+ },
+ "LFBD": {
+  "icao": "LFBD",
+  "iata": "BOD",
+  "name": "Bordeaux/Mérignac Bordeaux-Mérignac",
+  "country": "France",
+  "tz": "Europe/Paris",
+  "elevation_ft": 162,
+  "runway_count": 4,
+  "longest_runway_ft": 10180,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ },
+ "LFBZ": {
+  "icao": "LFBZ",
+  "iata": "BIQ",
+  "name": "Biarritz/Anglet/Bayonne Biarritz-Anglet-Bayonne",
+  "country": "France",
+  "tz": "Europe/Paris",
+  "elevation_ft": 245,
+  "runway_count": 2,
+  "longest_runway_ft": 7369,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-18"
  }
 }
