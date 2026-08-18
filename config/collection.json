@@ -11,10 +11,9 @@
     "type_share_delta": 0.2,
     "price_scrape": false,
     "providers": {
-      "opensky": true,
+      "opensky": false,
       "aerodatabox": false,
       "manual": true
-      "watch_flights": ["DY1800", "KL1600", "HV6619"]
     }
   },
   "seasons": {
