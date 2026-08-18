@@ -3,7 +3,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>RouteWatch</title>
 <style>
 :root{--bg:#0b0f14;--p:#121820;--p2:#182029;--l:#243040;--t:#e6edf3;--d:#8b98a8;
-  --m:#3fb950;--n:#d29922;--x:#f85149;--u:#58a6ff;--r:12px;--hh:49px}
+  --m:#3fb950;--n:#d29922;--x:#f85149;--u:#58a6ff;--r:12px}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--t);
   font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -27,16 +27,23 @@ h3{font-size:14px;margin:0}
 .card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
 .card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
 .card span{color:var(--d);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-.panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
+
+/* The panel is the scroll container for its own table. That is what makes the
+   sticky head reliable: it anchors to the top of this box instead of fighting
+   with the page header. No header-height maths needed anywhere. */
+.panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);
+  overflow:auto;max-height:74vh;position:relative}
+.panel::-webkit-scrollbar{width:10px;height:10px}
+.panel::-webkit-scrollbar-thumb{background:#2b3746;border-radius:8px}
+.panel::-webkit-scrollbar-track{background:transparent}
+
 table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
 th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--l);vertical-align:top}
-/* --hh is measured from the real header height at runtime, so the head row never
-   lands on top of the first data row when the header wraps to two lines. */
-th{color:var(--d);position:sticky;top:var(--hh);background:var(--p2);font-weight:500;
-  font-size:11px;text-transform:uppercase;letter-spacing:.5px;z-index:3;
-  box-shadow:inset 0 -1px 0 var(--l)}
+thead th{color:var(--d);position:sticky;top:0;z-index:3;background:var(--p2);font-weight:500;
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+  box-shadow:inset 0 -1px 0 var(--l);border-bottom:none}
 tbody tr:last-child td{border-bottom:none}
-tr:hover td{background:#151c25}
+tbody tr:hover td{background:#151c25}
 code{background:#1c2430;padding:1px 5px;border-radius:4px;font-size:12px;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .m{color:var(--m)}.n{color:var(--n)}.x{color:var(--x)}.u{color:var(--u)}
@@ -67,7 +74,7 @@ summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
   font-size:11.5px;text-decoration:none;color:var(--d)}
 .stores a:hover{color:var(--t);border-color:#31415a}
 .more{display:block;width:100%;background:var(--p2);border:none;border-top:1px solid var(--l);
-  color:var(--u);padding:10px;cursor:pointer;font:inherit;font-size:12.5px}
+  color:var(--u);padding:10px;cursor:pointer;font:inherit;font-size:12.5px;position:sticky;bottom:0}
 .more:hover{background:#1d2733}
 .nowrap{white-space:nowrap}
 </style></head><body>
@@ -92,26 +99,21 @@ const EN=[[/GEEN VERBINDING/g,'NO SERVICE'],[/ONBEKEND/g,'UNKNOWN'],
           [/kandidaat/g,'candidate'],[/bronnen/g,'sources']];
 const en=s=>{let o=String(s??'');for(const r of EN)o=o.replace(r[0],r[1]);return o;};
 
-/* Keep the sticky table heads clear of the header, whatever its height. */
-function measureHeader(){
-  const h=document.querySelector('header');
-  if(h) document.documentElement.style.setProperty('--hh',h.offsetHeight+'px');
-}
-measureHeader();
-addEventListener('resize',measureHeader);
-addEventListener('load',measureHeader);
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(measureHeader);
+/* Every table gets a real thead. Sticky only behaves predictably on thead cells
+ * inside a scrolling ancestor, and .panel is that ancestor. */
+const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead>';
 
 /* ------------------------------------------------------------ changes ---- */
 function evTable(rows){
   if(!rows||!rows.length) return '<p class="muted small">No changes recorded yet.</p>';
-  return '<div class="panel"><table><tr><th>When</th><th>Kind</th><th>Pair</th><th>Flight</th>'
-   +'<th>Season</th><th>Detail</th><th>Confidence</th></tr>'
+  return '<div class="panel"><table>'
+   +head(['When','Kind','Pair','Flight','Season','Detail','Confidence'])+'<tbody>'
    +rows.map(e=>'<tr class="'+esc(e.severity)+'"><td class="nowrap">'+esc(String(e.at).slice(0,16))+'</td>'
    +'<td class="nowrap">'+esc(e.kind)+'</td><td class="nowrap">'+esc(e.pair)+'</td>'
    +'<td class="nowrap">'+esc(e.airline)+' '+esc(e.flight)+'</td><td>'+esc(e.season)+'</td>'
    +'<td><code>'+esc(en(JSON.stringify(e.detail)))+'</code></td>'
-   +'<td class="muted small">'+esc(en(e.confidence))+'</td></tr>').join('')+'</table></div>';
+   +'<td class="muted small">'+esc(en(e.confidence))+'</td></tr>').join('')
+   +'</tbody></table></div>';
 }
 
 /* ----------------------------------------------------------- overview ---- */
@@ -142,20 +144,20 @@ function pr(){
      .map(x=>'<span class="chip '+(x[0]===f?'on':'')+'" onclick="sf(\''+x[0]+'\')">'+x[1]+'</span>').join('')
    +'<input id="q" placeholder="filter by ICAO, operator or type"><span id="qn" class="muted small"></span></div>'
    +'<h2>Pair matrix &middot; '+ps.length+' rows</h2>'
-   +'<div class="panel"><table id="t"><tr><th>Pair</th><th>Airports</th><th>NM</th><th>Operators</th>'
-   +'<th>Types</th><th>Status</th><th>Simmable</th></tr>'
+   +'<div class="panel"><table id="t">'
+   +head(['Pair','Airports','NM','Operators','Types','Status','Simmable'])+'<tbody>'
    +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td>'
    +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="nowrap">'+p.nm+'</td>'
    +'<td>'+(cut(p.operators,6)||'-')+'</td><td><code>'+(cut(p.types,3)||'-')+'</code></td>'
    +'<td class="'+cls(p.status)+' nowrap">'+esc(en(p.status))+'</td>'
    +'<td>'+(p.simmable?'<span class="m">yes</span>':'<span class="muted">no</span>')+'</td></tr>').join('')
-   +'</table>'
+   +'</tbody></table>'
    +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
      +' more ('+shown.length+' of '+ps.length+')</button>':'')
    +'</div>';
   const q=document.getElementById('q'), qn=document.getElementById('qn');
   q.oninput=e=>{const v=e.target.value.toUpperCase();let n=0;
-    Array.from(document.querySelectorAll('#t tr')).slice(1).forEach(tr=>{
+    document.querySelectorAll('#t tbody tr').forEach(tr=>{
       const hit=tr.textContent.toUpperCase().indexOf(v)>=0;
       tr.style.display=hit?'':'none'; if(hit)n++;});
     qn.textContent=v?n+' matching':'';};
@@ -170,20 +172,22 @@ window.pd=p=>{
   app.innerHTML='<h2>'+p+' &middot; '+o.nm+' NM &middot; '+esc(en(o.status))+'</h2>'
    +'<p class="muted small">Night restrictions &mdash; '+q[0]+': '+esc(en((ap[q[0]]||{}).night||'not established'))
    +' &middot; '+q[1]+': '+esc(en((ap[q[1]]||{}).night||'not established'))+'</p>'
-   +'<h2>Flight-level rows</h2><div class="panel"><table><tr><th>Operator</th><th>Flight</th>'
-   +'<th>Types (times seen)</th><th>Status</th><th>Days</th><th>STD</th><th>Sources</th><th>Seen</th></tr>'
+   +'<h2>Flight-level rows</h2><div class="panel"><table>'
+   +head(['Operator','Flight','Types (times seen)','Status','Days','STD','Sources','Seen'])+'<tbody>'
    +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td class="nowrap">'+esc(l.flight)+'</td>'
    +'<td><code>'+esc(Object.entries(l.types).map(x=>x[0]+' x'+x[1]).join(', '))+'</code></td>'
    +'<td class="'+cls(l.status)+' nowrap">'+esc(en(l.status))+'</td><td>'+l.days+'</td>'
    +'<td class="nowrap">'+esc(l.std)+'</td><td class="small">'+esc((l.sources||[]).join(', '))+'</td>'
-   +'<td class="nowrap small">'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')+'</table></div>'
-   +'<h2>Per season (observed boundaries)</h2><div class="panel"><table><tr><th>Season</th><th>Flight</th>'
-   +'<th>From</th><th>To</th><th>Days</th><th>Types</th><th>STD</th></tr>'
+   +'<td class="nowrap small">'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')
+   +'</tbody></table></div>'
+   +'<h2>Per season (observed boundaries)</h2><div class="panel"><table>'
+   +head(['Season','Flight','From','To','Days','Types','STD'])+'<tbody>'
    +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td>'
    +'<td class="nowrap">'+esc(l.flight)+'</td><td class="nowrap">'+esc(x[1].first)+'</td>'
    +'<td class="nowrap">'+esc(x[1].last)+'</td><td>'+x[1].days+'</td>'
    +'<td><code>'+esc(Object.keys(x[1].types).join(', '))+'</code></td>'
-   +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')+'</table></div>'
+   +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')
+   +'</tbody></table></div>'
    +'<h2>Changes on this pair</h2>'+evTable(D.events.filter(e=>e.pair===p));
 };
 
@@ -200,6 +204,14 @@ const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
   justflight:'https://www.justflight.com/searchresults?searchterm='};
 const cityOf=n=>String(n||'').split(/[\s\/-]+/)[0];
 
+/* prices_note in data.json is Dutch, so the page carries its own English wording. */
+const PRICES_NOTE='RouteWatch does not compare shop prices itself. FSAddonCompare already does that '
+ +'across Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket and the Marketplace, '
+ +'with price history and sale alerts. Direct search links per candidate are below. To pull prices into '
+ +'this dashboard anyway, set settings.price_scrape to true and fill price_urls per candidate with direct '
+ +'product URLs; the app then reads the schema.org JSON-LD price field. Off by default, because scraping is '
+ +'fragile and shops set their own terms.';
+
 function bu(){
   const cs=D.candidates||[];
   if(!cs.length){app.innerHTML='<h2>Buy advice</h2><p class="muted small">No candidates measured yet. '
@@ -208,16 +220,17 @@ function bu(){
    +'<p class="muted small">Measured, not estimated: the number of pairs with your current fleet and '
    +'airports where flights were actually observed. RouteWatch tells you WHAT to buy; price comparison '
    +'is one click away per candidate.</p>'
-   +'<div class="panel"><table><tr><th>#</th><th>Airport</th><th>Focus</th><th>New pairs</th>'
-   +'<th>MATCH</th><th>Simmable</th><th>Cargo</th><th>Connects with</th></tr>'
+   +'<div class="panel"><table>'
+   +head(['#','Airport','Focus','New pairs','MATCH','Simmable','Cargo','Connects with'])+'<tbody>'
    +cs.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
     +'<td class="nowrap"><a onclick="cd(\''+esc(c.icao)+'\')"><code>'+esc(c.icao)+'</code></a> '+esc(c.name)+'</td>'
     +'<td><span class="tag">'+esc(c.focus)+'</span></td>'
     +'<td class="gain"><b>'+c.gain.new_pairs+'</b></td>'
     +'<td class="gain m"><b>'+c.gain.match_pairs+'</b></td>'
     +'<td>'+c.gain.simmable_pairs+'</td><td>'+c.gain.cargo_pairs+'</td>'
-    +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')+'</table></div>'
-   +'<p class="muted small">Click an ICAO code for the rationale and store links. '+esc(D.prices_note||'')+'</p>';
+    +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')
+   +'</tbody></table></div>'
+   +'<p class="muted small">Click an ICAO code for the rationale and store links. '+PRICES_NOTE+'</p>';
 }
 
 window.cd=icao=>{
@@ -227,12 +240,13 @@ window.cd=icao=>{
    +'<div class="cards">'+[['new pairs',c.gain.new_pairs],['with MATCH',c.gain.match_pairs],
      ['simmable',c.gain.simmable_pairs],['cargo',c.gain.cargo_pairs]]
      .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
-   +'<h2>Why</h2><p class="small">'+esc(c.why||'')+'</p>'
+   +'<h2>Why</h2><p class="small">'+esc(en(c.why||''))+'</p>'
    +(c.known_developers?'<p class="muted small">Known developers: '+esc(c.known_developers.join(' | '))+'</p>':'')
    +(c.gain.connects.length?'<h2>Connects with</h2><p><code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
-   +(c.prices&&c.prices.length?'<h2>Prices found</h2><div class="panel"><table><tr><th>Store</th><th>Price</th></tr>'
+   +(c.prices&&c.prices.length?'<h2>Prices found</h2><div class="panel"><table>'
+     +head(['Store','Price'])+'<tbody>'
      +c.prices.map(p=>'<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a></td>'
-     +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</table></div>':'')
+     +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</tbody></table></div>':'')
    +'<h2>Search by code</h2><div class="stores">'
    +Object.entries(c.price_search||{}).map(s=>'<a href="'+esc(s[1])+'" target="_blank" rel="noopener">'
      +esc(s[0])+'</a>').join('')+'</div>'
@@ -258,16 +272,17 @@ function se(){
 }
 
 function fl(){
-  app.innerHTML='<h2>Owned fleet</h2><div class="panel"><table><tr><th>Key</th><th>Name</th><th>Role</th>'
-   +'<th>Range</th><th>Types</th></tr>'
+  app.innerHTML='<h2>Owned fleet</h2><div class="panel"><table>'
+   +head(['Key','Name','Role','Range','Types'])+'<tbody>'
    +D.fleet.owned.map(f=>'<tr><td><code>'+esc(f.key)+'</code></td><td>'+esc(f.name)+'</td>'
    +'<td>'+esc(f.role)+'</td><td class="nowrap">'+f.range_nm+' NM</td>'
-   +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')+'</table></div>'
-   +'<h2>Near-match rules</h2><div class="panel"><table><tr><th>Type</th><th>Substitute</th>'
-   +'<th>Concession</th></tr>'
+   +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')
+   +'</tbody></table></div>'
+   +'<h2>Near-match rules</h2><div class="panel"><table>'
+   +head(['Type','Substitute','Concession'])+'<tbody>'
    +Object.entries(D.fleet.near_match).map(x=>'<tr><td><code>'+esc(x[0])+'</code></td>'
    +'<td><code>'+esc(x[1].substitute)+'</code></td><td class="small">'+esc(en(x[1].concession))+'</td></tr>').join('')
-   +'</table></div>'
+   +'</tbody></table></div>'
    +'<p class="muted small">Edit fleet and airports in the <a href="editor.html">Editor</a>, '
    +'which produces valid JSON for config/collection.json.</p>';
 }
@@ -287,7 +302,6 @@ fetch('./data.json?'+Date.now()).then(r=>r.json()).then(d=>{
   document.getElementById('meta').innerHTML='<b>'+esc(d.summary.season.label)+'</b> &middot; updated '
    +esc(d.summary.generated.slice(0,16))+' &middot; '+d.summary.pairs_served+'/'+d.summary.pairs_possible+' pairs served';
   ov();
-  measureHeader();
 }).catch(function(){app.innerHTML='<h2>No data yet</h2><p class="small">Actions &rarr; RouteWatch &rarr; '
   +'Run workflow (backfill_days 1).</p>';});
 </script></body></html>
