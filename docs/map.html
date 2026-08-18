@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteWatch - Kaart</title>
+<style>
+  :root{
+    --bg:#0b0f14; --panel:#121820; --panel2:#182029; --line:#243040;
+    --txt:#e6edf3; --muted:#8b98a8;
+    --own:#3fb950; --pax:#d29922; --cargo:#58a6ff;
+    --match:#3fb950; --near:#d29922; --plain:#5a6b80;
+    --r:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+  nav{display:flex;gap:18px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+  nav b{font-size:17px;letter-spacing:-.2px}
+  nav a{color:#58a6ff;text-decoration:none;font-size:14px}
+  nav a:hover{text-decoration:underline}
+  nav .meta{margin-left:auto;color:var(--muted);font-size:13px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:18px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
+  .stat .n{font-size:24px;font-weight:650;letter-spacing:-.5px}
+  .stat .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .head{display:flex;gap:14px;align-items:center;justify-content:space-between;
+    padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .head h2{font-size:14px;font-weight:600;margin:0}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%}
+  .bar{width:16px;height:3px;border-radius:2px}
+  .toggles{display:flex;gap:7px;flex-wrap:wrap}
+  button.t{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
+  button.t[aria-pressed="false"]{opacity:.4}
+  button.t:hover{border-color:#31415a}
+  #map{display:block;width:100%;height:auto;background:#0d131a}
+  .land{fill:#1b2430;stroke:#26313f;stroke-width:.4}
+  .grat{fill:none;stroke:#161f29;stroke-width:.5}
+  .arc{fill:none;stroke-linecap:round;opacity:.5}
+  .arc:hover{opacity:1;stroke-width:2.4}
+  .pt{cursor:pointer;stroke:#0b0f14;stroke-width:1}
+  .pt:hover{stroke:#fff;stroke-width:1.6}
+  .note{padding:16px;color:var(--muted);font-size:13.5px;text-align:center}
+  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
+    background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 11px;
+    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:290px}
+  .tip b{display:block;margin-bottom:3px;font-size:13px}
+  .tip i{color:var(--muted);font-style:normal}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 16px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  tbody tr:last-child td{border-bottom:none}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .pill{font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .scroll{max-height:420px;overflow-y:auto}
+  footer{margin-top:26px;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <b>RouteWatch</b>
+    <a href="index.html">Dashboard</a>
+    <span style="color:var(--muted);font-size:14px">Kaart</span>
+    <span class="meta" id="meta">laden...</span>
+  </nav>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="card">
+    <div class="head">
+      <h2>Netwerk</h2>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--own)"></i>in bezit</span>
+        <span><i class="dot" style="background:var(--pax)"></i>wishlist pax</span>
+        <span><i class="dot" style="background:var(--cargo)"></i>wishlist cargo</span>
+        <span><i class="bar" style="background:var(--match)"></i>MATCH</span>
+        <span><i class="bar" style="background:var(--near)"></i>NEAR-MATCH</span>
+        <span><i class="bar" style="background:var(--plain)"></i>overig</span>
+      </div>
+      <div class="toggles">
+        <button class="t" data-f="own" aria-pressed="true">Velden</button>
+        <button class="t" data-f="cand" aria-pressed="true">Kandidaten</button>
+        <button class="t" data-f="arcs" aria-pressed="true">Routes</button>
+        <button class="t" data-f="match" aria-pressed="false">Alleen MATCH</button>
+        <button class="t" data-f="sim" aria-pressed="false">Alleen simbaar</button>
+        <button class="t" data-f="cargo" aria-pressed="false">Alleen vracht</button>
+      </div>
+    </div>
+    <svg id="map" viewBox="0 0 960 480" role="img" aria-label="Wereldkaart met luchthavens en routes"></svg>
+    <div class="note" id="note" hidden></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <div class="head"><h2>Bediende paren</h2><span class="pill" id="cPairs"></span></div>
+      <div class="scroll">
+        <table><thead><tr><th>Paar</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th></tr></thead>
+        <tbody id="tPairs"></tbody></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="head"><h2>Aankoopadvies</h2><span class="pill" id="cCand"></span></div>
+      <div class="scroll">
+        <table><thead><tr><th>Veld</th><th>Spoor</th><th>Nieuw</th><th>MATCH</th></tr></thead>
+        <tbody id="tCand"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Alles op deze pagina komt uit <span class="mono">docs/data.json</span>, dat RouteWatch elke ronde
+    bijwerkt. Bogen worden alleen getekend voor paren met een waargenomen verbinding.
+    Baanlengtes komen uit <span class="mono">data/airports-meta.json</span> zodra die is gevuld.
+  </footer>
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+const W=960, H=480, NS="http://www.w3.org/2000/svg";
+const svg=document.getElementById("map"), tip=document.getElementById("tip"), note=document.getElementById("note");
+const el=(t,at)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);return e;};
+const proj=(lon,lat)=>[(lon+180)/360*W,(90-lat)/180*H];
+const show=(e,html)=>{tip.innerHTML=html;tip.style.opacity=1;
+  tip.style.left=Math.min(e.clientX+14,innerWidth-300)+"px";tip.style.top=(e.clientY+14)+"px";};
+const hide=()=>tip.style.opacity=0;
+
+const active={own:true,cand:true,arcs:true,match:false,sim:false,cargo:false};
+let AP={}, PAIRS=[], SUM={}, CAND=[], META={};
+
+/* --------------------------------------------------------------- lagen --- */
+const gGrat=el("g",{class:"grat"}), gLand=el("g",{class:"land"}),
+      gArc=el("g",{}), gPt=el("g",{});
+for(let lon=-180;lon<=180;lon+=30){const[x]=proj(lon,0);gGrat.appendChild(el("line",{x1:x,y1:0,x2:x,y2:H}));}
+for(let lat=-60;lat<=60;lat+=30){const[,y]=proj(0,lat);gGrat.appendChild(el("line",{x1:0,y1:y,x2:W,y2:y}));}
+svg.append(gGrat,gLand,gArc,gPt);
+
+/* --------------------------------------------------- landcontouren (CDN) --- */
+const ringPath=c=>"M"+c.map(p=>proj(p[0],p[1]).map(v=>v.toFixed(1)).join(" ")).join("L")+"Z";
+fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
+  .then(r=>{if(!r.ok)throw 0;return r.json();})
+  .then(topo=>{
+    const tr=topo.transform, dec=arc=>{let x=0,y=0;return arc.map(p=>{x+=p[0];y+=p[1];
+      return [x*tr.scale[0]+tr.translate[0], y*tr.scale[1]+tr.translate[1]];});};
+    const A=topo.arcs.map(dec);
+    const line=idx=>{let o=[];for(const i of idx){const a=i<0?A[~i].slice().reverse():A[i];
+      o=o.length?o.concat(a.slice(1)):a.slice();}return o;};
+    const obj=topo.objects.land;
+    const geoms=obj.type==="GeometryCollection"?obj.geometries:[obj];
+    for(const g of geoms){
+      const polys=g.type==="Polygon"?[g.arcs]:g.arcs;
+      for(const poly of polys){
+        const d=poly.map(r=>ringPath(line(r))).join("");
+        if(d) gLand.appendChild(el("path",{d}));
+      }
+    }
+  }).catch(()=>{ /* zonder landlaag blijft het gradennet staan */ });
+
+/* ------------------------------------------------------ grootcirkelboog --- */
+function gcPath(a,b){
+  const R=Math.PI/180, la1=a.lat*R, lo1=a.lon*R, la2=b.lat*R, lo2=b.lon*R;
+  const d=2*Math.asin(Math.sqrt(Math.sin((la2-la1)/2)**2 +
+          Math.cos(la1)*Math.cos(la2)*Math.sin((lo2-lo1)/2)**2));
+  if(!d) return "";
+  const n=Math.max(12,Math.min(96,Math.round(d*40)));
+  const pts=[];
+  for(let i=0;i<=n;i++){
+    const f=i/n, A2=Math.sin((1-f)*d)/Math.sin(d), B2=Math.sin(f*d)/Math.sin(d);
+    const x=A2*Math.cos(la1)*Math.cos(lo1)+B2*Math.cos(la2)*Math.cos(lo2);
+    const y=A2*Math.cos(la1)*Math.sin(lo1)+B2*Math.cos(la2)*Math.sin(lo2);
+    const z=A2*Math.sin(la1)+B2*Math.sin(la2);
+    pts.push([Math.atan2(y,x)/R, Math.atan2(z,Math.hypot(x,y))/R]);
+  }
+  // knip bij de datumgrens, anders trekt de lijn dwars over de kaart
+  let d2="", pen=false, prev=null;
+  for(const [lon,lat] of pts){
+    if(prev && Math.abs(lon-prev)>180) pen=false;
+    const [x,y]=proj(lon,lat);
+    d2 += (pen?"L":"M") + x.toFixed(1) + " " + y.toFixed(1);
+    pen=true; prev=lon;
+  }
+  return d2;
+}
+
+const statusColor=s=>/^MATCH/.test(s||"")?"var(--match)":/NEAR/.test(s||"")?"var(--near)":"var(--plain)";
+const isServed=p=>p.status && p.status!=="GEEN VERBINDING";
+
+/* ------------------------------------------------------------- tekenen --- */
+function draw(){
+  gArc.textContent=""; gPt.textContent="";
+
+  const served=PAIRS.filter(isServed);
+  const shown=served.filter(p=>
+    (!active.match || /^MATCH/.test(p.status||"")) &&
+    (!active.sim   || p.simmable) &&
+    (!active.cargo || p.cargo));
+
+  if(active.arcs){
+    for(const p of shown){
+      const [x,y]=String(p.pair).split("-");
+      const a=AP[x], b=AP[y];
+      if(!a||!b) continue;
+      const d=gcPath(a,b);
+      if(!d) continue;
+      const path=el("path",{d,class:"arc",stroke:statusColor(p.status),
+        "stroke-width":p.simmable?1.7:1.1});
+      if(p.cargo) path.setAttribute("stroke-dasharray","4 3");
+      path.addEventListener("mousemove",e=>show(e,
+        `<b>${p.pair}</b><i>${p.from ?? x} - ${p.to ?? y}</i>`+
+        `<i>${p.nm ?? "?"} NM &middot; ${p.status}${p.simmable?" &middot; simbaar":""}${p.cargo?" &middot; vracht":""}</i>`+
+        `<i>operators: ${(p.operators||[]).join(", ")||"-"}</i>`+
+        `<i>types: ${(p.types||[]).join(", ")||"-"}</i>`));
+      path.addEventListener("mouseleave",hide);
+      gArc.appendChild(path);
+    }
+  }
+
+  // aantal bediende paren per veld, voor de tooltip
+  const deg={};
+  for(const p of served) for(const c of String(p.pair).split("-")) deg[c]=(deg[c]||0)+1;
+
+  for(const a of Object.values(AP)){
+    const cand=!!a.candidate;
+    if(cand && !active.cand) continue;
+    if(!cand && !active.own) continue;
+    const focus=String(a.focus||"pax");
+    const fill=cand ? (focus.includes("cargo") && !focus.includes("pax") ? "var(--cargo)" : "var(--pax)") : "var(--own)";
+    const [x,y]=proj(a.lon,a.lat);
+    const c=el("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r:cand?5:4.2,fill,class:"pt","fill-opacity":.95});
+    const m=META[a.icao]||{};
+    c.addEventListener("mousemove",e=>show(e,
+      `<b>${a.icao}${a.iata?" / "+a.iata:""} - ${a.name||""}</b>`+
+      `<i>${cand?"kandidaat ("+focus+")":"in bezit"} &middot; ${deg[a.icao]||0} bediende paren</i>`+
+      (m.longest_runway_ft?`<i>langste baan ${m.longest_runway_ft} ft, ${m.runway_count||"?"} banen</i>`:"")+
+      (a.night?`<i>nacht: ${a.night}</i>`:"")));
+    c.addEventListener("mouseleave",hide);
+    gPt.appendChild(c);
+  }
+
+  document.getElementById("cPairs").textContent = shown.length + " van " + PAIRS.length;
+  const tb=document.getElementById("tPairs");
+  tb.innerHTML = shown.slice().sort((a,b)=>(b.nm||0)-(a.nm||0)).slice(0,300).map(p=>
+    `<tr><td class="mono">${p.pair}</td><td>${p.nm ?? ""}</td>`+
+    `<td>${(p.operators||[]).slice(0,6).join(" ")}</td>`+
+    `<td class="mono">${(p.types||[]).slice(0,4).join(" ")}</td>`+
+    `<td style="color:${statusColor(p.status)}">${p.status}</td></tr>`).join("")
+    || `<tr><td colspan="5" style="color:var(--muted)">Nog geen bediende paren met deze filters.</td></tr>`;
+}
+
+/* ---------------------------------------------------------------- data --- */
+Promise.all([
+  fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()),
+  fetch("../data/airports-meta.json",{cache:"no-store"}).then(r=>r.ok?r.json():{}).catch(()=>({}))
+]).then(([d,meta])=>{
+  META=meta||{};
+  SUM=d.summary||{}; PAIRS=d.pairs||[]; CAND=d.candidates||[];
+  for(const a of d.airports||[]) if(a.icao) AP[a.icao]=a;
+
+  const s=SUM;
+  document.getElementById("meta").textContent =
+    (s.season?.label ? s.season.label+" " : "") +
+    (s.generated ? "bijgewerkt "+String(s.generated).slice(0,16) : "");
+
+  document.getElementById("stats").innerHTML=[
+    ["eigen velden", s.airports ?? Object.values(AP).filter(a=>!a.candidate).length],
+    ["kandidaten", s.candidates ?? Object.values(AP).filter(a=>a.candidate).length],
+    ["paren mogelijk", s.pairs_possible ?? PAIRS.length],
+    ["met verbinding", s.pairs_served ?? PAIRS.filter(isServed).length],
+    ["met MATCH", s.pairs_match ?? 0],
+    ["simbaar", s.pairs_simmable ?? 0],
+    ["vrachtparen", s.cargo_pairs ?? 0],
+    ["opgeschort", s.suspended ?? 0]
+  ].map(([l,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+
+  document.getElementById("cCand").textContent = CAND.length + " velden";
+  document.getElementById("tCand").innerHTML = CAND.map(c=>
+    `<tr><td class="mono">${c.icao}</td><td style="color:var(--muted)">${c.focus||""}</td>`+
+    `<td>${c.gain?.new_pairs ?? 0}</td><td>${c.gain?.match_pairs ?? 0}</td></tr>`).join("")
+    || `<tr><td colspan="4" style="color:var(--muted)">Geen kandidaten in data.json.</td></tr>`;
+
+  if(!PAIRS.filter(isServed).length){
+    note.hidden=false;
+    note.textContent="Nog geen bediende paren in data.json - de velden staan al op de kaart, de routebogen verschijnen zodra RouteWatch vluchten heeft verwerkt.";
+  }
+  draw();
+}).catch(()=>{
+  note.hidden=false;
+  note.textContent="data.json kon niet gelezen worden. Draai de workflow en probeer opnieuw.";
+});
+
+document.querySelectorAll("button.t").forEach(b=>b.addEventListener("click",()=>{
+  const f=b.dataset.f; active[f]=!active[f];
+  b.setAttribute("aria-pressed",String(active[f])); draw();
+}));
+</script>
+</body>
+</html>
