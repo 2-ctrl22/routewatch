@@ -1,1 +1,102 @@
-{}
+{
+ "EKCH": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EDDF": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EDDM": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "LEMD": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "LIMC": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EGKK": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EBLG": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "LFPG": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EGSS": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ },
+ "EDDP": {
+  "gain": {
+   "new_pairs": 0,
+   "match_pairs": 0,
+   "simmable_pairs": 0,
+   "cargo_pairs": 0,
+   "connects": []
+  },
+  "prices": null
+ }
+}
