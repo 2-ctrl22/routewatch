@@ -7,13 +7,14 @@
   },
   "_prijzen": "RouteWatch vergelijkt zelf geen winkelprijzen. FSAddonCompare doet dat al voor 9000+ add-ons over Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket en de Marketplace, met prijshistorie en sale-alerts. Per kandidaat staan hieronder directe zoeklinks. Wil je toch prijzen in dit dashboard, zet settings.price_scrape op true en vul per kandidaat price_urls in met directe product-URLs; de app leest dan het schema.org/JSON-LD prijsveld. Standaard UIT: dat scrapen is fragiel en winkels stellen eigen voorwaarden.",
   "settings": {
-    "missed_before_suspend": 3,
+    "missed_before_suspend": 6,
     "type_share_delta": 0.2,
     "price_scrape": false,
     "providers": {
       "opensky": true,
       "aerodatabox": false,
       "manual": true
+      "watch_flights": ["DY1800", "KL1600", "HV6619"]
     }
   },
   "seasons": {
