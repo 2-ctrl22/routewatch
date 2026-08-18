@@ -1,129 +1,158 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RouteWatch - Kaart</title>
+<title>RouteWatch - Map</title>
 <style>
   :root{
-    --bg:#0b0f14; --panel:#121820; --panel2:#182029; --line:#243040;
-    --txt:#e6edf3; --muted:#8b98a8;
+    --bg:#0b0f14; --p:#121820; --p2:#182029; --l:#243040;
+    --t:#e6edf3; --d:#8b98a8;
     --own:#3fb950; --pax:#d29922; --cargo:#58a6ff;
     --match:#3fb950; --near:#d29922; --plain:#5a6b80;
-    --r:14px;
+    --u:#58a6ff; --r:12px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
-  body{background:var(--bg);color:var(--txt);
-    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  body{background:var(--bg);color:var(--t);
+    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     -webkit-font-smoothing:antialiased}
-  .wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
-  nav{display:flex;gap:18px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
-  nav b{font-size:17px;letter-spacing:-.2px}
-  nav a{color:#58a6ff;text-decoration:none;font-size:14px}
-  nav a:hover{text-decoration:underline}
-  nav .meta{margin-left:auto;color:var(--muted);font-size:13px}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:18px}
-  .stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px}
-  .stat .n{font-size:24px;font-weight:650;letter-spacing:-.5px}
-  .stat .l{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
+    border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
+  header>b{font-size:16px;letter-spacing:-.2px}
+  header a{color:var(--u);text-decoration:none;font-size:13.5px}
+  header a:hover{text-decoration:underline}
+  header .here{color:var(--t);border-bottom:2px solid var(--u);padding-bottom:2px}
+  #meta{margin-left:auto;background:var(--p2);border:1px solid var(--l);border-radius:9px;
+    padding:6px 12px;font-size:12px;color:var(--d)}
+  #meta b{color:var(--t)}
+  main{padding:22px;max-width:1500px}
+  h2{font-size:13px;color:var(--d);margin:0;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:18px}
+  .card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
+  .card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
+  .card span{color:var(--d);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
   .head{display:flex;gap:14px;align-items:center;justify-content:space-between;
-    padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-  .head h2{font-size:14px;font-weight:600;margin:0}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+    padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--d)}
   .legend span{display:inline-flex;align-items:center;gap:6px}
   .dot{width:9px;height:9px;border-radius:50%}
   .bar{width:16px;height:3px;border-radius:2px}
-  .toggles{display:flex;gap:7px;flex-wrap:wrap}
-  button.t{background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+  .toggles{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  button.t{background:var(--p2);color:var(--d);border:1px solid var(--l);
     border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
-  button.t[aria-pressed="false"]{opacity:.4}
-  button.t:hover{border-color:#31415a}
-  #map{display:block;width:100%;height:auto;background:#0d131a}
-  .land{fill:#1b2430;stroke:#26313f;stroke-width:.4}
-  .grat{fill:none;stroke:#161f29;stroke-width:.5}
+  button.t[aria-pressed="true"]{color:var(--u);border-color:var(--u)}
+  button.t:hover{color:var(--t)}
+  .zoombar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--d)}
+  button.z{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:7px;
+    width:28px;height:26px;cursor:pointer;font:inherit;line-height:1}
+  button.z:hover{border-color:#31415a}
+  .mapwrap{position:relative}
+  #map{display:block;width:100%;height:auto;background:#0d131a;cursor:grab;touch-action:none}
+  #map.drag{cursor:grabbing}
+  .land{fill:#1b2430;stroke:#26313f}
+  .grat{fill:none;stroke:#161f29}
   .arc{fill:none;stroke-linecap:round;opacity:.5}
-  .arc:hover{opacity:1;stroke-width:2.4}
-  .pt{cursor:pointer;stroke:#0b0f14;stroke-width:1}
-  .pt:hover{stroke:#fff;stroke-width:1.6}
-  .note{padding:16px;color:var(--muted);font-size:13.5px;text-align:center}
+  .arc:hover{opacity:1}
+  .pt{cursor:pointer;stroke:#0b0f14}
+  .pt:hover{stroke:#fff}
+  .lbl{fill:var(--d);font-size:9px;pointer-events:none;font-family:ui-monospace,Menlo,monospace}
+  .note{padding:15px 16px;color:var(--d);font-size:13px;text-align:center}
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
     background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 11px;
-    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:290px}
+    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:300px}
   .tip b{display:block;margin-bottom:3px;font-size:13px}
-  .tip i{color:var(--muted);font-style:normal}
+  .tip i{color:var(--d);font-style:normal;display:block}
   .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
   @media(max-width:900px){.grid{grid-template-columns:1fr}}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:8px 16px;border-bottom:1px solid var(--line)}
-  th{color:var(--muted);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  th,td{text-align:left;padding:7px 14px;border-bottom:1px solid var(--l)}
+  th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    background:var(--p2);position:sticky;top:0}
   tbody tr:last-child td{border-bottom:none}
+  tr:hover td{background:#151c25}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-  .pill{font-size:10.5px;padding:2px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-  .scroll{max-height:420px;overflow-y:auto}
-  footer{margin-top:26px;color:var(--muted);font-size:12.5px}
+  .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
+  .scroll{max-height:430px;overflow:auto}
+  input{background:var(--p2);border:1px solid var(--l);color:var(--t);padding:5px 10px;
+    border-radius:7px;font:inherit;font-size:12.5px;min-width:150px}
+  input:focus{outline:none;border-color:var(--u)}
+  footer{margin-top:24px;color:var(--d);font-size:12.5px}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <nav>
-    <b>RouteWatch</b>
-    <a href="index.html">Dashboard</a>
-    <span style="color:var(--muted);font-size:14px">Kaart</span>
-    <span class="meta" id="meta">laden...</span>
-  </nav>
+<header><b>RouteWatch</b>
+  <a href="index.html">Dashboard</a>
+  <span class="here">Map</span>
+  <a href="editor.html">Editor</a>
+  <span id="meta">loading...</span>
+</header>
 
-  <div class="stats" id="stats"></div>
+<main>
+  <div class="cards" id="stats"></div>
 
-  <div class="card">
+  <div class="panel">
     <div class="head">
-      <h2>Netwerk</h2>
+      <h2>Network</h2>
       <div class="legend">
-        <span><i class="dot" style="background:var(--own)"></i>in bezit</span>
+        <span><i class="dot" style="background:var(--own)"></i>owned</span>
         <span><i class="dot" style="background:var(--pax)"></i>wishlist pax</span>
         <span><i class="dot" style="background:var(--cargo)"></i>wishlist cargo</span>
         <span><i class="bar" style="background:var(--match)"></i>MATCH</span>
         <span><i class="bar" style="background:var(--near)"></i>NEAR-MATCH</span>
-        <span><i class="bar" style="background:var(--plain)"></i>overig</span>
+        <span><i class="bar" style="background:var(--plain)"></i>other</span>
       </div>
       <div class="toggles">
-        <button class="t" data-f="own" aria-pressed="true">Velden</button>
-        <button class="t" data-f="cand" aria-pressed="true">Kandidaten</button>
+        <button class="t" data-f="own" aria-pressed="true">Airports</button>
+        <button class="t" data-f="cand" aria-pressed="true">Candidates</button>
         <button class="t" data-f="arcs" aria-pressed="true">Routes</button>
-        <button class="t" data-f="match" aria-pressed="false">Alleen MATCH</button>
-        <button class="t" data-f="sim" aria-pressed="false">Alleen simbaar</button>
-        <button class="t" data-f="cargo" aria-pressed="false">Alleen vracht</button>
+        <button class="t" data-f="labels" aria-pressed="false">Labels</button>
+        <button class="t" data-f="match" aria-pressed="false">MATCH only</button>
+        <button class="t" data-f="sim" aria-pressed="false">Simmable only</button>
+        <button class="t" data-f="cargo" aria-pressed="false">Cargo only</button>
+      </div>
+      <div class="zoombar">
+        <input id="find" placeholder="zoom to ICAO">
+        <button class="z" id="zin" title="Zoom in">+</button>
+        <button class="z" id="zout" title="Zoom out">&minus;</button>
+        <button class="z" id="zres" title="Reset" style="width:auto;padding:0 8px">Reset</button>
+        <span id="zlvl">1.0x</span>
       </div>
     </div>
-    <svg id="map" viewBox="0 0 960 480" role="img" aria-label="Wereldkaart met luchthavens en routes"></svg>
+    <div class="mapwrap">
+      <svg id="map" viewBox="0 0 960 480" role="img" aria-label="World map with airports and routes"></svg>
+    </div>
     <div class="note" id="note" hidden></div>
+    <div class="note" style="border-top:1px solid var(--l);color:#6b7787">
+      Scroll to zoom, drag to pan, double-click to reset.
+    </div>
   </div>
 
   <div class="grid">
-    <div class="card">
-      <div class="head"><h2>Bediende paren</h2><span class="pill" id="cPairs"></span></div>
+    <div class="panel">
+      <div class="head"><h2>Served pairs</h2><span class="pill" id="cPairs"></span></div>
       <div class="scroll">
-        <table><thead><tr><th>Paar</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th></tr></thead>
+        <table><thead><tr><th>Pair</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th></tr></thead>
         <tbody id="tPairs"></tbody></table>
       </div>
     </div>
-    <div class="card">
-      <div class="head"><h2>Aankoopadvies</h2><span class="pill" id="cCand"></span></div>
+    <div class="panel">
+      <div class="head"><h2>Buy advice</h2><span class="pill" id="cCand"></span></div>
       <div class="scroll">
-        <table><thead><tr><th>Veld</th><th>Spoor</th><th>Nieuw</th><th>MATCH</th></tr></thead>
+        <table><thead><tr><th>Airport</th><th>Focus</th><th>New</th><th>MATCH</th></tr></thead>
         <tbody id="tCand"></tbody></table>
       </div>
     </div>
   </div>
 
   <footer>
-    Alles op deze pagina komt uit <span class="mono">docs/data.json</span>, dat RouteWatch elke ronde
-    bijwerkt. Bogen worden alleen getekend voor paren met een waargenomen verbinding.
-    Baanlengtes komen uit <span class="mono">data/airports-meta.json</span> zodra die is gevuld.
+    Everything here comes from <span class="mono">docs/data.json</span>, refreshed by RouteWatch on every run.
+    Arcs are drawn only for pairs with an observed connection. Runway lengths appear in the tooltip
+    once <span class="mono">data/airports-meta.json</span> is filled.
   </footer>
-</div>
+</main>
 
 <div class="tip" id="tip"></div>
 
@@ -133,26 +162,90 @@ const svg=document.getElementById("map"), tip=document.getElementById("tip"), no
 const el=(t,at)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);return e;};
 const proj=(lon,lat)=>[(lon+180)/360*W,(90-lat)/180*H];
 const show=(e,html)=>{tip.innerHTML=html;tip.style.opacity=1;
-  tip.style.left=Math.min(e.clientX+14,innerWidth-300)+"px";tip.style.top=(e.clientY+14)+"px";};
+  tip.style.left=Math.min(e.clientX+14,innerWidth-310)+"px";tip.style.top=(e.clientY+14)+"px";};
 const hide=()=>tip.style.opacity=0;
 
-const active={own:true,cand:true,arcs:true,match:false,sim:false,cargo:false};
+/* Status text comes from routewatch.mjs and is partly Dutch. Translate on display
+ * so the data file stays untouched. */
+const EN={"GEEN VERBINDING":"NO SERVICE","ONBEKEND":"UNKNOWN"};
+const tr=s=>EN[String(s||"")]||String(s||"");
+
+const active={own:true,cand:true,arcs:true,labels:false,match:false,sim:false,cargo:false};
 let AP={}, PAIRS=[], SUM={}, CAND=[], META={};
 
-/* --------------------------------------------------------------- lagen --- */
+/* ------------------------------------------------------------- viewport --- */
+let view={x:0,y:0,k:1};
+const clamp=()=>{
+  view.k=Math.max(1,Math.min(12,view.k));
+  const maxX=W*(view.k-1)/view.k, maxY=H*(view.k-1)/view.k;
+  view.x=Math.max(0,Math.min(maxX,view.x));
+  view.y=Math.max(0,Math.min(maxY,view.y));
+};
+function applyView(){
+  clamp();
+  svg.setAttribute("viewBox", view.x.toFixed(2)+" "+view.y.toFixed(2)+" "
+    +(W/view.k).toFixed(2)+" "+(H/view.k).toFixed(2));
+  document.getElementById("zlvl").textContent=view.k.toFixed(1)+"x";
+  // keep strokes and dots visually constant while zooming
+  const s=1/view.k;
+  svg.style.setProperty("--s", s);
+  gGrat.setAttribute("stroke-width",(0.5*s).toFixed(2));
+  gLand.setAttribute("stroke-width",(0.4*s).toFixed(2));
+  for(const p of gArc.children) p.setAttribute("stroke-width",(p.dataset.w*s).toFixed(2));
+  for(const c of gPt.children){
+    if(c.tagName==="circle"){c.setAttribute("r",(c.dataset.r*s).toFixed(2));
+      c.setAttribute("stroke-width",(1*s).toFixed(2));}
+    else c.setAttribute("font-size",(9*s).toFixed(2));
+  }
+}
+function zoomAt(cx,cy,factor){
+  const k0=view.k; view.k=Math.max(1,Math.min(12,k0*factor));
+  // keep the point under the cursor fixed
+  view.x = cx - (cx-view.x)*(k0/view.k);
+  view.y = cy - (cy-view.y)*(k0/view.k);
+  applyView();
+}
+const svgPoint=e=>{
+  const r=svg.getBoundingClientRect();
+  return [view.x + (e.clientX-r.left)/r.width*(W/view.k),
+          view.y + (e.clientY-r.top)/r.height*(H/view.k)];
+};
+svg.addEventListener("wheel",e=>{e.preventDefault();
+  const [cx,cy]=svgPoint(e); zoomAt(cx,cy, e.deltaY<0?1.18:1/1.18);},{passive:false});
+let drag=null;
+svg.addEventListener("pointerdown",e=>{drag={sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y};
+  svg.classList.add("drag"); svg.setPointerCapture(e.pointerId);});
+svg.addEventListener("pointermove",e=>{if(!drag)return;
+  const r=svg.getBoundingClientRect();
+  view.x=drag.vx-(e.clientX-drag.sx)/r.width*(W/view.k);
+  view.y=drag.vy-(e.clientY-drag.sy)/r.height*(H/view.k);
+  applyView();});
+svg.addEventListener("pointerup",()=>{drag=null;svg.classList.remove("drag");});
+svg.addEventListener("dblclick",()=>{view={x:0,y:0,k:1};applyView();});
+document.getElementById("zin").onclick=()=>zoomAt(view.x+W/view.k/2,view.y+H/view.k/2,1.5);
+document.getElementById("zout").onclick=()=>zoomAt(view.x+W/view.k/2,view.y+H/view.k/2,1/1.5);
+document.getElementById("zres").onclick=()=>{view={x:0,y:0,k:1};applyView();};
+document.getElementById("find").addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  const a=AP[String(e.target.value||"").trim().toUpperCase()];
+  if(!a) return;
+  const [x,y]=proj(a.lon,a.lat);
+  view.k=5; view.x=x-W/view.k/2; view.y=y-H/view.k/2; applyView();
+});
+
+/* --------------------------------------------------------------- layers --- */
 const gGrat=el("g",{class:"grat"}), gLand=el("g",{class:"land"}),
       gArc=el("g",{}), gPt=el("g",{});
 for(let lon=-180;lon<=180;lon+=30){const[x]=proj(lon,0);gGrat.appendChild(el("line",{x1:x,y1:0,x2:x,y2:H}));}
 for(let lat=-60;lat<=60;lat+=30){const[,y]=proj(0,lat);gGrat.appendChild(el("line",{x1:0,y1:y,x2:W,y2:y}));}
 svg.append(gGrat,gLand,gArc,gPt);
 
-/* --------------------------------------------------- landcontouren (CDN) --- */
 const ringPath=c=>"M"+c.map(p=>proj(p[0],p[1]).map(v=>v.toFixed(1)).join(" ")).join("L")+"Z";
 fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
   .then(r=>{if(!r.ok)throw 0;return r.json();})
   .then(topo=>{
-    const tr=topo.transform, dec=arc=>{let x=0,y=0;return arc.map(p=>{x+=p[0];y+=p[1];
-      return [x*tr.scale[0]+tr.translate[0], y*tr.scale[1]+tr.translate[1]];});};
+    const tr2=topo.transform, dec=arc=>{let x=0,y=0;return arc.map(p=>{x+=p[0];y+=p[1];
+      return [x*tr2.scale[0]+tr2.translate[0], y*tr2.scale[1]+tr2.translate[1]];});};
     const A=topo.arcs.map(dec);
     const line=idx=>{let o=[];for(const i of idx){const a=i<0?A[~i].slice().reverse():A[i];
       o=o.length?o.concat(a.slice(1)):a.slice();}return o;};
@@ -165,9 +258,10 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
         if(d) gLand.appendChild(el("path",{d}));
       }
     }
-  }).catch(()=>{ /* zonder landlaag blijft het gradennet staan */ });
+    applyView();
+  }).catch(()=>{});
 
-/* ------------------------------------------------------ grootcirkelboog --- */
+/* -------------------------------------------------------- great circles --- */
 function gcPath(a,b){
   const R=Math.PI/180, la1=a.lat*R, lo1=a.lon*R, la2=b.lat*R, lo2=b.lon*R;
   const d=2*Math.asin(Math.sqrt(Math.sin((la2-la1)/2)**2 +
@@ -182,24 +276,21 @@ function gcPath(a,b){
     const z=A2*Math.sin(la1)+B2*Math.sin(la2);
     pts.push([Math.atan2(y,x)/R, Math.atan2(z,Math.hypot(x,y))/R]);
   }
-  // knip bij de datumgrens, anders trekt de lijn dwars over de kaart
-  let d2="", pen=false, prev=null;
+  let out="", pen=false, prev=null;
   for(const [lon,lat] of pts){
-    if(prev && Math.abs(lon-prev)>180) pen=false;
+    if(prev!==null && Math.abs(lon-prev)>180) pen=false;   // cut at the date line
     const [x,y]=proj(lon,lat);
-    d2 += (pen?"L":"M") + x.toFixed(1) + " " + y.toFixed(1);
+    out += (pen?"L":"M") + x.toFixed(1) + " " + y.toFixed(1);
     pen=true; prev=lon;
   }
-  return d2;
+  return out;
 }
-
 const statusColor=s=>/^MATCH/.test(s||"")?"var(--match)":/NEAR/.test(s||"")?"var(--near)":"var(--plain)";
 const isServed=p=>p.status && p.status!=="GEEN VERBINDING";
 
-/* ------------------------------------------------------------- tekenen --- */
+/* ---------------------------------------------------------------- draw ---- */
 function draw(){
   gArc.textContent=""; gPt.textContent="";
-
   const served=PAIRS.filter(isServed);
   const shown=served.filter(p=>
     (!active.match || /^MATCH/.test(p.status||"")) &&
@@ -213,20 +304,21 @@ function draw(){
       if(!a||!b) continue;
       const d=gcPath(a,b);
       if(!d) continue;
-      const path=el("path",{d,class:"arc",stroke:statusColor(p.status),
-        "stroke-width":p.simmable?1.7:1.1});
+      const w=p.simmable?1.7:1.1;
+      const path=el("path",{d,class:"arc",stroke:statusColor(p.status),"stroke-width":w});
+      path.dataset.w=w;
       if(p.cargo) path.setAttribute("stroke-dasharray","4 3");
       path.addEventListener("mousemove",e=>show(e,
-        `<b>${p.pair}</b><i>${p.from ?? x} - ${p.to ?? y}</i>`+
-        `<i>${p.nm ?? "?"} NM &middot; ${p.status}${p.simmable?" &middot; simbaar":""}${p.cargo?" &middot; vracht":""}</i>`+
-        `<i>operators: ${(p.operators||[]).join(", ")||"-"}</i>`+
-        `<i>types: ${(p.types||[]).join(", ")||"-"}</i>`));
+        "<b>"+p.pair+"</b><i>"+(p.from??x)+" - "+(p.to??y)+"</i>"+
+        "<i>"+(p.nm??"?")+" NM &middot; "+tr(p.status)+(p.simmable?" &middot; simmable":"")+
+        (p.cargo?" &middot; cargo":"")+"</i>"+
+        "<i>operators: "+((p.operators||[]).join(", ")||"-")+"</i>"+
+        "<i>types: "+((p.types||[]).join(", ")||"-")+"</i>"));
       path.addEventListener("mouseleave",hide);
       gArc.appendChild(path);
     }
   }
 
-  // aantal bediende paren per veld, voor de tooltip
   const deg={};
   for(const p of served) for(const c of String(p.pair).split("-")) deg[c]=(deg[c]||0)+1;
 
@@ -235,68 +327,78 @@ function draw(){
     if(cand && !active.cand) continue;
     if(!cand && !active.own) continue;
     const focus=String(a.focus||"pax");
-    const fill=cand ? (focus.includes("cargo") && !focus.includes("pax") ? "var(--cargo)" : "var(--pax)") : "var(--own)";
+    const fill=cand ? (focus.includes("cargo") && !focus.includes("pax") ? "var(--cargo)" : "var(--pax)")
+                    : "var(--own)";
     const [x,y]=proj(a.lon,a.lat);
-    const c=el("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r:cand?5:4.2,fill,class:"pt","fill-opacity":.95});
+    const r=cand?5:4.2;
+    const c=el("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r,fill,class:"pt",
+      "stroke-width":1,"fill-opacity":.95});
+    c.dataset.r=r;
     const m=META[a.icao]||{};
     c.addEventListener("mousemove",e=>show(e,
-      `<b>${a.icao}${a.iata?" / "+a.iata:""} - ${a.name||""}</b>`+
-      `<i>${cand?"kandidaat ("+focus+")":"in bezit"} &middot; ${deg[a.icao]||0} bediende paren</i>`+
-      (m.longest_runway_ft?`<i>langste baan ${m.longest_runway_ft} ft, ${m.runway_count||"?"} banen</i>`:"")+
-      (a.night?`<i>nacht: ${a.night}</i>`:"")));
+      "<b>"+a.icao+(a.iata?" / "+a.iata:"")+" - "+(a.name||"")+"</b>"+
+      "<i>"+(cand?"candidate ("+focus+")":"owned")+" &middot; "+(deg[a.icao]||0)+" served pairs</i>"+
+      (m.longest_runway_ft?"<i>longest runway "+m.longest_runway_ft+" ft, "+(m.runway_count||"?")+" runways</i>":"")+
+      (a.night?"<i>night: "+a.night+"</i>":"")));
     c.addEventListener("mouseleave",hide);
     gPt.appendChild(c);
+    if(active.labels){
+      const tx=el("text",{x:(x+7).toFixed(1),y:(y+3).toFixed(1),class:"lbl","font-size":9});
+      tx.textContent=a.icao;
+      gPt.appendChild(tx);
+    }
   }
+  applyView();
 
-  document.getElementById("cPairs").textContent = shown.length + " van " + PAIRS.length;
-  const tb=document.getElementById("tPairs");
-  tb.innerHTML = shown.slice().sort((a,b)=>(b.nm||0)-(a.nm||0)).slice(0,300).map(p=>
-    `<tr><td class="mono">${p.pair}</td><td>${p.nm ?? ""}</td>`+
-    `<td>${(p.operators||[]).slice(0,6).join(" ")}</td>`+
-    `<td class="mono">${(p.types||[]).slice(0,4).join(" ")}</td>`+
-    `<td style="color:${statusColor(p.status)}">${p.status}</td></tr>`).join("")
-    || `<tr><td colspan="5" style="color:var(--muted)">Nog geen bediende paren met deze filters.</td></tr>`;
+  document.getElementById("cPairs").textContent=shown.length+" of "+PAIRS.length;
+  document.getElementById("tPairs").innerHTML=shown.slice().sort((a,b)=>(b.nm||0)-(a.nm||0))
+    .slice(0,300).map(p=>
+    '<tr><td class="mono">'+p.pair+'</td><td>'+(p.nm??"")+'</td>'+
+    '<td>'+((p.operators||[]).slice(0,6).join(" "))+'</td>'+
+    '<td class="mono">'+((p.types||[]).slice(0,3).join(" "))+'</td>'+
+    '<td style="color:'+statusColor(p.status)+'">'+tr(p.status)+'</td></tr>').join("")
+    || '<tr><td colspan="5" style="color:var(--d)">No served pairs with these filters.</td></tr>';
 }
 
-/* ---------------------------------------------------------------- data --- */
+/* ---------------------------------------------------------------- data ---- */
 Promise.all([
-  fetch("data.json",{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()),
-  fetch("../data/airports-meta.json",{cache:"no-store"}).then(r=>r.ok?r.json():{}).catch(()=>({}))
+  fetch("data.json?"+Date.now()).then(r=>r.ok?r.json():Promise.reject()),
+  fetch("../data/airports-meta.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,meta])=>{
   META=meta||{};
   SUM=d.summary||{}; PAIRS=d.pairs||[]; CAND=d.candidates||[];
   for(const a of d.airports||[]) if(a.icao) AP[a.icao]=a;
 
   const s=SUM;
-  document.getElementById("meta").textContent =
-    (s.season?.label ? s.season.label+" " : "") +
-    (s.generated ? "bijgewerkt "+String(s.generated).slice(0,16) : "");
+  document.getElementById("meta").innerHTML=
+    "<b>"+(s.season?.label||"")+"</b> &middot; updated "+String(s.generated||"").slice(0,16);
 
   document.getElementById("stats").innerHTML=[
-    ["eigen velden", s.airports ?? Object.values(AP).filter(a=>!a.candidate).length],
-    ["kandidaten", s.candidates ?? Object.values(AP).filter(a=>a.candidate).length],
-    ["paren mogelijk", s.pairs_possible ?? PAIRS.length],
-    ["met verbinding", s.pairs_served ?? PAIRS.filter(isServed).length],
-    ["met MATCH", s.pairs_match ?? 0],
-    ["simbaar", s.pairs_simmable ?? 0],
-    ["vrachtparen", s.cargo_pairs ?? 0],
-    ["opgeschort", s.suspended ?? 0]
-  ].map(([l,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">${l}</div></div>`).join("");
+    ["airports owned", s.airports ?? Object.values(AP).filter(a=>!a.candidate).length],
+    ["candidates", s.candidates ?? Object.values(AP).filter(a=>a.candidate).length],
+    ["pairs possible", s.pairs_possible ?? PAIRS.length],
+    ["served", s.pairs_served ?? PAIRS.filter(isServed).length],
+    ["with MATCH", s.pairs_match ?? 0],
+    ["simmable", s.pairs_simmable ?? 0],
+    ["cargo pairs", s.cargo_pairs ?? 0],
+    ["suspended", s.suspended ?? 0]
+  ].map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join("");
 
-  document.getElementById("cCand").textContent = CAND.length + " velden";
-  document.getElementById("tCand").innerHTML = CAND.map(c=>
-    `<tr><td class="mono">${c.icao}</td><td style="color:var(--muted)">${c.focus||""}</td>`+
-    `<td>${c.gain?.new_pairs ?? 0}</td><td>${c.gain?.match_pairs ?? 0}</td></tr>`).join("")
-    || `<tr><td colspan="4" style="color:var(--muted)">Geen kandidaten in data.json.</td></tr>`;
+  document.getElementById("cCand").textContent=CAND.length+" airports";
+  document.getElementById("tCand").innerHTML=CAND.map(c=>
+    '<tr><td class="mono">'+c.icao+'</td><td style="color:var(--d)">'+(c.focus||"")+'</td>'+
+    '<td>'+(c.gain?.new_pairs ?? 0)+'</td><td style="color:var(--match)">'+(c.gain?.match_pairs ?? 0)+'</td></tr>')
+    .join("") || '<tr><td colspan="4" style="color:var(--d)">No candidates in data.json.</td></tr>';
 
   if(!PAIRS.filter(isServed).length){
     note.hidden=false;
-    note.textContent="Nog geen bediende paren in data.json - de velden staan al op de kaart, de routebogen verschijnen zodra RouteWatch vluchten heeft verwerkt.";
+    note.textContent="No served pairs in data.json yet - airports are already plotted, route arcs appear "
+      +"once RouteWatch has processed flights.";
   }
   draw();
 }).catch(()=>{
   note.hidden=false;
-  note.textContent="data.json kon niet gelezen worden. Draai de workflow en probeer opnieuw.";
+  note.textContent="Could not read data.json. Run the workflow and reload.";
 });
 
 document.querySelectorAll("button.t").forEach(b=>b.addEventListener("click",()=>{
