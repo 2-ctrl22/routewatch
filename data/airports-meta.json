@@ -1,0 +1,67 @@
+{
+ "EHAM": {
+  "icao": "EHAM",
+  "iata": "AMS",
+  "name": "Amsterdam Schiphol",
+  "country": "Netherlands",
+  "tz": "Europe/Amsterdam",
+  "elevation_ft": -11,
+  "runway_count": 12,
+  "longest_runway_ft": 12467,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ },
+ "EBBR": {
+  "icao": "EBBR",
+  "iata": "BRU",
+  "name": "Brussels",
+  "country": "Belgium",
+  "tz": "Europe/Brussels",
+  "elevation_ft": 184,
+  "runway_count": 6,
+  "longest_runway_ft": 12005,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ },
+ "EDDS": {
+  "icao": "EDDS",
+  "iata": "STR",
+  "name": "Stuttgart",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 1276,
+  "runway_count": 2,
+  "longest_runway_ft": 10955,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ },
+ "EDDK": {
+  "icao": "EDDK",
+  "iata": "CGN",
+  "name": "Cologne Bonn",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 302,
+  "runway_count": 6,
+  "longest_runway_ft": 12477,
+  "surfaces": [
+   "Concrete",
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ }
+}
