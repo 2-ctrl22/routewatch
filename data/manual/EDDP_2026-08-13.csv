@@ -1,0 +1,8 @@
+arr_icao,airline,flight_no,std,type_raw,cargo
+EDDS,AWH,AWH92D,06:10,Cessna 425 Conquest I,0
+EDDF,LH,LH159,06:10,Airbus A320 (Sharklets),0
+EDDF,LH,LH153,10:20,Embraer 195,0
+LEBL,ABR,ABR294,15:44,Boeing 737,0
+LGKR,MBU,MBU2RH,17:17,Airbus A320 NEO,0
+LGKR,Marabu Airlines,DI6678,17:05,Airbus A320 NEO,0
+EBBR,3S,3S116,17:40,Boeing 777-200,1

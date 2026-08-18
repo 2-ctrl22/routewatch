@@ -1,0 +1,4 @@
+arr_icao,airline,flight_no,std,type_raw,cargo
+LFPG,AF,AF7527,06:10,Airbus A220-300,0
+LFPG,AF,AF7521,10:40,Airbus A220-300,0
+LFPG,AF,AF7523,14:55,Embraer 190,0

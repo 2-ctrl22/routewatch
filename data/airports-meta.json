@@ -63,5 +63,55 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-08-18"
+ },
+ "EDLV": {
+  "icao": "EDLV",
+  "iata": "NRN",
+  "name": "Weeze Niederrhein",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 106,
+  "runway_count": 2,
+  "longest_runway_ft": 7989,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-18"
+ },
+ "LFLL": {
+  "icao": "LFLL",
+  "iata": "LYS",
+  "name": "Lyon Saint-Exupéry",
+  "country": "France",
+  "tz": "Europe/Paris",
+  "elevation_ft": 821,
+  "runway_count": 8,
+  "longest_runway_ft": 13173,
+  "surfaces": [
+   "Asphalt",
+   "Concrete",
+   "Unknown"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
+ },
+ "LFRB": {
+  "icao": "LFRB",
+  "iata": "BES",
+  "name": "Brest/Guipavas Brest Bretagne",
+  "country": "France",
+  "tz": "Europe/Paris",
+  "elevation_ft": 325,
+  "runway_count": 4,
+  "longest_runway_ft": 10164,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-18"
  }
 }

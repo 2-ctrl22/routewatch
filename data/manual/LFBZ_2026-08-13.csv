@@ -1,0 +1,9 @@
+arr_icao,airline,flight_no,std,type_raw,cargo
+LFPG,AF,AF7487,07:00,Embraer 190,0
+LSGG,LX,LX2333,09:50,Airbus A220-300,0
+LFPG,AF,AF7481,11:50,Embraer 190,0
+LFLL,AF,AF6275,13:45,Embraer 170,0
+EGSS,FR,FR371,14:00,Boeing 737,0
+LFPG,AF,AF7483,15:05,Embraer 170,0
+EHAM,KL,KL1486,16:55,Embraer 195,0
+EGKK,U2,U28398,17:40,Airbus A319,0
