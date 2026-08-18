@@ -3,12 +3,14 @@ name: RouteWatch
 on:
   schedule:
     - cron: "30 3 * * *"
-  workflow_dispatch:
+  workflow_dispatch: 
     inputs:
       backfill_days:
         description: "Aantal dagen terug ophalen (eenmalig, bv. 14)"
         required: false
         default: "1"
+    schedule:
+    - cron: '0 5 * * 1'
 
 permissions:
   contents: write
@@ -26,16 +28,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: RouteWatch draaien
+      - name: Data ophalen (budgetbewust)
         env:
-          OPENSKY_USER: ${{ secrets.OPENSKY_USER }}
-          OPENSKY_PASS: ${{ secrets.OPENSKY_PASS }}
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-          ROUTEWATCH_WEBHOOK: ${{ secrets.ROUTEWATCH_WEBHOOK }}
-          BACKFILL_DAYS: ${{ github.event.inputs.backfill_days || '1' }}
-        run: node scripts/routewatch.mjs
-      - name: Data terugcommitten
-        run: |
+          BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
+          ADB_UNIT_CAP: '110'
+          ADB_UNITS_PER_CALL: '2'
+        run: node scripts/collect-adb.mjs
+
+      - name: Verrijken (banen, toestellen, types)
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          ENRICH_UNIT_CAP: '60'
+        run: node scripts/enrich-adb.mjs
           git config user.name  "routewatch-bot"
           git config user.email "routewatch-bot@users.noreply.github.com"
           git add data docs
