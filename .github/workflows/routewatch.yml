@@ -1,16 +1,17 @@
 name: RouteWatch
 
 on:
+  # Wekelijks, want het gratis AeroDataBox-plan geeft 600 units per maand.
+  # Een ronde kost circa 82 units, dus 4,33 rondes per maand past.
+  # Dagelijks draaien zou het quotum binnen een week opmaken.
   schedule:
-    - cron: "30 3 * * *"
-  workflow_dispatch: 
+    - cron: "0 5 * * 1"          # elke maandag 05:00 UTC
+  workflow_dispatch:
     inputs:
       backfill_days:
         description: "Aantal dagen terug ophalen (eenmalig, bv. 14)"
         required: false
         default: "1"
-    schedule:
-    - cron: '0 5 * * 1'
 
 permissions:
   contents: write
@@ -25,9 +26,12 @@ jobs:
     timeout-minutes: 55
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      # 1. Ophalen: 1 aanroep per luchthaven, venster roteert per week.
       - name: Data ophalen (budgetbewust)
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
@@ -36,11 +40,29 @@ jobs:
           ADB_UNITS_PER_CALL: '2'
         run: node scripts/collect-adb.mjs
 
+      # 2. Verwerken: dit is de kernstap. Leest de CSV's en bouwt de ledger,
+      #    de paarmatrix, het aankoopadvies en docs/data.json.
+      - name: RouteWatch draaien
+        env:
+          OPENSKY_USER: ${{ secrets.OPENSKY_USER }}
+          OPENSKY_PASS: ${{ secrets.OPENSKY_PASS }}
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          ROUTEWATCH_WEBHOOK: ${{ secrets.ROUTEWATCH_WEBHOOK }}
+          BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
+        run: node scripts/routewatch.mjs
+
+      # 3. Verrijken: leest de ledger die stap 2 net heeft geschreven, dus
+      #    deze stap moet NA RouteWatch komen.
       - name: Verrijken (banen, toestellen, types)
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           ENRICH_UNIT_CAP: '60'
+          ENRICH_FLIGHTS: '25'
+          ENRICH_RUNWAYS: 'true'
         run: node scripts/enrich-adb.mjs
+
+      - name: Data terugcommitten
+        run: |
           git config user.name  "routewatch-bot"
           git config user.email "routewatch-bot@users.noreply.github.com"
           git add data docs
@@ -50,6 +72,10 @@ jobs:
             git commit -m "RouteWatch $(date -u +%Y-%m-%d)"
             git push
           fi
+
       - name: Samenvatting
         if: always()
-        run: cat data/last-run.md >> $GITHUB_STEP_SUMMARY || true
+        run: |
+          cat data/last-run.md >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat data/last-enrich.md >> $GITHUB_STEP_SUMMARY || true
