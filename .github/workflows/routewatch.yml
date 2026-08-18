@@ -2,14 +2,13 @@ name: RouteWatch
 
 on:
   # Wekelijks, want het gratis AeroDataBox-plan geeft 600 units per maand.
-  # Een ronde kost circa 82 units, dus 4,33 rondes per maand past.
-  # Dagelijks draaien zou het quotum binnen een week opmaken.
+  # Een ronde kost 82 units (41 velden x 2), dus 4,33 rondes per maand past.
   schedule:
     - cron: "0 5 * * 1"          # elke maandag 05:00 UTC
   workflow_dispatch:
     inputs:
       backfill_days:
-        description: "Aantal dagen terug ophalen (eenmalig, bv. 14)"
+        description: "Aantal dagen dat de COLLECTOR ophaalt (1 = 82 units, 2 = 164 units)"
         required: false
         default: "1"
 
@@ -32,23 +31,29 @@ jobs:
           node-version: "20"
 
       # 1. Ophalen: 1 aanroep per luchthaven, venster roteert per week.
+      #    Let op: deze stap kost units. Houd BACKFILL_DAYS op 1.
       - name: Data ophalen (budgetbewust)
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
           ADB_UNIT_CAP: '110'
           ADB_UNITS_PER_CALL: '2'
+          ADB_SLEEP_MS: '2500'
         run: node scripts/collect-adb.mjs
 
-      # 2. Verwerken: dit is de kernstap. Leest de CSV's en bouwt de ledger,
-      #    de paarmatrix, het aankoopadvies en docs/data.json.
+      # 2. Verwerken: BACKFILL_DAYS staat hier op 8 en dat is BEWUST anders dan
+      #    bij stap 1. De collector schrijft door de weekrotatie een dag die tot
+      #    zeven dagen terug kan liggen; met een venster van 8 dagen vindt
+      #    RouteWatch die CSV altijd. Dit kost NUL extra units, want deze stap
+      #    leest alleen bestanden van schijf: opensky en aerodatabox staan uit
+      #    in config/collection.json.
       - name: RouteWatch draaien
         env:
           OPENSKY_USER: ${{ secrets.OPENSKY_USER }}
           OPENSKY_PASS: ${{ secrets.OPENSKY_PASS }}
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           ROUTEWATCH_WEBHOOK: ${{ secrets.ROUTEWATCH_WEBHOOK }}
-          BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
+          BACKFILL_DAYS: '8'
         run: node scripts/routewatch.mjs
 
       # 3. Verrijken: leest de ledger die stap 2 net heeft geschreven, dus
