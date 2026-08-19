@@ -1,14 +1,14 @@
 name: RouteWatch
 
 on:
-  # Wekelijks, want het gratis AeroDataBox-plan geeft 600 units per maand.
-  # Een ronde kost 82 units (41 velden x 2), dus 4,33 rondes per maand past.
+  # Weekly: the free AeroDataBox plan provides 600 units per month.
+  # One collection round costs 82 units (41 airports x 2), so 4.33 rounds/month fit.
   schedule:
-    - cron: "0 5 * * 1"          # elke maandag 05:00 UTC
+    - cron: "0 5 * * 1"          # every Monday at 05:00 UTC
   workflow_dispatch:
     inputs:
       backfill_days:
-        description: "Aantal dagen dat de COLLECTOR ophaalt (1 = 82 units, 2 = 164 units)"
+        description: "Days the COLLECTOR fetches (1 = 82 units, 2 = 164 units)"
         required: false
         default: "1"
 
@@ -30,9 +30,9 @@ jobs:
         with:
           node-version: "20"
 
-      # 1. Ophalen: 1 aanroep per luchthaven, venster roteert per week.
-      #    Let op: deze stap kost units. Houd BACKFILL_DAYS op 1.
-      - name: Data ophalen (budgetbewust)
+      # 1. Collect: one call per airport; time window rotates each week.
+      #    This step costs API units. Keep BACKFILL_DAYS at 1.
+      - name: Collect flight data (budget-aware)
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           BACKFILL_DAYS: ${{ inputs.backfill_days || '1' }}
@@ -41,13 +41,12 @@ jobs:
           ADB_SLEEP_MS: '2500'
         run: node scripts/collect-adb.mjs
 
-      # 2. Verwerken: BACKFILL_DAYS staat hier op 8 en dat is BEWUST anders dan
-      #    bij stap 1. De collector schrijft door de weekrotatie een dag die tot
-      #    zeven dagen terug kan liggen; met een venster van 8 dagen vindt
-      #    RouteWatch die CSV altijd. Dit kost NUL extra units, want deze stap
-      #    leest alleen bestanden van schijf: opensky en aerodatabox staan uit
-      #    in config/collection.json.
-      - name: RouteWatch draaien
+      # 2. Process: BACKFILL_DAYS is deliberately different from step 1.
+      #    The collector writes a day up to seven days back because of its weekly
+      #    rotation. An eight-day window always finds that CSV. This costs zero
+      #    units because the providers are disabled in collection.json here and
+      #    RouteWatch only reads files from disk.
+      - name: Run RouteWatch
         env:
           OPENSKY_USER: ${{ secrets.OPENSKY_USER }}
           OPENSKY_PASS: ${{ secrets.OPENSKY_PASS }}
@@ -56,9 +55,17 @@ jobs:
           BACKFILL_DAYS: '8'
         run: node scripts/routewatch.mjs
 
-      # 3. Verrijken: leest de ledger die stap 2 net heeft geschreven, dus
-      #    deze stap moet NA RouteWatch komen.
-      - name: Verrijken (banen, toestellen, types)
+      # 3. Retention audit: report only. It does not delete, move or untrack
+      #    anything. Article 5.5 caps raw API Contents at seven days; the report
+      #    tells us exactly what must be addressed before a public release.
+      #    Do NOT add --sweep here until the data-retention migration is designed
+      #    and reviewed: the current alpha still depends on its historic ledger.
+      - name: Audit raw-data retention (report only)
+        run: node scripts/publish-derived.mjs --audit
+
+      # 4. Enrich: reads the ledger that step 2 just wrote, so it must run after
+      #    RouteWatch.
+      - name: Enrich airports, aircraft and flight types
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           ENRICH_UNIT_CAP: '60'
@@ -66,21 +73,23 @@ jobs:
           ENRICH_RUNWAYS: 'true'
         run: node scripts/enrich-adb.mjs
 
-      - name: Data terugcommitten
+      - name: Commit generated data
         run: |
           git config user.name  "routewatch-bot"
           git config user.email "routewatch-bot@users.noreply.github.com"
           git add data docs
           if git diff --staged --quiet; then
-            echo "geen wijzigingen"
+            echo "no changes"
           else
             git commit -m "RouteWatch $(date -u +%Y-%m-%d)"
             git push
           fi
 
-      - name: Samenvatting
+      - name: Summary
         if: always()
         run: |
           cat data/last-run.md >> $GITHUB_STEP_SUMMARY || true
           echo "" >> $GITHUB_STEP_SUMMARY
           cat data/last-enrich.md >> $GITHUB_STEP_SUMMARY || true
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cat data/retention-check.md >> $GITHUB_STEP_SUMMARY || true
