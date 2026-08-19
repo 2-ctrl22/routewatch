@@ -145,5 +145,490 @@
   "narrowbody_ok": true,
   "widebody_ok": false,
   "fetched": "2026-08-18"
+ },
+ "EGLL": {
+  "icao": "EGLL",
+  "iata": "LHR",
+  "name": "London Heathrow",
+  "country": "United Kingdom",
+  "tz": "Europe/London",
+  "elevation_ft": 83,
+  "runway_count": 4,
+  "longest_runway_ft": 12779,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EGBB": {
+  "icao": "EGBB",
+  "iata": "BHX",
+  "name": "Birmingham",
+  "country": "United Kingdom",
+  "tz": "Europe/London",
+  "elevation_ft": 327,
+  "runway_count": 2,
+  "longest_runway_ft": 10033,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EGPH": {
+  "icao": "EGPH",
+  "iata": "EDI",
+  "name": "Edinburgh",
+  "country": "United Kingdom",
+  "tz": "Europe/London",
+  "elevation_ft": 135,
+  "runway_count": 6,
+  "longest_runway_ft": 8369,
+  "surfaces": [
+   "Asphalt",
+   "Unknown"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-19"
+ },
+ "LSZH": {
+  "icao": "LSZH",
+  "iata": "ZRH",
+  "name": "Zurich Kloten",
+  "country": "Switzerland",
+  "tz": "Europe/Zurich",
+  "elevation_ft": 1416,
+  "runway_count": 6,
+  "longest_runway_ft": 12218,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LSGG": {
+  "icao": "LSGG",
+  "iata": "GVA",
+  "name": "Geneva Cointrin",
+  "country": "Switzerland",
+  "tz": "Europe/Zurich",
+  "elevation_ft": 1411,
+  "runway_count": 4,
+  "longest_runway_ft": 12805,
+  "surfaces": [
+   "Concrete",
+   "Grass"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LOWI": {
+  "icao": "LOWI",
+  "iata": "INN",
+  "name": "Innsbruck",
+  "country": "Austria",
+  "tz": "Europe/Vienna",
+  "elevation_ft": 1906,
+  "runway_count": 2,
+  "longest_runway_ft": 6549,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-19"
+ },
+ "LEBL": {
+  "icao": "LEBL",
+  "iata": "BCN",
+  "name": "Barcelona",
+  "country": "Spain",
+  "tz": "Europe/Madrid",
+  "elevation_ft": 12,
+  "runway_count": 6,
+  "longest_runway_ft": 10991,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LEMG": {
+  "icao": "LEMG",
+  "iata": "AGP",
+  "name": "Málaga",
+  "country": "Spain",
+  "tz": "Europe/Madrid",
+  "elevation_ft": 53,
+  "runway_count": 4,
+  "longest_runway_ft": 10515,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LEZL": {
+  "icao": "LEZL",
+  "iata": "SVQ",
+  "name": "Seville Sevilla",
+  "country": "Spain",
+  "tz": "Europe/Madrid",
+  "elevation_ft": 112,
+  "runway_count": 2,
+  "longest_runway_ft": 11040,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LPPR": {
+  "icao": "LPPR",
+  "iata": "OPO",
+  "name": "Porto Francisco de Sá Carneiro",
+  "country": "Portugal",
+  "tz": "Europe/Lisbon",
+  "elevation_ft": 228,
+  "runway_count": 2,
+  "longest_runway_ft": 11447,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LIRF": {
+  "icao": "LIRF",
+  "iata": "FCO",
+  "name": "Rome Leonardo da Vinci–Fiumicino",
+  "country": "Italy",
+  "tz": "Europe/Rome",
+  "elevation_ft": 15,
+  "runway_count": 8,
+  "longest_runway_ft": 12841,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LGAV": {
+  "icao": "LGAV",
+  "iata": "ATH",
+  "name": "Athens Eleftherios Venizelos",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 308,
+  "runway_count": 4,
+  "longest_runway_ft": 13133,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LGKR": {
+  "icao": "LGKR",
+  "iata": "CFU",
+  "name": "Kerkyra Island Corfu",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 6,
+  "runway_count": 2,
+  "longest_runway_ft": 7608,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-19"
+ },
+ "LGIR": {
+  "icao": "LGIR",
+  "iata": "HER",
+  "name": "Heraklion Nikos Kazantzakis",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 115,
+  "runway_count": 6,
+  "longest_runway_ft": 8891,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-08-19"
+ },
+ "ENGM": {
+  "icao": "ENGM",
+  "iata": "OSL",
+  "name": "Oslo Gardermoen",
+  "country": "Norway",
+  "tz": "Europe/Oslo",
+  "elevation_ft": 681,
+  "runway_count": 4,
+  "longest_runway_ft": 11834,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "ESSA": {
+  "icao": "ESSA",
+  "iata": "ARN",
+  "name": "Stockholm -Arlanda",
+  "country": "Sweden",
+  "tz": "Europe/Stockholm",
+  "elevation_ft": 137,
+  "runway_count": 6,
+  "longest_runway_ft": 10820,
+  "surfaces": [
+   "Concrete",
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EFHK": {
+  "icao": "EFHK",
+  "iata": "HEL",
+  "name": "Helsinki Vantaa",
+  "country": "Finland",
+  "tz": "Europe/Helsinki",
+  "elevation_ft": 179,
+  "runway_count": 6,
+  "longest_runway_ft": 10466,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EPWA": {
+  "icao": "EPWA",
+  "iata": "WAW",
+  "name": "Warsaw Chopin",
+  "country": "Poland",
+  "tz": "Europe/Warsaw",
+  "elevation_ft": 362,
+  "runway_count": 4,
+  "longest_runway_ft": 12106,
+  "surfaces": [
+   "Concrete",
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "OTHH": {
+  "icao": "OTHH",
+  "iata": "DOH",
+  "name": "Doha Hamad",
+  "country": "Qatar",
+  "tz": "Asia/Qatar",
+  "elevation_ft": 13,
+  "runway_count": null,
+  "longest_runway_ft": null,
+  "surfaces": [],
+  "narrowbody_ok": null,
+  "widebody_ok": null,
+  "fetched": "2026-08-19"
+ },
+ "FACT": {
+  "icao": "FACT",
+  "iata": "CPT",
+  "name": "Cape Town",
+  "country": "South Africa",
+  "tz": "Africa/Johannesburg",
+  "elevation_ft": 151,
+  "runway_count": 4,
+  "longest_runway_ft": 10538,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "NZAA": {
+  "icao": "NZAA",
+  "iata": "AKL",
+  "name": "Auckland",
+  "country": "New Zealand",
+  "tz": "Pacific/Auckland",
+  "elevation_ft": 23,
+  "runway_count": 4,
+  "longest_runway_ft": 12093,
+  "surfaces": [
+   "Unknown",
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "KSFO": {
+  "icao": "KSFO",
+  "iata": "SFO",
+  "name": "San Francisco",
+  "country": "United States",
+  "tz": "America/Los_Angeles",
+  "elevation_ft": 13,
+  "runway_count": 8,
+  "longest_runway_ft": 11890,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EKCH": {
+  "icao": "EKCH",
+  "iata": "CPH",
+  "name": "Copenhagen Kastrup",
+  "country": "Denmark",
+  "tz": "Europe/Copenhagen",
+  "elevation_ft": 17,
+  "runway_count": 6,
+  "longest_runway_ft": 11814,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EDDF": {
+  "icao": "EDDF",
+  "iata": "FRA",
+  "name": "Frankfurt-am-Main",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 364,
+  "runway_count": 8,
+  "longest_runway_ft": 13110,
+  "surfaces": [
+   "Asphalt",
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EDDM": {
+  "icao": "EDDM",
+  "iata": "MUC",
+  "name": "Munich",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 1487,
+  "runway_count": 4,
+  "longest_runway_ft": 13097,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LEMD": {
+  "icao": "LEMD",
+  "iata": "MAD",
+  "name": "Madrid Adolfo Suárez –Barajas",
+  "country": "Spain",
+  "tz": "Europe/Madrid",
+  "elevation_ft": 1998,
+  "runway_count": 8,
+  "longest_runway_ft": 13734,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LIMC": {
+  "icao": "LIMC",
+  "iata": "MXP",
+  "name": "Milan Malpensa",
+  "country": "Italy",
+  "tz": "Europe/Rome",
+  "elevation_ft": 768,
+  "runway_count": 4,
+  "longest_runway_ft": 12877,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EGKK": {
+  "icao": "EGKK",
+  "iata": "LGW",
+  "name": "London Gatwick",
+  "country": "United Kingdom",
+  "tz": "Europe/London",
+  "elevation_ft": 202,
+  "runway_count": 4,
+  "longest_runway_ft": 10377,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "EBLG": {
+  "icao": "EBLG",
+  "iata": "LGG",
+  "name": "Liège",
+  "country": "Belgium",
+  "tz": "Europe/Brussels",
+  "elevation_ft": 659,
+  "runway_count": 8,
+  "longest_runway_ft": 12139,
+  "surfaces": [
+   "Asphalt",
+   "Unknown"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
+ },
+ "LFPG": {
+  "icao": "LFPG",
+  "iata": "CDG",
+  "name": "Paris Charles de Gaulle",
+  "country": "France",
+  "tz": "Europe/Paris",
+  "elevation_ft": 392,
+  "runway_count": 8,
+  "longest_runway_ft": 13809,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-19"
  }
 }

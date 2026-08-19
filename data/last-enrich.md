@@ -1,14 +1,14 @@
-# Verrijking 2026-08-18T18:29
+# Enrichment 2026-08-19T10:37
 
-- velden met baangegevens: 9 van 41 (2 nieuw)
-- registraties in cache: 0 (0 nieuw)
-- vluchtnummers in typehistorie: 0 van 2453 kandidaten
-- cursor: 0/2453, volledige rondes: 0
-- verbruikte units deze run: 5 van plafond 60
-- LET OP: vroegtijdig gestopt om je quotum te beschermen
+- runway data: 39 of 41 airports (30 new)
+- aircraft registrations cached: 0 (0 new)
+- flight numbers in type history: 0 of 3020 candidates
+- rotation cursor: 0/3020, full rounds: 0
+- API units used this run: 60 of cap 60
+- NOTE: run stopped early to protect your quota
 
-## Gemengde vloot vastgesteld (0)
-- nog geen
+## Mixed fleet confirmed (0)
+- none yet
 
-Deze vluchtnummers wisselen binnen een week van toesteltype. Dat is precies de
-categorie die in je inventarisatie als "per datum te bevestigen" staat.
+These flight numbers switch aircraft type within one week. That is exactly the
+category your inventory marks as "to be confirmed per date".

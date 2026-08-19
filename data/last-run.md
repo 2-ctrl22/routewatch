@@ -1,56 +1,58 @@
-## RouteWatch 2026-08-18T18:29
+## RouteWatch 2026-08-19T10:34
 
-- seizoen **S26** (2026-03-29 t/m 2026-10-24)
-- paren met verbinding: **205** van 465
-- met MATCH: **39** · simbaar: **146**
-- nieuwe wijzigingen: **5317**
+- season **S26** (2026-03-29 through 2026-10-24)
+- pairs with a connection: **233** of 465
+- with MATCH: **49** &middot; simmable: **191**
+- registrations known: **1165**
+- airlines named: **86** (86 new, 1 renamed, still unnamed: 5H 5O AAB ABR AM AP AR AWH DK EY FH GA)
+- new changes: **7936**
 
-### Aankoopadvies op netwerkwinst
+### Buy advice by network gain
 
-- **EGSS London Stansted** (cargo): +14 paren, +8 met MATCH
-- **EGKK London Gatwick** (pax): +22 paren, +3 met MATCH
-- **LIMC Milaan Malpensa** (pax+cargo): +16 paren, +3 met MATCH
-- **EDDM Muenchen** (pax): +25 paren, +2 met MATCH
-- **EDDF Frankfurt** (pax): +23 paren, +1 met MATCH
-- **LEMD Madrid Barajas** (pax): +21 paren, +1 met MATCH
+- **LIMC Milan Malpensa** (pax+cargo): +22 pairs, +5 with MATCH
+- **EGSS London Stansted** (cargo): +16 pairs, +5 with MATCH
+- **EGKK London Gatwick** (pax): +22 pairs, +4 with MATCH
+- **EDDM Munich** (pax): +25 pairs, +2 with MATCH
+- **EDDF Frankfurt** (pax): +23 pairs, +1 with MATCH
+- **EKCH Copenhagen Kastrup** (pax): +22 pairs, +1 with MATCH
 
-- `ROUTE_NEW` EHAM-LEMG HV HV6115 — {"nm":1017,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LSZH LX LX737 — {"nm":326,"types":["BCS3"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LSGG KL KL1929 — {"nm":368,"types":["EMBRAER 190"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LFPG KL KL1401 — {"nm":215,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-ESSA KL KL1215 — {"nm":622,"types":["B738"],"status":"MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-EKCH SK SK550 — {"nm":342,"types":["A319"],"status":"NEAR-MATCH","kandidaat":true}
-- `ROUTE_NEW` EBBR-EHAM KL KL1701 — {"nm":85,"types":["E175"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LEBL KL KL1497 — {"nm":670,"types":["EMBRAER 190"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LGIR HV HV6871 — {"nm":1340,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-EKCH KL KL1267 — {"nm":342,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-LEMD KL KL1501 — {"nm":789,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EGKK-EHAM U2 U28671 — {"nm":197,"types":["A320"],"status":"MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-ENGM KL KL1197 — {"nm":518,"types":["E195"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-EPWA LO LO270 — {"nm":595,"types":["B38M"],"status":"NEAR-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LSZH KL KL1917 — {"nm":326,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EGLL-EHAM KL KL1001 — {"nm":200,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EDDM-EHAM KL KL1849 — {"nm":359,"types":["EMBRAER 190"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-LEMG U2 U27889 — {"nm":1017,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LEMD IB IB740 — {"nm":789,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-LFPG KL KL1403 — {"nm":215,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-LIRF KL KL1601 — {"nm":700,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LEMG HV HV6113 — {"nm":1017,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LGKR OR OR1115 — {"nm":987,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LFLL KL KL1427 — {"nm":395,"types":["E175"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LPPR HV HV6007 — {"nm":861,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EBBR-EHAM KL KL9857 — {"nm":85,"types":["AIRBUS A330-300"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EDDS-EHAM KL KL1827 — {"nm":276,"types":["EMBRAER 190"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EDDF-EHAM LH LH1003 — {"nm":198,"types":["A320"],"status":"MATCH","kandidaat":true}
-- `ROUTE_NEW` EDDM-EHAM LH LH2311 — {"nm":359,"types":["AIRBUS A320 (SHARKLETS)"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EGPH-EHAM KL KL923 — {"nm":360,"types":["E195"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EGBB-EHAM KL KL1041 — {"nm":239,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LEBL KL KL1511 — {"nm":670,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LFPG KL KL1405 — {"nm":215,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EDDF-EHAM KL KL1815 — {"nm":198,"types":["E175"],"status":"NO-MATCH","kandidaat":true}
-- `ROUTE_NEW` EHAM-LGAV KL KL1953 — {"nm":1178,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EGLL-EHAM KL KL1003 — {"nm":200,"types":["E295"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EGKK-EHAM U2 U28673 — {"nm":197,"types":["A319"],"status":"NEAR-MATCH","kandidaat":true}
-- `ROUTE_NEW` EBBR-EHAM KL KL1703 — {"nm":85,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-LPPR KL KL1571 — {"nm":861,"types":["B738"],"status":"MATCH","kandidaat":false}
-- `ROUTE_NEW` EHAM-EKCH KL KL1269 — {"nm":342,"types":["BOEING 737"],"status":"NO-MATCH","kandidaat":true}
+- `AIRLINE_RENAMED`  4Y  - {"from":"Flight Alaska","to":"Eurowings Discover"}
+- `ROUTE_NEW` EHAM-LGIR HV HV6875 - {"nm":1340,"types":["AIRBUS A321"],"status":"NO-MATCH","candidate":false}
+- `DOW_PATTERN_CHANGE` EHAM-LEBL KL KL1497 - {"from":[4],"to":[4,5]}
+- `ROUTE_NEW` EHAM-LPPR HV HV6003 - {"nm":861,"types":["BOEING 737"],"status":"NO-MATCH","candidate":false}
+- `DOW_PATTERN_CHANGE` EHAM-EKCH SK SK550 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LEMG HV HV6115 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LSGG KL KL1929 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LSZH LX LX737 - {"from":[4],"to":[4,5]}
+- `ROUTE_NEW` EHAM-LEZL U2 U27809 - {"nm":1000,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","candidate":false}
+- `MATCH_CHANGED` EHAM-ESSA KL KL1215 - {"from":"MATCH","to":"MATCH+NO-MATCH","types":["B738","AIRBUS A321 NEO"]}
+- `TYPE_NEW` EHAM-ESSA KL KL1215 - {"added":["AIRBUS A321 NEO"],"previously":["B738"]}
+- `TYPE_MIX_SHIFT` EHAM-ESSA KL KL1215 - {"type":"B738","share_from":1,"share_to":0.67}
+- `DOW_PATTERN_CHANGE` EHAM-ESSA KL KL1215 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LEMD KL KL1501 - {"from":[4],"to":[4,5]}
+- `TYPE_NEW` EHAM-ENGM KL KL1197 - {"added":["EMBRAER 190"],"previously":["E195"]}
+- `TYPE_MIX_SHIFT` EHAM-ENGM KL KL1197 - {"type":"E195","share_from":1,"share_to":0.67}
+- `DOW_PATTERN_CHANGE` EHAM-ENGM KL KL1197 - {"from":[4],"to":[4,5]}
+- `ROUTE_NEW` EHAM-LGKR U2 U27913 - {"nm":987,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","candidate":false}
+- `DOW_PATTERN_CHANGE` EHAM-LEBL VY VY8308 - {"from":[4],"to":[4,5]}
+- `ROUTE_NEW` EHAM-LGIR CD CD5257 - {"nm":1340,"types":["BOEING 737 MAX 9"],"status":"NO-MATCH","candidate":false}
+- `ROUTE_NEW` EHAM-LGIR HV HV5723 - {"nm":1340,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","candidate":false}
+- `DOW_PATTERN_CHANGE` EHAM-EKCH KL KL1267 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LSZH KL KL1917 - {"from":[4],"to":[4,5]}
+- `MATCH_CHANGED` EGLL-EHAM BA BA445 - {"from":"MATCH","to":"MATCH+NO-MATCH","types":["A320","AIRBUS A320 (SHARKLETS)"]}
+- `TYPE_NEW` EGLL-EHAM BA BA445 - {"added":["AIRBUS A320 (SHARKLETS)"],"previously":["A320"]}
+- `TYPE_MIX_SHIFT` EGLL-EHAM BA BA445 - {"type":"A320","share_from":1,"share_to":0.67}
+- `DOW_PATTERN_CHANGE` EGLL-EHAM BA BA445 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LIRF KL KL1601 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EGLL-EHAM KL KL1001 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LFPG KL KL1403 - {"from":[4],"to":[4,5]}
+- `ROUTE_NEW` EHAM-LEZL HV HV6731 - {"nm":1000,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","candidate":false}
+- `TYPE_NEW` EHAM-LEMD IB IB740 - {"added":["AIRBUS A320 (SHARKLETS)"],"previously":["AIRBUS A320 NEO"]}
+- `TYPE_MIX_SHIFT` EHAM-LEMD IB IB740 - {"type":"AIRBUS A320 NEO","share_from":1,"share_to":0.67}
+- `DOW_PATTERN_CHANGE` EHAM-LEMD IB IB740 - {"from":[4],"to":[4,5]}
+- `TYPE_NEW` EHAM-LEMG U2 U27889 - {"added":["AIRBUS A321 (SHARKLETS)"],"previously":["AIRBUS A320 NEO"]}
+- `TYPE_MIX_SHIFT` EHAM-LEMG U2 U27889 - {"type":"AIRBUS A320 NEO","share_from":1,"share_to":0.67}
+- `DOW_PATTERN_CHANGE` EHAM-LEMG U2 U27889 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EHAM-LFLL KL KL1427 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EDDS-EHAM KL KL1827 - {"from":[4],"to":[4,5]}
+- `DOW_PATTERN_CHANGE` EGPH-EHAM KL KL923 - {"from":[4],"to":[4,5]}
