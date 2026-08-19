@@ -68,15 +68,24 @@ jobs:
           BACKFILL_DAYS: '8'
         run: node scripts/routewatch.mjs
 
-      # 3. Retention audit: report only. It does not delete, move or untrack
-      #    anything. Article 5.5 caps raw API Contents at seven days; the report
-      #    tells us exactly what must be addressed before a public release.
-      #    Do NOT add --sweep here until the data-retention migration is designed
-      #    and reviewed: the current alpha still depends on its historic ledger.
-      #    The audit script itself writes no report file, so the shell captures
-      #    whatever it prints. pipefail keeps a script failure visible instead of
-      #    being masked by tee's exit code.
-      - name: Audit raw-data retention (report only)
+      # 3. Build the shareable variants and report on retention.
+      #
+      #    Previously this ran with --audit, which reports but skips writing, so
+      #    docs/community.json was never produced. Variant A is the aggregate-only
+      #    Derived Work that Article 5.6 exempts from the distribution ban, so it
+      #    is the one file we actually want served. Building it is the point.
+      #
+      #    Deliberately NOT passed:
+      #      --sweep   would delete expired CSVs; the alpha still needs its ledger
+      #                and the retention migration is not designed yet.
+      #      --audit   would skip writing the variants entirely.
+      #
+      #    IMMERSION_DIR is left at its default of data/, so variant B with flight
+      #    numbers and departure times stays out of docs/ and out of git. Do not
+      #    set IMMERSION_DIR=docs until the permission is on paper.
+      #
+      #    pipefail keeps a script failure visible instead of being masked by tee.
+      - name: Build shareable variants and audit retention
         run: |
           set -o pipefail
           mkdir -p data
@@ -85,7 +94,7 @@ jobs:
             echo ""
             echo '```'
           } > data/retention-check.md
-          node scripts/publish-derived.mjs --audit | tee -a data/retention-check.md
+          node scripts/publish-derived.mjs | tee -a data/retention-check.md
           echo '```' >> data/retention-check.md
 
       # 4. Enrich: reads the ledger that step 2 just wrote, so it must run after
