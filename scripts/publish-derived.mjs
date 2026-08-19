@@ -245,6 +245,8 @@ const flights=B.pairs.reduce((n,p)=>n+p.flights.length,0);
 const withTime=B.pairs.reduce((n,p)=>n+p.flights.filter(f=>f.std).length,0);
 
 if(!AUDIT){
+  mkdirSync("data",{recursive:true});
+  writeFileSync("data/variant-comparison.md",md.join("\n")+"\n");
   mkdirSync(OUTDIR,{recursive:true});
   writeFileSync(join(OUTDIR,"community.json"),JSON.stringify(A));
   mkdirSync(IMMERSION_DIR,{recursive:true});
@@ -325,8 +327,7 @@ md.push(``,`## Note on git history`,``,
 `data/manual/*.csv and the immersion variant are in .gitignore for that reason: a`,
 `cache that lives in git history forever is not a cache.`);
 
-mkdirSync("data",{recursive:true});
-writeFileSync("data/variant-comparison.md",md.join("\n")+"\n");
+
 
 LOG(`comparison in data/variant-comparison.md`);
 LOG(`${sweep.checked} cached CSVs, ${sweep.expired.length} past ${RETENTION_DAYS} days, ${sweep.deleted} deleted`);
