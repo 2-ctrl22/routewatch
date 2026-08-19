@@ -11,6 +11,10 @@ on:
         description: "Days the COLLECTOR fetches (1 = 82 units, 2 = 164 units)"
         required: false
         default: "1"
+      publish_profile:
+        description: "docs/data.json contents: full (current policy) or restricted"
+        required: false
+        default: "full"
 
 permissions:
   contents: write
@@ -68,12 +72,27 @@ jobs:
           BACKFILL_DAYS: '8'
         run: node scripts/routewatch.mjs
 
-      # 3. Build the shareable variants and report on retention.
+      # 2b. Publication profile, wired up but deliberately set to FULL.
       #
-      #    Previously this ran with --audit, which reports but skips writing, so
-      #    docs/community.json was never produced. Variant A is the aggregate-only
-      #    Derived Work that Article 5.6 exempts from the distribution ban, so it
-      #    is the one file we actually want served. Building it is the point.
+      #     Policy decision: everything stays open until AeroDataBox answers. We
+      #     assume approval and build for it; if the answer is negative we adjust.
+      #     So this step changes NOTHING about docs/data.json today - on full it
+      #     only reports what the file contains and leaves every field in place.
+      #
+      #     The reason it is wired up now is that the plumbing must be proven
+      #     before it is needed. If the answer is no, switching is one word:
+      #     change the default below to restricted, or run the workflow manually
+      #     with publish_profile=restricted. No migration, no redesign.
+      #
+      #     restricted would remove legs and per-flight event detail while keeping
+      #     counts, classifications, distances and candidate gains. data/ledger.json
+      #     always keeps every field either way, so nothing is ever lost.
+      - name: Apply publication profile
+        env:
+          PUBLISH_PROFILE: ${{ inputs.publish_profile || 'full' }}
+        run: node scripts/apply-profile.mjs
+
+      # 3. Build the shareable variants and report on retention.
       #
       #    Deliberately NOT passed:
       #      --sweep   would delete expired CSVs; the alpha still needs its ledger
@@ -81,8 +100,8 @@ jobs:
       #      --audit   would skip writing the variants entirely.
       #
       #    IMMERSION_DIR is left at its default of data/, so variant B with flight
-      #    numbers and departure times stays out of docs/ and out of git. Do not
-      #    set IMMERSION_DIR=docs until the permission is on paper.
+      #    numbers and departure times stays out of docs/ and out of git. That is
+      #    a separate gate from the profile above and also waits on the answer.
       #
       #    pipefail keeps a script failure visible instead of being masked by tee.
       - name: Build shareable variants and audit retention
