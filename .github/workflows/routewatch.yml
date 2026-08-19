@@ -12,9 +12,13 @@ on:
         required: false
         default: "1"
       publish_profile:
-        description: "docs/data.json contents: full (current policy) or restricted"
+        description: "docs/data.json contents: full (approved) or restricted"
         required: false
         default: "full"
+      immersion_dir:
+        description: "Where variant B goes: docs (served) or data (private)"
+        required: false
+        default: "docs"
 
 permissions:
   contents: write
@@ -37,10 +41,10 @@ jobs:
       # 0. Validate the config FIRST. routewatch.mjs feeds config lat/lon straight
       #    into a Math.acos distance formula, so a null coordinate produces NaN,
       #    and `nm > range_nm` against NaN is false. The result is a leg silently
-      #    reported as not simmable instead of an error. scan-sim.mjs --write
-      #    intentionally proposes airports with needs_coordinates:true, so this is
-      #    the guard between that proposal and a live config. Running it before the
-      #    collector also means a broken config costs 0 units instead of 82.
+      #    reported as not simmable instead of an error. The sim scanners propose
+      #    airports with needs_coordinates:true, so this is the guard between such a
+      #    proposal and a live config. Running it before the collector also means a
+      #    broken config costs 0 units instead of 82.
       - name: Validate config
         env:
           ADB_UNITS_PER_CALL: '2'
@@ -72,21 +76,14 @@ jobs:
           BACKFILL_DAYS: '8'
         run: node scripts/routewatch.mjs
 
-      # 2b. Publication profile, wired up but deliberately set to FULL.
+      # 2b. Publication profile. AeroDataBox granted permission on 19 August 2026,
+      #     so this stays on full: docs/data.json keeps its legs, flight numbers,
+      #     scheduled times and per-season records.
       #
-      #     Policy decision: everything stays open until AeroDataBox answers. We
-      #     assume approval and build for it; if the answer is negative we adjust.
-      #     So this step changes NOTHING about docs/data.json today - on full it
-      #     only reports what the file contains and leaves every field in place.
-      #
-      #     The reason it is wired up now is that the plumbing must be proven
-      #     before it is needed. If the answer is no, switching is one word:
-      #     change the default below to restricted, or run the workflow manually
-      #     with publish_profile=restricted. No migration, no redesign.
-      #
-      #     restricted would remove legs and per-flight event detail while keeping
-      #     counts, classifications, distances and candidate gains. data/ledger.json
-      #     always keeps every field either way, so nothing is ever lost.
+      #     The switch remains wired up on purpose. If the permission is ever
+      #     narrowed or withdrawn, changing the default above to restricted removes
+      #     flight-level detail from the published file in a single run. No
+      #     migration, no redesign. data/ledger.json keeps every field regardless.
       - name: Apply publication profile
         env:
           PUBLISH_PROFILE: ${{ inputs.publish_profile || 'full' }}
@@ -94,17 +91,28 @@ jobs:
 
       # 3. Build the shareable variants and report on retention.
       #
-      #    Deliberately NOT passed:
-      #      --sweep   would delete expired CSVs; the alpha still needs its ledger
-      #                and the retention migration is not designed yet.
-      #      --audit   would skip writing the variants entirely.
+      #    IMMERSION_DIR now defaults to docs, so variant B - flight numbers,
+      #    scheduled departure times, airline and aircraft type per route - is
+      #    served publicly. That is the immersion payload, and it is what the
+      #    permission covers. Aircraft registrations stay excluded by the script
+      #    itself, which we keep that way.
       #
-      #    IMMERSION_DIR is left at its default of data/, so variant B with flight
-      #    numbers and departure times stays out of docs/ and out of git. That is
-      #    a separate gate from the profile above and also waits on the answer.
+      #    The matching .gitignore line was removed in the same change, otherwise
+      #    the commit step would have skipped the file silently and it would never
+      #    have reached Pages. data/community-immersion.json stays ignored, so
+      #    IMMERSION_DIR=data remains a clean private fallback.
+      #
+      #    Still NOT passed:
+      #      --sweep   deleting expired CSVs remains a separate decision. The alpha
+      #                depends on its historic ledger and that migration is not
+      #                designed yet. Permission to publish is not a reason to start
+      #                deleting local history.
+      #      --audit   would skip writing the variants entirely.
       #
       #    pipefail keeps a script failure visible instead of being masked by tee.
       - name: Build shareable variants and audit retention
+        env:
+          IMMERSION_DIR: ${{ inputs.immersion_dir || 'docs' }}
         run: |
           set -o pipefail
           mkdir -p data
@@ -115,6 +123,12 @@ jobs:
           } > data/retention-check.md
           node scripts/publish-derived.mjs | tee -a data/retention-check.md
           echo '```' >> data/retention-check.md
+
+      # 3b. Community reference set: airline names, airport coordinates, fleet
+      #     definitions and near-match rules. Derived facts only, no flights, so it
+      #     was always shareable and stays unaffected by the permission question.
+      - name: Export community reference
+        run: node scripts/export-reference.mjs
 
       # 4. Enrich: reads the ledger that step 2 just wrote, so it must run after
       #    RouteWatch. run-enrich.mjs is a thin wrapper that executes
