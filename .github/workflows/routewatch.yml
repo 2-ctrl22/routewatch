@@ -64,14 +64,17 @@ jobs:
         run: node scripts/publish-derived.mjs --audit
 
       # 4. Enrich: reads the ledger that step 2 just wrote, so it must run after
-      #    RouteWatch.
+      #    RouteWatch. run-enrich.mjs is a thin wrapper that executes
+      #    enrich-adb.mjs unchanged and only translates its log output to English.
+      #    Quota handling, 429 backoff and the priority rotation live in
+      #    enrich-adb.mjs and are untouched.
       - name: Enrich airports, aircraft and flight types
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
           ENRICH_UNIT_CAP: '60'
           ENRICH_FLIGHTS: '25'
           ENRICH_RUNWAYS: 'true'
-        run: node scripts/enrich-adb.mjs
+        run: node scripts/run-enrich.mjs
 
       - name: Commit generated data
         run: |
