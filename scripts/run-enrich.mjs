@@ -12,6 +12,9 @@
  * This wrapper runs the original process unchanged and translates only stdout and
  * stderr on their way to the GitHub Actions log. Exit code and all files written
  * by enrich-adb.mjs pass through exactly as before.
+ *
+ * Ordering note: the rotation line is matched before the bare "ronde" rule,
+ * because the more specific pattern must win.
  */
 import { spawn } from "node:child_process";
 
@@ -31,6 +34,7 @@ const MAP=[
   [/429 blijft - deze sectie stopt, andere secties gaan door/g,"429 persists - this section stops, other sections continue"],
   [/sleutel niet geabonneerd, hele run stopt/g,"key not subscribed, entire run stops"],
   [/banen, langste/g,"runways, longest"],
+  [/banen (\S+) fout:/g,"runways $1 error:"],
   [/airports-meta\.json: (\d+) van (\d+) velden, (\d+) nieuw/g,"airports-meta.json: $1 of $2 airports, $3 new"],
   [/sectie gestopt op 429/g,"section stopped on 429"],
   [/registraties, (\d+) nieuw/g,"registrations, $1 new"],
@@ -41,6 +45,8 @@ const MAP=[
   [/overig/g,"other"],
   [/bij (\d+) per week: urgente groep rond in (\d+) weken, alles in (\d+) weken/g,"at $1 per week: urgent group complete in $2 weeks, all complete in $3 weeks"],
   [/nog geen vluchtnummers in de ledger - draai eerst collect-adb en routewatch/g,"no flight numbers in the ledger yet - run collect-adb and RouteWatch first"],
+  [/rotatie: (\d+) nummers deze run/g,"rotation: $1 numbers this run"],
+  [/rotatie:/g,"rotation:"],
   [/nummers deze run, cursor/g,"numbers this run, cursor"],
   [/ronde/g,"round"],
   [/GEMENGDE VLOOT/g,"MIXED FLEET"],
