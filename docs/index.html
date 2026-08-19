@@ -98,11 +98,21 @@ const app=document.getElementById('app');
 const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="muted">+'+(a.length-n)+'</span>';};
 const nf=n=>Number(n).toLocaleString('en-GB');
 
-/* Some labels are written in Dutch by routewatch.mjs and stored that way in
- * data.json. Translate at display time only, so the data files stay untouched
- * and every comparison below keeps working on the raw value. */
+/* Older runs wrote this sentinel in Dutch, newer runs write it in English.
+ * Accept both, so switching the source language never breaks the filters. */
+const NOSVC=s=>{const v=String(s??'');return v==='GEEN VERBINDING'||v==='NO SERVICE';};
+
+/* data/events.json keeps up to 3000 historical events, and the older ones stay
+ * Dutch forever. So display-time translation has to remain, even once
+ * routewatch.mjs writes English. */
 const EN=[[/GEEN VERBINDING/g,'NO SERVICE'],[/ONBEKEND/g,'UNKNOWN'],
-          [/kandidaat/g,'candidate'],[/bronnen/g,'sources']];
+          [/kandidaat/g,'candidate'],[/bronnen/g,'sources'],
+          [/\bvan\b/g,'from'],[/\bnaar\b/g,'to'],[/\bnieuw\b/g,'new'],[/\beerder\b/g,'previously'],
+          [/\bdagen\b/g,'days'],[/\bwaargenomen\b/g,'observed'],[/\bvorig\b/g,'previous'],
+          [/\bwinkel\b/g,'store'],[/\btegenseizoen\b/g,'counter season'],
+          [/laatst_gezien/g,'last_seen'],[/gemiste_gelegenheden/g,'missed_opportunities'],
+          [/eerste_verbinding/g,'first_connection'],[/geen_actieve_vluchtregel/g,'no_active_flight_line'],
+          [/hervat_op/g,'resumed_on'],[/aandeel_/g,'share_'],[/toelichting/g,'note']];
 const en=s=>{let o=String(s??'');for(const r of EN)o=o.replace(r[0],r[1]);return o;};
 
 const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead>';
@@ -111,8 +121,11 @@ const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></
 /* Aircraft codes mean nothing to most people, so spell the common ones out. */
 const TYPES={B733:'Boeing 737-300',B734:'Boeing 737-400',B735:'Boeing 737-500',
  B736:'Boeing 737-600',B737:'Boeing 737-700',B738:'Boeing 737-800',B739:'Boeing 737-900',
- B37M:'Boeing 737 MAX 7',B38M:'Boeing 737 MAX 8',B39M:'Boeing 737 MAX 9',
+ B73H:'Boeing 737-800',B73Y:'Boeing 737-800 freighter',B738F:'Boeing 737-800 freighter',
+ B734F:'Boeing 737-400 freighter',
+ B37M:'Boeing 737 MAX 7',B38M:'Boeing 737 MAX 8',B38X:'Boeing 737 MAX 8-200',B39M:'Boeing 737 MAX 9',
  B752:'Boeing 757-200',B763:'Boeing 767-300',B772:'Boeing 777-200',B77W:'Boeing 777-300ER',
+ B77L:'Boeing 777F',B77F:'Boeing 777F',
  B788:'Boeing 787-8',B789:'Boeing 787-9',B78X:'Boeing 787-10',
  BCS1:'Airbus A220-100',BCS3:'Airbus A220-300',
  A319:'Airbus A319',A320:'Airbus A320',A321:'Airbus A321',
@@ -137,8 +150,13 @@ function prettyType(s){
 }
 
 const KINDS={ROUTE_NEW:'New route',ROUTE_GONE:'Route disappeared',ROUTE_BACK:'Route is back',
+ PAIR_NEW:'First ever connection',PAIR_GONE:'No flights left on this pair',
  TYPE_NEW:'Different aircraft',TYPE_GONE:'Aircraft no longer used',
- STATUS_CHANGE:'Fleet match changed',SEASON_START:'Season started',SEASON_END:'Season ended',
+ TYPE_MIX_SHIFT:'Aircraft mix shifted',MATCH_CHANGED:'Fleet match changed',
+ SIMMABLE_CHANGED:'Session fit changed',DOW_PATTERN_CHANGE:'Flies on different days',
+ SEASON_NEW:'New this season',SEASON_NOT_RETURNING:'Not back this season',
+ SEASON_TYPE_SWAP:'Different aircraft per season',SEASON_TIME_SHIFT:'Departure time shifted',
+ CANDIDATE_GAIN_UP:'Wishlist airport worth more now',PRICE_DROP:'Price dropped',
  SUSPENDED:'Paused, not seen for a while',RESUMED:'Flying again'};
 const kindLabel=k=>KINDS[k]||String(k||'').replace(/_/g,' ').toLowerCase()
   .replace(/^./,c=>c.toUpperCase());
@@ -146,6 +164,7 @@ const kindLabel=k=>KINDS[k]||String(k||'').replace(/_/g,' ').toLowerCase()
 /* Can you actually fly this leg with the aircraft you own? */
 function flyText(st){
   const s=String(st||'');
+  if(NOSVC(s)) return '<span class="muted">no flights seen</span>';
   if(s==='MATCH'||s.startsWith('MATCH')) return '<span class="m">Yes, you own this aircraft</span>';
   if(s.startsWith('NEAR')) return '<span class="n">Almost, close substitute</span>';
   if(s.startsWith('NO-')) return '<span class="x">No, not in your fleet</span>';
@@ -199,16 +218,17 @@ function evTable(rows){
    +rows.map(e=>{
      const d=e.detail||{}, ts=(d.types||[]).map(prettyType);
      const seas=e.season||seasonOf(e.at);
+     const wish=d.candidate??d.kandidaat;
      return '<tr class="'+esc(e.severity)+'" title="'+esc(en(JSON.stringify(d)))+'">'
       +'<td class="nowrap">'+esc(fmtWhen(e.at))+'</td>'
       +'<td class="nowrap">'+esc(kindLabel(e.kind))+'</td>'
       +'<td class="nowrap">'+esc(e.pair)
-        +(d.candidate?' <span class="tag wish">wishlist</span>':'')+'</td>'
+        +(wish?' <span class="tag wish">wishlist</span>':'')+'</td>'
       +'<td class="nowrap">'+esc(e.airline?String(e.airline)+' '+String(e.flight||''):(e.flight||'-'))+'</td>'
       +'<td class="nowrap">'+(seas?esc(seas):'<span class="muted">-</span>')+'</td>'
       +'<td class="num">'+(d.nm?nf(d.nm)+' NM':'<span class="muted">-</span>')+'</td>'
       +'<td>'+(ts.length?esc(ts.join(', ')):'<span class="muted">-</span>')+'</td>'
-      +'<td class="nowrap">'+flyText(d.status)+'</td>'
+      +'<td class="nowrap">'+(d.status?flyText(d.status):'<span class="muted">-</span>')+'</td>'
       +'<td class="small">'+sureText(e.confidence)+'</td></tr>';
    }).join('')
    +'</tbody></table></div>'
@@ -246,8 +266,8 @@ function ov(){
 /* --------------------------------------------------------- pair matrix --- */
 function pr(){
   const f=filter;
-  const ps=D.pairs.filter(p=>f==='all'||(f==='served'&&p.status!=='GEEN VERBINDING')
-   ||(f==='unserved'&&p.status==='GEEN VERBINDING')||(f==='match'&&p.status.startsWith('MATCH'))
+  const ps=D.pairs.filter(p=>f==='all'||(f==='served'&&!NOSVC(p.status))
+   ||(f==='unserved'&&NOSVC(p.status))||(f==='match'&&String(p.status).startsWith('MATCH'))
    ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
   const shown=ps.slice(0,PAGE*prPage);
   app.innerHTML='<div class="chips">'
@@ -263,7 +283,7 @@ function pr(){
    +'<td>'+(cut(p.operators,6)||'-')+'</td>'
    +'<td>'+((p.types||[]).length?esc((p.types||[]).slice(0,3).map(prettyType).join(', '))
      +((p.types||[]).length>3?' <span class="muted">+'+((p.types||[]).length-3)+'</span>':''):'-')+'</td>'
-   +'<td class="nowrap">'+(p.status==='GEEN VERBINDING'?'<span class="muted">no flights seen</span>':flyText(p.status))+'</td>'
+   +'<td class="nowrap">'+flyText(p.status)+'</td>'
    +'<td>'+(p.simmable?'<span class="m">yes</span>':'<span class="muted">no</span>')+'</td></tr>').join('')
    +'</tbody></table>'
    +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
@@ -315,7 +335,6 @@ const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
   justflight:'https://www.justflight.com/searchresults?searchterm='};
 const cityOf=n=>String(n||'').split(/[\s\/-]+/)[0];
 
-/* prices_note in data.json is Dutch, so the page carries its own English wording. */
 const PRICES_NOTE='RouteWatch does not compare shop prices itself. FSAddonCompare already does that '
  +'across Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket and the Marketplace, '
  +'with price history and sale alerts. Direct search links per candidate are below. To pull prices into '
