@@ -9,25 +9,30 @@
 #    RouteWatch reads these CSVs on every run and keeps only its own computed
 #    results, so nothing of value is lost by not committing them.
 #
-# 2. THE IMMERSION VARIANT
+# 2. THE IMMERSION VARIANT - permission granted 19 August 2026
 #    docs/community-immersion.json carries flight numbers, departure times and
-#    airline per route. Those are Contents, not a Derived Work. Anything under
-#    docs/ is served publicly by GitHub Pages, so committing it would publish it.
-#    It stays ignored until AeroDataBox confirms in writing that the Plan Terms
-#    permit showing those fields to end users (Articles 5.6 and 5.3).
+#    airline per route. AeroDataBox has confirmed that the Plan Terms permit
+#    showing those fields to end users (Articles 5.6 and 5.3), so the docs/ path
+#    is no longer ignored and GitHub Pages may serve it.
 #
-#    Remove those two lines once that permission is on paper.
+#    The data/ path stays ignored. Setting IMMERSION_DIR=data is the private
+#    fallback, and a private copy has no reason to sit in git history.
+#
+#    Two things did NOT change with the permission:
+#      - aircraft registrations are still excluded from the variant, by the script
+#      - the seven-day cache rule below still applies to raw CSVs
 
 # Cached API responses, seven-day retention
 data/manual/*.csv
 
-# Flight-level variant: not public until permission is in writing
-docs/community-immersion.json
+# Private fallback location for the flight-level variant
 data/community-immersion.json
 
 # Local scanner output: describes one person's machine, not the project
 data/sim-scan.json
 data/sim-scan.md
+data/xplane-scan.json
+data/xplane-scan.md
 config/collection.scan.json
 
 # Reports regenerated on every run
