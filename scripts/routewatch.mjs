@@ -11,7 +11,16 @@
  *
  * All output is written in English. The pages under docs/ still translate the
  * older Dutch wording, because data/events.json keeps up to 3000 historical
- * records that were written before this change.
+ * records that were written before that change.
+ *
+ * Two fixes in this version:
+ *  1. Registrations are now stored per flight line as `regs`. enrich-adb.mjs
+ *     reads exactly that field; it used to find nothing, which is why
+ *     data/aircraft-meta.json stayed empty.
+ *  2. The AeroDataBox destination is read from arrival.airport first and only
+ *     then from movement.airport. With withLeg=true the API replaces movement
+ *     with departure and arrival, so the old code always got undefined. Same
+ *     bug that collect-adb.mjs already documents and fixes.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 
@@ -22,6 +31,20 @@ const OWN = CFG.airports.filter(a => !a.candidate).map(a => a.icao);
 const CAND = CFG.airports.filter(a => a.candidate).map(a => a.icao);
 const CODES = Object.keys(ALL);
 const isOwn = c => !ALL[c]?.candidate;
+
+/* IATA -> ICAO, so a source that answers with AMS still resolves to EHAM. */
+const IATA2ICAO = {};
+for (const a of CFG.airports) if (a.iata && a.icao) IATA2ICAO[String(a.iata).toUpperCase()] = a.icao;
+
+/** Resolve an airport block from any provider to an ICAO code we collect. */
+function destIcao(ap){
+  if(!ap) return null;
+  const i=String(ap.icao??"").toUpperCase();
+  if(i && ALL[i]) return i;
+  const t=String(ap.iata??"").toUpperCase();
+  if(t && IATA2ICAO[t]) return IATA2ICAO[t];
+  return null;
+}
 
 const lastSunday = (y,m0)=>{const d=new Date(Date.UTC(y,m0+1,0));d.setUTCDate(d.getUTCDate()-d.getUTCDay());return d;};
 const iso = d => d.toISOString().slice(0,10);
@@ -99,11 +122,15 @@ async function aeroDataBox(icao,day){
    +`?withLeg=true&direction=Departure&withCancelled=false&withCodeshared=false&withCargo=true&withPrivate=false`,
    {headers:{"X-RapidAPI-Key":key,"X-RapidAPI-Host":host}});
    if(!res.ok) continue; const j=await res.json();
-   for(const f of j.departures??[]){const arr=String(f?.movement?.airport?.icao??"").toUpperCase();
-    if(!ALL[arr]||arr===icao) continue;
+   for(const f of j.departures??[]){
+    /* withLeg=true replaces movement with departure and arrival, so try
+       arrival.airport first and fall back to movement.airport. */
+    const arr=destIcao(f?.arrival?.airport ?? f?.movement?.airport);
+    if(!arr||arr===icao) continue;
+    const dep=f?.departure ?? f?.movement ?? {};
     out.push({layer:"schedule",source:"aerodatabox",dep:icao,arr,
      airline:f?.airline?.iata??f?.airline?.icao??"?",flight:String(f?.number??"").replace(/\s/g,"")||"?",
-     std:String(f?.departure?.scheduledTime?.local??"").slice(11,16)||null,
+     std:String(dep?.scheduledTime?.local??dep?.scheduledTimeLocal??"").slice(11,16)||null,
      type:normType(f?.aircraft?.model??f?.aircraft?.typeCode),reg:f?.aircraft?.reg??null,
      cargo:String(f?.isCargo??"").toLowerCase()==="true"?1:0});}
   }catch{} await sleep(1100);}
@@ -117,7 +144,7 @@ function manual(icao,day){
   cols.forEach((c,i)=>o[c]=(v[i]??"").trim());
   return {layer:"schedule",source:"manual",dep:icao,arr:String(o.arr_icao).toUpperCase(),
    airline:o.airline||"?",flight:o.flight_no||"?",std:o.std||null,type:normType(o.type_raw),
-   reg:null,cargo:Number(o.cargo||0)};}).filter(o=>ALL[o.arr]&&o.arr!==icao);}
+   reg:o.reg||null,cargo:Number(o.cargo||0)};}).filter(o=>ALL[o.arr]&&o.arr!==icao);}
 
 /** Optional and off by default: price from the schema.org JSON-LD of a product URL. */
 async function scrapePrice(url){
@@ -161,18 +188,25 @@ for(const [key,rows] of group){
  const nm=gcNm(ALL[a],ALL[b]);
  const cargo=rows.some(r=>r.cargo)?1:0;
  const cur=LEDGER[key]??{pair,airline:rows[0].airline,flight:rows[0].flight,nm,cargo,
-  first_seen:rows[0].day,days:[],types:{},seasons:{},dow:[],std:null,sources:[],state:"active",missed:0};
+  first_seen:rows[0].day,days:[],types:{},seasons:{},dow:[],std:null,sources:[],regs:[],
+  state:"active",missed:0};
+ /* Older ledger entries predate the regs field. */
+ if(!Array.isArray(cur.regs)) cur.regs=[];
  const before={status:cur.status,simmable:cur.simmable,types:{...cur.types},dow:[...cur.dow]};
  for(const o of rows){
   if(!cur.days.includes(o.day)) cur.days.push(o.day);
   if(o.type) cur.types[o.type]=(cur.types[o.type]??0)+1;
   if(!cur.dow.includes(o.dow)) cur.dow.push(o.dow);
   if(!cur.sources.includes(o.source)) cur.sources.push(o.source);
+  /* enrich-adb.mjs walks row.regs to look up aircraft per registration. */
+  if(o.reg){const r=String(o.reg).toUpperCase().trim();
+   if(r && !cur.regs.includes(r)) cur.regs.push(r);}
   const s=(cur.seasons[o.season]??={first:o.day,last:o.day,days:0,types:{},std:o.std});
   s.first=s.first<o.day?s.first:o.day; s.last=s.last>o.day?s.last:o.day; s.days++;
   if(o.type) s.types[o.type]=(s.types[o.type]??0)+1;
   if(o.std){s.std=o.std; cur.std=o.std;}}
  cur.days=cur.days.sort().slice(-120);
+ cur.regs=cur.regs.slice(-40);
  cur.last_seen=cur.days[cur.days.length-1]; cur.nm=nm; cur.cargo=cargo;
  const types=Object.keys(cur.types);
  cur.status=matchStatus(types); cur.simmable=simmable(pair,types,nm,cargo);
@@ -271,11 +305,13 @@ writeFileSync("data/ledger.json",JSON.stringify(LEDGER,null,1));
 writeFileSync(REGF,JSON.stringify(REG));
 const allEv=[...events,...OLDEV].slice(0,3000);
 writeFileSync("data/events.json",JSON.stringify(allEv,null,1));
+const knownRegs=new Set();
+for(const x of Object.values(LEDGER)) for(const r of x.regs??[]) knownRegs.add(r);
 const summary={generated:new Date().toISOString(),season:seasonFor(iso(new Date())),counter_season:othS,
  airports:OWN.length,candidates:CAND.length,pairs_possible:pairs.length,pairs_served:served,
  pairs_unserved:pairs.length-served,pairs_match:pairs.filter(p=>p.status.startsWith("MATCH")).length,
  pairs_simmable:pairs.filter(p=>p.simmable).length,cargo_pairs:pairs.filter(p=>p.cargo).length,
- flightlines:active.filter(l=>!l.candidate).length,
+ flightlines:active.filter(l=>!l.candidate).length,registrations:knownRegs.size,
  suspended:Object.values(LEDGER).filter(x=>x.state==="suspended").length,new_events:events.length,
  price_scrape:!!S.price_scrape};
 /* _prices is the English key; _prijzen is still read so an older config keeps working. */
@@ -287,6 +323,7 @@ const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
  `- season **${summary.season.label}** (${summary.season.start} through ${summary.season.end})`,
  `- pairs with a connection: **${served}** of ${pairs.length}`,
  `- with MATCH: **${summary.pairs_match}** &middot; simmable: **${summary.pairs_simmable}**`,
+ `- registrations known: **${knownRegs.size}**`,
  `- new changes: **${events.length}**`,"","### Buy advice by network gain",""];
 for(const c of candidates.slice(0,6))
  md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} pairs, +${c.gain.match_pairs} with MATCH`
@@ -297,4 +334,4 @@ writeFileSync("data/last-run.md",md.join("\n"));
 if(process.env.ROUTEWATCH_WEBHOOK && events.length)
  await fetch(process.env.ROUTEWATCH_WEBHOOK,{method:"POST",headers:{"content-type":"application/json"},
   body:JSON.stringify({text:md.join("\n")})}).catch(()=>{});
-console.log(`done: ${served}/${pairs.length} pairs, ${events.length} changes, ${candidates.length} candidates`);
+console.log(`done: ${served}/${pairs.length} pairs, ${events.length} changes, ${candidates.length} candidates, ${knownRegs.size} registrations`);
