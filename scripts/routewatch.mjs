@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 /**
- * RouteWatch - één script, nul dependencies, geen database.
- * Opslag = JSON in deze repo, dus git is je historie en back-up.
+ * RouteWatch - one script, zero dependencies, no database.
+ * Storage = JSON in this repository, so git is your history and your backup.
  *
- * Nieuw in v2: KANDIDAATVELDEN. Een luchthaven met "candidate": true wordt wel
- * opgehaald maar telt niet mee in je hoofdmatrix. De app meet daarmee hoeveel
- * nieuwe bediende paren en nieuwe MATCH-paren die aankoop je zou opleveren.
- * Prijsvergelijking gebeurt niet hier: FSAddonCompare doet dat al beter. Per
- * kandidaat staan alleen directe zoeklinks in de config.
+ * New in v2: CANDIDATE AIRPORTS. An airport with "candidate": true is collected
+ * but does not count towards your main matrix. That way the app measures how many
+ * new served pairs and new MATCH pairs buying it would give you.
+ * Price comparison does not happen here: FSAddonCompare already does it better.
+ * The config only holds direct search links per candidate.
+ *
+ * All output is written in English. The pages under docs/ still translate the
+ * older Dutch wording, because data/events.json keeps up to 3000 historical
+ * records that were written before this change.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 
@@ -49,7 +53,7 @@ const pk=(a,b)=>[a,b].sort().join("-");
 
 function matchStatus(types){const t=new Set();
  for(const x of types) if(x) t.add(OWNED[x]?"MATCH":NEAR[x]?"NEAR-MATCH":"NO-MATCH");
- if(!t.size) return "ONBEKEND";
+ if(!t.size) return "UNKNOWN";
  if(t.size===1) return [...t][0];
  if(t.has("MATCH")) return "MATCH+"+[...t].filter(x=>x!=="MATCH").sort().join("+");
  return "NEAR-MATCH+NO-MATCH";}
@@ -115,9 +119,9 @@ function manual(icao,day){
    airline:o.airline||"?",flight:o.flight_no||"?",std:o.std||null,type:normType(o.type_raw),
    reg:null,cargo:Number(o.cargo||0)};}).filter(o=>ALL[o.arr]&&o.arr!==icao);}
 
-/** Optioneel en standaard uit: prijs uit schema.org/JSON-LD van een product-URL. */
+/** Optional and off by default: price from the schema.org JSON-LD of a product URL. */
 async function scrapePrice(url){
- try{const res=await fetch(url,{headers:{"user-agent":"RouteWatch/1.0 (persoonlijk gebruik)"}});
+ try{const res=await fetch(url,{headers:{"user-agent":"RouteWatch/1.0 (personal use)"}});
   if(!res.ok) return null; const html=await res.text();
   for(const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/g)){
    try{const j=JSON.parse(m[1]); const nodes=Array.isArray(j)?j:[j];
@@ -143,7 +147,7 @@ for(let d=1;d<=days;d++){
               ...(S.providers?.manual?manual(icao,day):[])];
   for(const o of rows) fresh.push({...o,day,season:seasonFor(day).label,
    dow:new Date(day+"T00:00:00Z").getUTCDay()});}
- process.stderr.write(`${day}: ${fresh.length} observaties cumulatief\n`);}
+ process.stderr.write(`${day}: ${fresh.length} observations so far\n`);}
 
 const group=new Map();
 for(const o of fresh){const k=`${pk(o.dep,o.arr)}|${o.airline}|${o.flight}`;
@@ -175,22 +179,22 @@ for(const [key,rows] of group){
  cur.candidate=!isOwn(a)||!isOwn(b);
  const wasSusp=cur.state==="suspended"; cur.state="active"; cur.missed=0;
  const id={pair,airline:cur.airline,flight:cur.flight};
- const conf=`n=${cur.days.length}d, bronnen=${cur.sources.length}`;
- if(!before.status){ evt("ROUTE_NEW",{...id,detail:{nm,types,status:cur.status,kandidaat:cur.candidate},confidence:conf}); }
+ const conf=`n=${cur.days.length}d, sources=${cur.sources.length}`;
+ if(!before.status){ evt("ROUTE_NEW",{...id,detail:{nm,types,status:cur.status,candidate:cur.candidate},confidence:conf}); }
  else{
-  if(before.status!==cur.status) evt("MATCH_CHANGED",{...id,detail:{van:before.status,naar:cur.status,types},confidence:conf});
-  if(before.simmable!==cur.simmable) evt("SIMMABLE_CHANGED",{...id,detail:{van:before.simmable,naar:cur.simmable,nm},confidence:conf});
-  const nieuw=types.filter(t=>!(t in before.types));
-  if(nieuw.length) evt("TYPE_NEW",{...id,detail:{nieuw,eerder:Object.keys(before.types)},confidence:conf});
+  if(before.status!==cur.status) evt("MATCH_CHANGED",{...id,detail:{from:before.status,to:cur.status,types},confidence:conf});
+  if(before.simmable!==cur.simmable) evt("SIMMABLE_CHANGED",{...id,detail:{from:before.simmable,to:cur.simmable,nm},confidence:conf});
+  const added=types.filter(t=>!(t in before.types));
+  if(added.length) evt("TYPE_NEW",{...id,detail:{added,previously:Object.keys(before.types)},confidence:conf});
   const tot=o=>Object.values(o).reduce((x,y)=>x+y,0)||1;
   for(const t of new Set([...Object.keys(before.types),...types])){
-   if(nieuw.includes(t)) continue;
+   if(added.includes(t)) continue;
    const va=(before.types[t]??0)/tot(before.types), na=(cur.types[t]??0)/tot(cur.types);
    if(Math.abs(na-va)>=(S.type_share_delta??0.2))
-    evt("TYPE_MIX_SHIFT",{...id,detail:{type:t,aandeel_van:+va.toFixed(2),aandeel_naar:+na.toFixed(2)},confidence:conf});}
+    evt("TYPE_MIX_SHIFT",{...id,detail:{type:t,share_from:+va.toFixed(2),share_to:+na.toFixed(2)},confidence:conf});}
   if(before.dow.length && before.dow.sort().join()!==[...cur.dow].sort().join())
-   evt("DOW_PATTERN_CHANGE",{...id,detail:{van:before.dow,naar:cur.dow}});
-  if(wasSusp) evt("RESUMED",{...id,detail:{hervat_op:cur.last_seen},confidence:conf});}
+   evt("DOW_PATTERN_CHANGE",{...id,detail:{from:before.dow,to:cur.dow}});
+  if(wasSusp) evt("RESUMED",{...id,detail:{resumed_on:cur.last_seen},confidence:conf});}
  LEDGER[key]=cur;}
 
 for(const [key,x] of Object.entries(LEDGER)){
@@ -198,43 +202,43 @@ for(const [key,x] of Object.entries(LEDGER)){
  x.missed=(x.missed??0)+1;
  if(x.missed>=(S.missed_before_suspend??3)){x.state="suspended";
   evt("SUSPENDED",{pair:x.pair,airline:x.airline,flight:x.flight,
-   detail:{laatst_gezien:x.last_seen,gemiste_gelegenheden:x.missed},
-   confidence:`${x.missed} opeenvolgende gelegenheden gemist`});}}
+   detail:{last_seen:x.last_seen,missed_opportunities:x.missed},
+   confidence:`${x.missed} consecutive opportunities missed`});}}
 
 const active=Object.values(LEDGER).filter(x=>x.state==="active");
 const nowPairs=new Set(active.map(x=>x.pair));
-for(const p of nowPairs) if(!prevPairs.has(p)) evt("PAIR_NEW",{pair:p,detail:{eerste_verbinding:true}});
-for(const p of prevPairs) if(!nowPairs.has(p)) evt("PAIR_GONE",{pair:p,detail:{geen_actieve_vluchtregel:true}});
+for(const p of nowPairs) if(!prevPairs.has(p)) evt("PAIR_NEW",{pair:p,detail:{first_connection:true}});
+for(const p of prevPairs) if(!nowPairs.has(p)) evt("PAIR_GONE",{pair:p,detail:{no_active_flight_line:true}});
 
 const curS=seasonFor(iso(new Date())).label, othS=counter(curS);
 for(const x of Object.values(LEDGER)){
  const A=x.seasons?.[curS],B=x.seasons?.[othS];
  const id={pair:x.pair,airline:x.airline,flight:x.flight,season:curS};
- if(A&&!B) evt("SEASON_NEW",{...id,detail:{waargenomen:`${A.first} t/m ${A.last}`,dagen:A.days,tegenseizoen:othS},confidence:"waargenomen grenzen, niet geschat"});
- else if(!A&&B) evt("SEASON_NOT_RETURNING",{...id,detail:{vorig:`${B.first} t/m ${B.last}`,tegenseizoen:othS}});
+ if(A&&!B) evt("SEASON_NEW",{...id,detail:{observed:`${A.first} through ${A.last}`,days:A.days,counter_season:othS},confidence:"observed boundaries, not estimated"});
+ else if(!A&&B) evt("SEASON_NOT_RETURNING",{...id,detail:{previous:`${B.first} through ${B.last}`,counter_season:othS}});
  else if(A&&B){
   const ta=Object.keys(A.types),tb=Object.keys(B.types);
   if(ta.some(t=>!tb.includes(t))||tb.some(t=>!ta.includes(t))) evt("SEASON_TYPE_SWAP",{...id,detail:{[curS]:ta,[othS]:tb}});
   if(A.std&&B.std&&A.std!==B.std) evt("SEASON_TIME_SHIFT",{...id,detail:{[curS]:A.std,[othS]:B.std}});}}
 
-/* ---------- hoofdmatrix: alleen eigen velden ---------- */
+/* ---------- main matrix: airports you own only ---------- */
 const pairRow=(x,y)=>{const p=pk(x,y),legs=active.filter(l=>l.pair===p);
  return {pair:p,from:ALL[x].name,to:ALL[y].name,nm:gcNm(ALL[x],ALL[y]),
   operators:[...new Set(legs.map(l=>l.airline))].sort(),
   types:[...new Set(legs.flatMap(l=>Object.keys(l.types)))].sort(),
-  status:legs.length?legs.map(l=>l.status).sort().reverse()[0]:"GEEN VERBINDING",
+  status:legs.length?legs.map(l=>l.status).sort().reverse()[0]:"NO SERVICE",
   simmable:legs.some(l=>l.simmable),cargo:legs.some(l=>l.cargo),
   legs:legs.map(l=>({airline:l.airline,flight:l.flight,types:l.types,status:l.status,
    days:l.days.length,std:l.std,sources:l.sources,seasons:l.seasons,first:l.first_seen,last:l.last_seen}))};};
 const pairs=[];
 for(let i=0;i<OWN.length;i++) for(let j=i+1;j<OWN.length;j++) pairs.push(pairRow(OWN[i],OWN[j]));
-const served=pairs.filter(p=>p.status!=="GEEN VERBINDING").length;
+const served=pairs.filter(p=>p.status!=="NO SERVICE").length;
 
-/* ---------- aankoopadvies: netwerkwinst per kandidaat ---------- */
+/* ---------- buy advice: network gain per candidate ---------- */
 const OLDGAIN=load("data/candidates.json",{});
 const candidates=[];
 for(const c of CAND){
- const rows=OWN.map(o=>pairRow(c,o)).filter(r=>r.status!=="GEEN VERBINDING");
+ const rows=OWN.map(o=>pairRow(c,o)).filter(r=>r.status!=="NO SERVICE");
  const gain={new_pairs:rows.length,
   match_pairs:rows.filter(r=>r.status.startsWith("MATCH")).length,
   simmable_pairs:rows.filter(r=>r.simmable).length,
@@ -249,11 +253,11 @@ for(const c of CAND){
   prices.sort((a,b)=>a.price-b.price);
   const prev=OLDGAIN[c]?.prices?.[0]?.price;
   if(prev && prices[0] && prices[0].price < prev*0.95)
-   evt("PRICE_DROP",{pair:c,detail:{van:prev,naar:prices[0].price,winkel:prices[0].store}});}
+   evt("PRICE_DROP",{pair:c,detail:{from:prev,to:prices[0].price,store:prices[0].store}});}
  const prevGain=OLDGAIN[c]?.gain?.match_pairs;
  if(prevGain!==undefined && gain.match_pairs>prevGain)
-  evt("CANDIDATE_GAIN_UP",{pair:c,detail:{van:prevGain,naar:gain.match_pairs,
-   toelichting:"deze aankoop levert nu meer MATCH-paren op dan bij de vorige meting"}});
+  evt("CANDIDATE_GAIN_UP",{pair:c,detail:{from:prevGain,to:gain.match_pairs,
+   note:"this purchase now unlocks more MATCH pairs than at the previous measurement"}});
  candidates.push({icao:c,iata:meta.iata,name:meta.name,focus:meta.focus??"pax",why:meta.why??null,
   known_developers:meta.known_developers??null,price_search:meta.price_search??null,
   prices,gain,routes:rows});}
@@ -261,7 +265,7 @@ candidates.sort((a,b)=>b.gain.match_pairs-a.gain.match_pairs || b.gain.new_pairs
 writeFileSync("data/candidates.json",JSON.stringify(Object.fromEntries(
  candidates.map(c=>[c.icao,{gain:c.gain,prices:c.prices}])),null,1));
 
-/* ---------- wegschrijven ---------- */
+/* ---------- write everything out ---------- */
 mkdirSync("data",{recursive:true}); mkdirSync("docs",{recursive:true});
 writeFileSync("data/ledger.json",JSON.stringify(LEDGER,null,1));
 writeFileSync(REGF,JSON.stringify(REG));
@@ -274,21 +278,23 @@ const summary={generated:new Date().toISOString(),season:seasonFor(iso(new Date(
  flightlines:active.filter(l=>!l.candidate).length,
  suspended:Object.values(LEDGER).filter(x=>x.state==="suspended").length,new_events:events.length,
  price_scrape:!!S.price_scrape};
+/* _prices is the English key; _prijzen is still read so an older config keeps working. */
 writeFileSync("docs/data.json",JSON.stringify({summary,pairs,candidates,
- events:allEv.slice(0,800),fleet:CFG.fleet,airports:CFG.airports,prices_note:CFG._prijzen}));
+ events:allEv.slice(0,800),fleet:CFG.fleet,airports:CFG.airports,
+ prices_note:CFG._prices ?? CFG._prijzen ?? null}));
 
 const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
- `- seizoen **${summary.season.label}** (${summary.season.start} t/m ${summary.season.end})`,
- `- paren met verbinding: **${served}** van ${pairs.length}`,
- `- met MATCH: **${summary.pairs_match}** · simbaar: **${summary.pairs_simmable}**`,
- `- nieuwe wijzigingen: **${events.length}**`,"","### Aankoopadvies op netwerkwinst",""];
+ `- season **${summary.season.label}** (${summary.season.start} through ${summary.season.end})`,
+ `- pairs with a connection: **${served}** of ${pairs.length}`,
+ `- with MATCH: **${summary.pairs_match}** &middot; simmable: **${summary.pairs_simmable}**`,
+ `- new changes: **${events.length}**`,"","### Buy advice by network gain",""];
 for(const c of candidates.slice(0,6))
- md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} paren, +${c.gain.match_pairs} met MATCH`
-  + (c.prices?.[0]?` · goedkoopst nu ${c.prices[0].price} ${c.prices[0].currency??""} bij ${c.prices[0].store}`:""));
+ md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} pairs, +${c.gain.match_pairs} with MATCH`
+  + (c.prices?.[0]?` &middot; cheapest now ${c.prices[0].price} ${c.prices[0].currency??""} at ${c.prices[0].store}`:""));
 md.push("");
-for(const e of events.slice(0,40)) md.push(`- \`${e.kind}\` ${e.pair??""} ${e.airline??""} ${e.flight??""} — ${JSON.stringify(e.detail)}`);
+for(const e of events.slice(0,40)) md.push(`- \`${e.kind}\` ${e.pair??""} ${e.airline??""} ${e.flight??""} - ${JSON.stringify(e.detail)}`);
 writeFileSync("data/last-run.md",md.join("\n"));
 if(process.env.ROUTEWATCH_WEBHOOK && events.length)
  await fetch(process.env.ROUTEWATCH_WEBHOOK,{method:"POST",headers:{"content-type":"application/json"},
   body:JSON.stringify({text:md.join("\n")})}).catch(()=>{});
-console.log(`klaar: ${served}/${pairs.length} paren, ${events.length} wijzigingen, ${candidates.length} kandidaten`);
+console.log(`done: ${served}/${pairs.length} pairs, ${events.length} changes, ${candidates.length} candidates`);
