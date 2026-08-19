@@ -1,39 +1,48 @@
 #!/usr/bin/env node
 /**
- * collect-adb.mjs - budgetbewuste collector voor RouteWatch
+ * collect-adb.mjs - budget-conscious collector for RouteWatch
  *
- * Raakt routewatch.mjs NIET aan. Schrijft CSV's in de vorm die de bestaande
- * manual()-provider al leest:
- *     data/manual/{ICAO}_{JJJJ-MM-DD}.csv
- *     arr_icao,airline,flight_no,std,type_raw,cargo
+ * Does NOT touch routewatch.mjs. Writes CSVs in the shape the existing manual()
+ * provider already reads:
+ *     data/manual/{ICAO}_{YYYY-MM-DD}.csv
+ *     arr_icao,airline,flight_no,std,type_raw,cargo,reg
  *
  * ------------------------------------------------------------------ FIX v2 --
- * WAT ER MIS WAS: de URL zet withLeg=true. De documentatie zegt daarover:
+ * WHAT WAS WRONG: the URL sets withLeg=true. The documentation says about that:
  *   "Movement property will be replaced with Departure and Arrival properties"
- * Deze code las f.movement.airport.icao, dat bestaat dan niet, dus elke
- * bestemming werd undefined en viel buiten de collectie. Resultaat: 527
- * vertrekken gevonden op EHAM en 0 bruikbare regels.
+ * This code read f.movement.airport.icao, which then does not exist, so every
+ * destination came out undefined and fell outside the collection. Result: 527
+ * departures found at EHAM and 0 usable rows.
  *
- * NU: eerst arrival.airport, dan movement.airport als terugval. Werkt dus met
- * en zonder withLeg. Bovendien wordt een IATA-code herkend en via de config
- * naar ICAO vertaald, zodat AMS ook EHAM oplevert.
+ * NOW: arrival.airport first, then movement.airport as a fallback. So it works
+ * with and without withLeg. On top of that an IATA code is recognised and
+ * translated to ICAO through the config, so AMS also yields EHAM.
  *
- * OOK NIEUW: 429-backoff. Bij de vorige run kwam de snelheidslimiet al na 9
- * aanroepen langs terwijl de pauzes 1,3 tot 2,8 seconden waren. De pauze staat
- * nu op 2.500 ms en bij een 429 wacht het script 60 seconden en probeert het
- * eenmaal opnieuw voordat het stopt.
+ * ALSO NEW: 429 backoff. On the previous run the rate limit hit after only 9
+ * calls even though the pauses were 1.3 to 2.8 seconds. The pause is now
+ * 2,500 ms and on a 429 the script waits 60 seconds and retries once before
+ * giving up.
  *
- * BUDGET (AeroDataBox BASIC: 600 units/maand, 2400 requests, 1 req/seconde)
+ * ------------------------------------------------------------------ FIX v3 --
+ * The registration is now written as a seventh column. routewatch.mjs stores it
+ * per flight line in the ledger as `regs`, and enrich-adb.mjs reads exactly that
+ * field to look up aircraft. Without this column that lookup has nothing to
+ * work with and data/aircraft-meta.json stays empty.
+ * The column is appended at the end, and manual() reads columns by name, so
+ * older CSVs without it keep working.
+ *
+ * BUDGET (AeroDataBox BASIC: 600 units/month, 2400 requests, 1 req/second)
  *   Tier 1 = 1 unit, Tier 2 = 2, Tier 3 = 6, Tier 4 = 60.
- *   41 velden x 2 units = 82 units per ronde, 1 ronde per week = circa 355/maand.
+ *   41 airports x 2 units = 82 units per round, 1 round per week = about 355/month.
  *
- * DEKKING ZONDER BLINDE VLEKKEN
- *   Het FIDS-venster mag maximaal 12 uur zijn. In plaats van 2 aanroepen per dag
- *   doen we 1 aanroep en roteren we het venster per week:
+ * COVERAGE WITHOUT BLIND SPOTS
+ *   The FIDS window may be 12 hours at most. Instead of 2 calls per day we make
+ *   1 call and rotate the window per week:
  *     week 0: 06:00-18:00   week 1: 12:00-00:00
  *     week 2: 00:00-12:00   week 3: 18:00-06:00
- *   De gemeten dag schuift ook per week op, zodat alle 7 weekdagen langskomen.
- *   De ledger van routewatch.mjs is cumulatief, dus die deelmetingen vullen aan.
+ *   The measured day also shifts per week, so all 7 weekdays come around.
+ *   The ledger in routewatch.mjs is cumulative, so those partial measurements
+ *   add up.
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -42,7 +51,7 @@ const LOG = (...a) => console.log("[collect-adb]", ...a);
 
 const KEY = process.env.RAPIDAPI_KEY;
 if (!KEY) {
-  LOG("geen RAPIDAPI_KEY gezet - niets te doen, RouteWatch draait straks op bestaande CSV's");
+  LOG("no RAPIDAPI_KEY set - nothing to do, RouteWatch will run on the existing CSVs");
   process.exit(0);
 }
 
@@ -64,27 +73,27 @@ let CFG;
 try {
   CFG = JSON.parse(readFileSync("config/collection.json", "utf8"));
 } catch (e) {
-  LOG("kan config/collection.json niet lezen:", e.message);
+  LOG("cannot read config/collection.json:", e.message);
   process.exit(1);
 }
 
 const AIRPORTS = (CFG.airports ?? []).map(a => a.icao).filter(Boolean);
 const KNOWN = new Set(AIRPORTS);
 
-// IATA -> ICAO, zodat AMS ook als EHAM wordt herkend.
+// IATA -> ICAO, so AMS is recognised as EHAM as well.
 const IATA2ICAO = {};
 for (const a of CFG.airports ?? []) {
   if (a.iata && a.icao) IATA2ICAO[String(a.iata).toUpperCase()] = a.icao;
 }
 
 if (!AIRPORTS.length) {
-  LOG("geen luchthavens in de config gevonden");
+  LOG("no airports found in the config");
   process.exit(1);
 }
 
-/* ------------------------------------------------------------- rotatie ---- */
+/* ------------------------------------------------------------- rotation --- */
 
-const EPOCH = Date.UTC(2026, 0, 5);                 // maandag 5 januari 2026
+const EPOCH = Date.UTC(2026, 0, 5);                 // Monday 5 January 2026
 const weekIndex = Math.floor((Date.now() - EPOCH) / (7 * 864e5));
 const WINDOWS = ["06:00", "12:00", "00:00", "18:00"];
 const START = process.env.ADB_WINDOW || WINDOWS[((weekIndex % 4) + 4) % 4];
@@ -105,23 +114,27 @@ function windowFor(day) {
 
 /* ------------------------------------------------------------------ csv --- */
 
-const HEADER = "arr_icao,airline,flight_no,std,type_raw,cargo";
+/* reg is last on purpose: manual() in routewatch.mjs maps columns by name, so
+   appending a column never breaks the CSVs that are already on disk. */
+const HEADER = "arr_icao,airline,flight_no,std,type_raw,cargo,reg";
 const clean = v => String(v ?? "").replace(/[,\r\n]/g, " ").trim();
 
 function writeCsv(icao, day, rows) {
   mkdirSync("data/manual", { recursive: true });
   const path = `data/manual/${icao}_${day}.csv`;
   const body = rows.map(r =>
-    [clean(r.arr), clean(r.airline), clean(r.flight), clean(r.std), clean(r.type), r.cargo ? 1 : 0].join(",")
+    [clean(r.arr), clean(r.airline), clean(r.flight), clean(r.std), clean(r.type),
+     r.cargo ? 1 : 0, clean(r.reg)].join(",")
   );
   writeFileSync(path, [HEADER, ...body].join("\n") + "\n");
-  LOG(`geschreven ${path}: ${rows.length} regels`);
+  const withReg = rows.filter(r => r.reg).length;
+  LOG(`wrote ${path}: ${rows.length} rows, ${withReg} with a registration`);
 }
 
-/* --------------------------------------------------------- bestemming ----- */
+/* -------------------------------------------------------- destination ----- */
 
-/* Met withLeg=true heet het blok arrival; zonder withLeg heet het movement.
- * Beide worden geprobeerd, en zowel ICAO als IATA wordt herkend.
+/* With withLeg=true the block is called arrival; without withLeg it is called
+ * movement. Both are tried, and ICAO as well as IATA is recognised.
  */
 function destOf(f) {
   const ap = f?.arrival?.airport ?? f?.movement?.airport ?? null;
@@ -141,24 +154,27 @@ function stdOf(f) {
   return m ? m[1] : "";
 }
 
-/* Eenmalige diagnose: welke sleutels zitten er echt in het antwoord?
- * Kost niets en voorkomt dat we ooit weer moeten gokken.
+/* One-off diagnosis: which keys does the answer really contain?
+ * Costs nothing and stops us from ever having to guess again.
  */
 function diagnose(f) {
   if (diagnosed || !f) return;
   diagnosed = true;
-  LOG(`diagnose - sleutels per vlucht: ${Object.keys(f).join(", ")}`);
+  LOG(`diagnosis - keys per flight: ${Object.keys(f).join(", ")}`);
   const ap = f?.arrival?.airport ?? f?.movement?.airport;
-  if (ap) LOG(`diagnose - sleutels bestemming: ${Object.keys(ap).join(", ")} | icao=${ap.icao ?? "-"} iata=${ap.iata ?? "-"}`);
-  else LOG(`diagnose - GEEN arrival.airport en GEEN movement.airport gevonden`);
+  if (ap) LOG(`diagnosis - destination keys: ${Object.keys(ap).join(", ")} | icao=${ap.icao ?? "-"} iata=${ap.iata ?? "-"}`);
+  else LOG(`diagnosis - NO arrival.airport and NO movement.airport found`);
+  const ac = f?.aircraft;
+  if (ac) LOG(`diagnosis - aircraft keys: ${Object.keys(ac).join(", ")} | reg=${ac.reg ?? "-"}`);
+  else LOG(`diagnosis - no aircraft block, so no registrations this run`);
 }
 
-/* ------------------------------------------------------------- ophalen ---- */
+/* ------------------------------------------------------------- fetching --- */
 
 async function fetchAirportDay(icao, day, retried = false) {
   if (stopped) return null;
   if (spent + UNITS_PER_CALL > UNIT_CAP) {
-    LOG(`unitplafond ${UNIT_CAP} bereikt na ${spent} units - rest van de run overgeslagen`);
+    LOG(`unit cap ${UNIT_CAP} reached after ${spent} units - rest of the run skipped`);
     stopped = true;
     return null;
   }
@@ -173,16 +189,16 @@ async function fetchAirportDay(icao, day, retried = false) {
 
     if (res.status === 429) {
       if (!retried) {
-        LOG(`${icao} ${day}: 429 - even ${Math.round(BACKOFF_MS / 1000)}s wachten en eenmaal opnieuw proberen`);
+        LOG(`${icao} ${day}: 429 - waiting ${Math.round(BACKOFF_MS / 1000)}s and retrying once`);
         await sleep(BACKOFF_MS);
         return fetchAirportDay(icao, day, true);
       }
-      LOG(`${icao} ${day}: 429 na de tweede poging - quotum of snelheidslimiet, stop deze run`);
+      LOG(`${icao} ${day}: 429 after the second attempt - quota or rate limit, stopping this run`);
       stopped = true;
       return null;
     }
-    if (res.status === 403) { LOG(`${icao} ${day}: 403 - sleutel niet geabonneerd op dit plan, stop`); stopped = true; return null; }
-    if (res.status === 404) { LOG(`${icao} ${day}: 404 - geen data in dit venster`); return []; }
+    if (res.status === 403) { LOG(`${icao} ${day}: 403 - key not subscribed to this plan, stopping`); stopped = true; return null; }
+    if (res.status === 404) { LOG(`${icao} ${day}: 404 - no data in this window`); return []; }
     if (!res.ok) { LOG(`${icao} ${day}: HTTP ${res.status}`); return []; }
 
     const j = await res.json();
@@ -192,17 +208,19 @@ async function fetchAirportDay(icao, day, retried = false) {
     const rows = [];
     for (const f of deps) {
       const arr = destOf(f);
-      if (!arr || arr === icao) continue;                 // alleen paren binnen je collectie
+      if (!arr || arr === icao) continue;                 // only pairs inside your collection
       rows.push({
         arr,
         airline: f?.airline?.iata ?? f?.airline?.icao ?? f?.airline?.name ?? "?",
         flight: String(f?.number ?? "").replace(/\s/g, "") || "?",
         std: stdOf(f),
         type: f?.aircraft?.model ?? f?.aircraft?.typeCode ?? "",
-        cargo: String(f?.isCargo ?? "").toLowerCase() === "true" ? 1 : 0
+        cargo: String(f?.isCargo ?? "").toLowerCase() === "true" ? 1 : 0,
+        /* Feeds ledger.regs, which enrich-adb.mjs turns into aircraft-meta.json. */
+        reg: f?.aircraft?.reg ?? ""
       });
     }
-    LOG(`${icao} ${day} ${START}+12u: ${deps.length} vertrekken, ${rows.length} binnen je collectie (units ${spent}/${UNIT_CAP})`);
+    LOG(`${icao} ${day} ${START}+12h: ${deps.length} departures, ${rows.length} inside your collection (units ${spent}/${UNIT_CAP})`);
     return rows;
   } catch (e) {
     LOG(`${icao} ${day} error:`, e.message);
@@ -210,12 +228,12 @@ async function fetchAirportDay(icao, day, retried = false) {
   }
 }
 
-/* --------------------------------------------------------------- hoofdlus - */
+/* --------------------------------------------------------------- main loop - */
 
-LOG(`ronde ${weekIndex}: venster ${START}+12u, dagverschuiving ${DAY_SHIFT}, ${DAYS} dag(en), ${AIRPORTS.length} velden`);
-LOG(`plafond ${UNIT_CAP} units, ${UNITS_PER_CALL} per aanroep, pauze ${SLEEP_MS} ms, dus maximaal ${Math.floor(UNIT_CAP / UNITS_PER_CALL)} aanroepen deze run`);
+LOG(`round ${weekIndex}: window ${START}+12h, day shift ${DAY_SHIFT}, ${DAYS} day(s), ${AIRPORTS.length} airports`);
+LOG(`cap ${UNIT_CAP} units, ${UNITS_PER_CALL} per call, pause ${SLEEP_MS} ms, so at most ${Math.floor(UNIT_CAP / UNITS_PER_CALL)} calls this run`);
 
-let written = 0, skipped = 0, totalRows = 0;
+let written = 0, skipped = 0, totalRows = 0, totalRegs = 0;
 
 outer:
 for (let d = 1; d <= DAYS; d++) {
@@ -226,11 +244,17 @@ for (let d = 1; d <= DAYS; d++) {
     if (existsSync(path) && !OVERWRITE) { skipped++; continue; }
     const rows = await fetchAirportDay(icao, day);
     if (rows === null) break outer;
-    if (rows.length) { writeCsv(icao, day, rows); written++; totalRows += rows.length; }
+    if (rows.length) {
+      writeCsv(icao, day, rows);
+      written++; totalRows += rows.length;
+      totalRegs += rows.filter(r => r.reg).length;
+    }
     await sleep(SLEEP_MS);
   }
 }
 
-LOG(`klaar: ${written} CSV's met ${totalRows} regels, ${skipped} overgeslagen omdat ze al bestonden, ${spent} units verbruikt`);
-if (stopped) LOG("let op: de run is vroegtijdig gestopt om je quotum te beschermen");
-if (!written && !skipped) LOG("nul CSV's: kijk naar de diagnoseregel hierboven om te zien hoe de bestemming heet in het antwoord");
+LOG(`done: ${written} CSVs with ${totalRows} rows (${totalRegs} carrying a registration), `
+  + `${skipped} skipped because they already existed, ${spent} units used`);
+if (stopped) LOG("note: the run stopped early to protect your quota");
+if (!written && !skipped) LOG("zero CSVs: check the diagnosis line above to see what the destination is called in the answer");
+if (written && !totalRegs) LOG("note: rows were written but no registrations came back, so aircraft-meta.json cannot fill up yet");
