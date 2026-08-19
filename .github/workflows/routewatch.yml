@@ -60,8 +60,20 @@ jobs:
       #    tells us exactly what must be addressed before a public release.
       #    Do NOT add --sweep here until the data-retention migration is designed
       #    and reviewed: the current alpha still depends on its historic ledger.
+      #    The audit script itself writes no report file, so the shell captures
+      #    whatever it prints. pipefail keeps a script failure visible instead of
+      #    being masked by tee's exit code.
       - name: Audit raw-data retention (report only)
-        run: node scripts/publish-derived.mjs --audit
+        run: |
+          set -o pipefail
+          mkdir -p data
+          {
+            echo "### Retention audit"
+            echo ""
+            echo '```'
+          } > data/retention-check.md
+          node scripts/publish-derived.mjs --audit | tee -a data/retention-check.md
+          echo '```' >> data/retention-check.md
 
       # 4. Enrich: reads the ledger that step 2 just wrote, so it must run after
       #    RouteWatch. run-enrich.mjs is a thin wrapper that executes
