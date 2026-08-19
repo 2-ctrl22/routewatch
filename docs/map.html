@@ -9,7 +9,7 @@
     --bg:#0b0f14; --p:#121820; --p2:#182029; --l:#243040;
     --t:#e6edf3; --d:#8b98a8;
     --own:#3fb950; --pax:#d29922; --cargo:#58a6ff;
-    --match:#3fb950; --near:#d29922; --plain:#5a6b80;
+    --match:#3fb950; --near:#d29922; --plain:#46566e;
     --u:#58a6ff; --r:12px;
   }
   *{box-sizing:border-box}
@@ -35,29 +35,33 @@
   .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
   .head{display:flex;gap:14px;align-items:center;justify-content:space-between;
     padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
-  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--d)}
-  .legend span{display:inline-flex;align-items:center;gap:6px}
-  .dot{width:9px;height:9px;border-radius:50%}
-  .bar{width:16px;height:3px;border-radius:2px}
   .toggles{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
   button.t{background:var(--p2);color:var(--d);border:1px solid var(--l);
     border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
   button.t[aria-pressed="true"]{color:var(--u);border-color:var(--u)}
   button.t:hover{color:var(--t)}
+  button.t i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;
+    vertical-align:1px}
+  button.t .bar{width:14px;height:3px;border-radius:2px;display:inline-block;margin-right:6px;
+    vertical-align:3px}
   .zoombar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--d)}
   button.z{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:7px;
     width:28px;height:26px;cursor:pointer;font:inherit;line-height:1}
   button.z:hover{border-color:#31415a}
   .mapwrap{position:relative}
-  #map{display:block;width:100%;height:auto;background:#0d131a;cursor:grab;touch-action:none}
+  #map{display:block;width:100%;height:auto;background:#0a0e13;cursor:grab;touch-action:none}
   #map.drag{cursor:grabbing}
-  .land{fill:#1b2430;stroke:#26313f}
-  .grat{fill:none;stroke:#161f29}
-  .arc{fill:none;stroke-linecap:round;opacity:.5}
-  .arc:hover{opacity:1}
-  .pt{cursor:pointer;stroke:#0b0f14}
-  .pt:hover{stroke:#fff}
-  .lbl{fill:var(--d);font-size:9px;pointer-events:none;font-family:ui-monospace,Menlo,monospace}
+  .land{fill:#151d27;stroke:#222d3b}
+  .grat{fill:none;stroke:#121a23}
+  .arc{fill:none;stroke-linecap:round}
+  .pt{cursor:pointer;stroke:#0a0e13}
+  .lbl{fill:#c2ccd8;font-size:9px;pointer-events:none;
+    font-family:ui-monospace,Menlo,monospace;paint-order:stroke;stroke:#0a0e13;stroke-width:2.5}
+  /* Focus mode: everything fades except the airport you point at. */
+  #map.focus .arc{opacity:.06}
+  #map.focus .arc.on{opacity:.95}
+  #map.focus .pt{opacity:.25}
+  #map.focus .pt.on{opacity:1}
   .note{padding:15px 16px;color:var(--d);font-size:13px;text-align:center}
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
     background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 11px;
@@ -76,6 +80,7 @@
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
   .num{font-variant-numeric:tabular-nums;white-space:nowrap}
   .op{border-bottom:1px dotted #3d4759;cursor:help}
+  .op.unk{border-bottom-color:#4a3a3a;color:#9aa4b1}
   .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
   .scroll{max-height:430px;overflow:auto}
   input{background:var(--p2);border:1px solid var(--l);color:var(--t);padding:5px 10px;
@@ -99,22 +104,15 @@
   <div class="panel">
     <div class="head">
       <h2>Network</h2>
-      <div class="legend">
-        <span><i class="dot" style="background:var(--own)"></i>you own it</span>
-        <span><i class="dot" style="background:var(--pax)"></i>wishlist, passengers</span>
-        <span><i class="dot" style="background:var(--cargo)"></i>wishlist, cargo</span>
-        <span><i class="bar" style="background:var(--match)"></i>you own the aircraft</span>
-        <span><i class="bar" style="background:var(--near)"></i>close substitute</span>
-        <span><i class="bar" style="background:var(--plain)"></i>aircraft you do not own</span>
-      </div>
       <div class="toggles">
-        <button class="t" data-f="own" aria-pressed="true">Airports</button>
-        <button class="t" data-f="cand" aria-pressed="true">Wishlist</button>
-        <button class="t" data-f="arcs" aria-pressed="true">Routes</button>
-        <button class="t" data-f="labels" aria-pressed="false">Labels</button>
-        <button class="t" data-f="match" aria-pressed="false">Flyable only</button>
+        <button class="t" data-f="match" aria-pressed="true"><span class="bar" style="background:var(--match)"></span>You can fly it</button>
+        <button class="t" data-f="near" aria-pressed="true"><span class="bar" style="background:var(--near)"></span>Close substitute</button>
+        <button class="t" data-f="plain" aria-pressed="false"><span class="bar" style="background:var(--plain)"></span>Not in fleet</button>
         <button class="t" data-f="sim" aria-pressed="false">Fits a session</button>
         <button class="t" data-f="cargo" aria-pressed="false">Cargo only</button>
+        <button class="t" data-f="own" aria-pressed="true"><i style="background:var(--own)"></i>Airports</button>
+        <button class="t" data-f="cand" aria-pressed="true"><i style="background:var(--pax)"></i>Wishlist</button>
+        <button class="t" data-f="labels" aria-pressed="false">Labels</button>
       </div>
       <div class="zoombar">
         <input id="find" placeholder="zoom to ICAO">
@@ -128,14 +126,12 @@
       <svg id="map" viewBox="0 0 960 480" role="img" aria-label="World map with airports and routes"></svg>
     </div>
     <div class="note" id="note" hidden></div>
-    <div class="note" style="border-top:1px solid var(--l);color:#6b7787">
-      Scroll to zoom, drag to pan, double-click to reset.
-    </div>
+    <div class="note" style="border-top:1px solid var(--l);color:#6b7787" id="hint"></div>
   </div>
 
   <div class="grid">
     <div class="panel">
-      <div class="head"><h2>Routes with real flights</h2><span class="pill" id="cPairs"></span></div>
+      <div class="head"><h2>Routes on the map</h2><span class="pill" id="cPairs"></span></div>
       <div class="scroll">
         <table><thead><tr><th>Route</th><th>Distance</th><th>Operators</th><th>Aircraft</th>
         <th>Can you fly it?</th></tr></thead>
@@ -153,8 +149,8 @@
 
   <footer>
     Everything here comes from <span class="mono">docs/data.json</span>, refreshed by RouteWatch on every run.
-    Arcs are drawn only for routes where flights were actually observed. Runway lengths appear in the
-    tooltip once <span class="mono">data/airports-meta.json</span> is filled.
+    Routes flown by aircraft you do not own are hidden at first, because they are the large majority and
+    they bury the ones you can actually fly. Switch them back on with <b>Not in fleet</b>.
   </footer>
 </main>
 
@@ -171,30 +167,30 @@ const show=(e,html)=>{tip.innerHTML=html;tip.style.opacity=1;
   tip.style.left=Math.min(e.clientX+14,innerWidth-330)+"px";tip.style.top=(e.clientY+14)+"px";};
 const hide=()=>tip.style.opacity=0;
 
-/* Older runs wrote this sentinel in Dutch, newer runs write it in English. */
 const NOSVC=s=>{const v=String(s??"");return v==="GEEN VERBINDING"||v==="NO SERVICE";};
 const EN={"GEEN VERBINDING":"NO SERVICE","ONBEKEND":"UNKNOWN"};
 const tr=s=>EN[String(s||"")]||String(s||"");
 
-/* Aircraft codes spelled out, same table as the dashboard. */
 const TYPES={B733:"Boeing 737-300",B734:"Boeing 737-400",B735:"Boeing 737-500",
  B736:"Boeing 737-600",B737:"Boeing 737-700",B738:"Boeing 737-800",B739:"Boeing 737-900",
  B73H:"Boeing 737-800",B73Y:"Boeing 737-800 freighter",B738F:"Boeing 737-800 freighter",
- B734F:"Boeing 737-400 freighter",
+ B734F:"Boeing 737-400 freighter",B752:"Boeing 757-200",B753:"Boeing 757-300",
  B37M:"Boeing 737 MAX 7",B38M:"Boeing 737 MAX 8",B38X:"Boeing 737 MAX 8-200",B39M:"Boeing 737 MAX 9",
- B752:"Boeing 757-200",B763:"Boeing 767-300",B772:"Boeing 777-200",B77W:"Boeing 777-300ER",
- B77L:"Boeing 777F",B77F:"Boeing 777F",
- B788:"Boeing 787-8",B789:"Boeing 787-9",B78X:"Boeing 787-10",
+ B762:"Boeing 767-200",B763:"Boeing 767-300",B764:"Boeing 767-400",
+ B772:"Boeing 777-200",B77L:"Boeing 777F",B77F:"Boeing 777F",B77W:"Boeing 777-300ER",B773:"Boeing 777-300",
+ B788:"Boeing 787-8",B789:"Boeing 787-9",B78X:"Boeing 787-10",B744:"Boeing 747-400",B748:"Boeing 747-8",
  BCS1:"Airbus A220-100",BCS3:"Airbus A220-300",
- A319:"Airbus A319",A320:"Airbus A320",A321:"Airbus A321",
+ A318:"Airbus A318",A319:"Airbus A319",A320:"Airbus A320",A321:"Airbus A321",
  A19N:"Airbus A319neo",A20N:"Airbus A320neo",A21N:"Airbus A321neo",
- A332:"Airbus A330-200",A333:"Airbus A330-300",A339:"Airbus A330-900neo",
- A343:"Airbus A340-300",A359:"Airbus A350-900",A35K:"Airbus A350-1000",
- E170:"Embraer E170",E175:"Embraer E175",E190:"Embraer E190",E195:"Embraer E195",
+ A332:"Airbus A330-200",A333:"Airbus A330-300",A338:"Airbus A330-800neo",A339:"Airbus A330-900neo",
+ A343:"Airbus A340-300",A346:"Airbus A340-600",A359:"Airbus A350-900",A35K:"Airbus A350-1000",
+ A388:"Airbus A380-800",
+ E145:"Embraer ERJ-145",E170:"Embraer E170",E175:"Embraer E175",E190:"Embraer E190",E195:"Embraer E195",
  E290:"Embraer E190-E2",E295:"Embraer E195-E2",
- AT43:"ATR 42",AT72:"ATR 72",AT75:"ATR 72-500",AT76:"ATR 72-600",
- DH8D:"Dash 8 Q400",CRJ9:"Bombardier CRJ900",CRJX:"Bombardier CRJ1000",
- SB20:"Saab 2000",SF34:"Saab 340"};
+ AT43:"ATR 42",AT45:"ATR 42-500",AT46:"ATR 42-600",AT72:"ATR 72",AT75:"ATR 72-500",AT76:"ATR 72-600",
+ DH8A:"Dash 8-100",DH8C:"Dash 8-300",DH8D:"Dash 8 Q400",
+ CRJ2:"Bombardier CRJ200",CRJ7:"Bombardier CRJ700",CRJ9:"Bombardier CRJ900",CRJX:"Bombardier CRJ1000",
+ SB20:"Saab 2000",SF34:"Saab 340",F70:"Fokker 70",F100:"Fokker 100",MD11:"McDonnell Douglas MD-11"};
 function prettyType(s){
   const k=String(s||"").trim().toUpperCase();
   if(TYPES[k]) return TYPES[k];
@@ -202,47 +198,63 @@ function prettyType(s){
           .join(" ").replace(/ neo/g,"neo");
 }
 
-/* Operators arrive as IATA from AeroDataBox and as an ICAO callsign prefix from
- * OpenSky, so both spellings map to the same airline name. */
-const AIRLINES={
- KL:"KLM",KLM:"KLM",WA:"KLM Cityhopper",KLC:"KLM Cityhopper",
- HV:"Transavia",TRA:"Transavia",TO:"Transavia France",TVF:"Transavia France",
- AF:"Air France",AFR:"Air France",BA:"British Airways",BAW:"British Airways",
- LH:"Lufthansa",DLH:"Lufthansa",LX:"Swiss",SWR:"Swiss",OS:"Austrian Airlines",AUA:"Austrian Airlines",
- SN:"Brussels Airlines",BEL:"Brussels Airlines",EW:"Eurowings",EWG:"Eurowings",
- "4Y":"Discover Airlines",OCN:"Discover Airlines",DE:"Condor",CFG:"Condor",
- X3:"TUI fly Germany",TUI:"TUI fly Germany",BY:"TUI Airways",TOM:"TUI Airways",
- TB:"TUI fly Belgium",JAF:"TUI fly Belgium",
- FR:"Ryanair",RYR:"Ryanair",RK:"Ryanair UK",RUK:"Ryanair UK",
- U2:"easyJet",EZY:"easyJet",EJU:"easyJet Europe",EC:"easyJet Europe",
- VY:"Vueling",VLG:"Vueling",IB:"Iberia",IBE:"Iberia",I2:"Iberia Express",IBS:"Iberia Express",
- UX:"Air Europa",AEA:"Air Europa",TP:"TAP Air Portugal",TAP:"TAP Air Portugal",
- AZ:"ITA Airways",ITY:"ITA Airways",
- SK:"SAS",SAS:"SAS",DY:"Norwegian",NAX:"Norwegian",D8:"Norwegian Sweden",IBK:"Norwegian Sweden",
- AY:"Finnair",FIN:"Finnair",LO:"LOT Polish Airlines",LOT:"LOT Polish Airlines",
- W6:"Wizz Air",WZZ:"Wizz Air",A3:"Aegean Airlines",AEE:"Aegean Airlines",
- OA:"Olympic Air",OAL:"Olympic Air",TK:"Turkish Airlines",THY:"Turkish Airlines",
- BT:"airBaltic",BTI:"airBaltic",LG:"Luxair",LGL:"Luxair",EI:"Aer Lingus",EIN:"Aer Lingus",
- LS:"Jet2",EXS:"Jet2",FI:"Icelandair",ICE:"Icelandair",WF:"Wideroe",WIF:"Wideroe",
- V7:"Volotea",VOE:"Volotea",PC:"Pegasus Airlines",PGT:"Pegasus Airlines",
+/* Names come from data.json, built by the run itself. The short list is only a
+ * fallback for codes the data has not named yet, mostly OpenSky callsigns. */
+const FALLBACK={KL:"KLM",KLM:"KLM",KLC:"KLM Cityhopper",HV:"Transavia",TRA:"Transavia",
+ TVF:"Transavia France",AF:"Air France",AFR:"Air France",BA:"British Airways",BAW:"British Airways",
+ LH:"Lufthansa",DLH:"Lufthansa",CLH:"Lufthansa CityLine",LX:"Swiss",SWR:"Swiss",
+ OS:"Austrian Airlines",AUA:"Austrian Airlines",SN:"Brussels Airlines",BEL:"Brussels Airlines",
+ EW:"Eurowings",EWG:"Eurowings",DE:"Condor",CFG:"Condor",FR:"Ryanair",RYR:"Ryanair",
+ U2:"easyJet",EZY:"easyJet",EJU:"easyJet Europe",VY:"Vueling",VLG:"Vueling",
+ IB:"Iberia",IBE:"Iberia",IBS:"Iberia Express",ANE:"Air Nostrum",UX:"Air Europa",AEA:"Air Europa",
+ TP:"TAP Air Portugal",TAP:"TAP Air Portugal",AZ:"ITA Airways",ITY:"ITA Airways",
+ A3:"Aegean Airlines",AEE:"Aegean Airlines",OA:"Olympic Air",OAL:"Olympic Air",
+ GQ:"Sky Express",SEH:"Sky Express",SK:"SAS",SAS:"SAS",DY:"Norwegian",NAX:"Norwegian",
+ AY:"Finnair",FIN:"Finnair",BT:"airBaltic",BTI:"airBaltic",FI:"Icelandair",ICE:"Icelandair",
+ LO:"LOT Polish Airlines",LOT:"LOT Polish Airlines",W6:"Wizz Air",WZZ:"Wizz Air",
+ W4:"Wizz Air Malta",WMT:"Wizz Air Malta",W9:"Wizz Air UK",WUK:"Wizz Air UK",
+ LG:"Luxair",LGL:"Luxair",EI:"Aer Lingus",EIN:"Aer Lingus",LS:"Jet2",EXS:"Jet2",
+ BY:"TUI Airways",TOM:"TUI Airways",TUI:"TUI fly Germany",JAF:"TUI fly Belgium",
+ TK:"Turkish Airlines",THY:"Turkish Airlines",PC:"Pegasus Airlines",PGT:"Pegasus Airlines",
  QR:"Qatar Airways",QTR:"Qatar Airways",EK:"Emirates",UAE:"Emirates",
- EY:"Etihad Airways",ETD:"Etihad Airways",
- UA:"United Airlines",UAL:"United Airlines",AA:"American Airlines",AAL:"American Airlines",
- DL:"Delta Air Lines",DAL:"Delta Air Lines",
+ EY:"Etihad Airways",ETD:"Etihad Airways",KU:"Kuwait Airways",KAC:"Kuwait Airways",
+ SV:"Saudia",SVA:"Saudia",MS:"EgyptAir",MSR:"EgyptAir",ET:"Ethiopian Airlines",ETH:"Ethiopian Airlines",
  SA:"South African Airways",SAA:"South African Airways",
- NZ:"Air New Zealand",ANZ:"Air New Zealand",
- /* Cargo carriers, codes verified against IATA and CAPA listings. */
+ UA:"United Airlines",UAL:"United Airlines",AA:"American Airlines",AAL:"American Airlines",
+ DL:"Delta Air Lines",DAL:"Delta Air Lines",NZ:"Air New Zealand",ANZ:"Air New Zealand",
+ SQ:"Singapore Airlines",SIA:"Singapore Airlines",
  FX:"FedEx Express",FDX:"FedEx Express","5X":"UPS Airlines",UPS:"UPS Airlines",
- QY:"EAT Leipzig (DHL)",BCS:"EAT Leipzig (DHL)",
- "3V":"ASL Airlines Belgium",TAY:"ASL Airlines Belgium",
- "5O":"ASL Airlines France",FPO:"ASL Airlines France",
- T2:"West Atlantic Sweden",SWN:"West Atlantic Sweden",NPT:"West Atlantic UK",
- DJ:"Maersk Air Cargo",SRR:"Maersk Air Cargo",CV:"Cargolux",CLX:"Cargolux"};
-const airlineName=c=>AIRLINES[String(c||"").trim().toUpperCase()]||null;
+ QY:"EAT Leipzig (DHL)",BCS:"EAT Leipzig (DHL)","3V":"ASL Airlines Belgium",TAY:"ASL Airlines Belgium",
+ "5O":"ASL Airlines France",FPO:"ASL Airlines France",T2:"West Atlantic Sweden",SWN:"West Atlantic Sweden",
+ NPT:"West Atlantic UK",DJ:"Maersk Air Cargo",SRR:"Maersk Air Cargo",CV:"Cargolux",CLX:"Cargolux",
+ MP:"Martinair Cargo",MPH:"Martinair Cargo",GEC:"Lufthansa Cargo",BOX:"AeroLogic"};
+let AIRL={};
+const airlineName=c=>{const k=String(c||"").trim().toUpperCase();
+  return k?(AIRL[k]||FALLBACK[k]||null):null;};
 const opChip=c=>{const n=airlineName(c);
-  return n?'<span class="op" title="'+esc(n)+'">'+esc(c)+'</span>':esc(c);};
+  return n?'<span class="op" title="'+esc(n)+'">'+esc(c)+'</span>'
+         :'<span class="op unk" title="no name for '+esc(c)+' yet">'+esc(c)+'</span>';};
 
-const active={own:true,cand:true,arcs:true,labels:false,match:false,sim:false,cargo:false};
+/* Which of the three bands does a route belong to? */
+function band(s){
+  const v=String(s||"");
+  if(/^MATCH/.test(v)) return "match";
+  if(/NEAR/.test(v)) return "near";
+  return "plain";
+}
+const BANDCOLOR={match:"var(--match)",near:"var(--near)",plain:"var(--plain)"};
+function flyText(s){
+  const v=String(s||"");
+  if(/^MATCH/.test(v)) return '<span style="color:var(--match)">Yes, you own it</span>';
+  if(/NEAR/.test(v)) return '<span style="color:var(--near)">Almost, substitute</span>';
+  if(/^NO-/.test(v)) return '<span style="color:#8b98a8">No, not in fleet</span>';
+  return '<span style="color:var(--d)">Unknown</span>';
+}
+
+/* Grey routes are the large majority, so they start hidden: otherwise they bury
+ * everything you can actually fly. */
+const active={match:true,near:true,plain:false,sim:false,cargo:false,
+              own:true,cand:true,labels:false};
 let AP={}, PAIRS=[], SUM={}, CAND=[], META={};
 
 /* ------------------------------------------------------------- viewport --- */
@@ -259,11 +271,15 @@ function applyView(){
     +(W/view.k).toFixed(2)+" "+(H/view.k).toFixed(2));
   document.getElementById("zlvl").textContent=view.k.toFixed(1)+"x";
   const s=1/view.k;
+  /* Lines get a touch finer as you zoom in, so a dense cluster opens up
+     instead of turning into a solid block of colour. */
+  const fine=Math.pow(s,1.15);
   gGrat.setAttribute("stroke-width",(0.5*s).toFixed(2));
-  gLand.setAttribute("stroke-width",(0.4*s).toFixed(2));
-  for(const p of gArc.children) p.setAttribute("stroke-width",(p.dataset.w*s).toFixed(2));
+  gLand.setAttribute("stroke-width",(0.5*s).toFixed(2));
+  for(const g of [gPlain,gNear,gMatch])
+    for(const p of g.children) p.setAttribute("stroke-width",(p.dataset.w*fine).toFixed(2));
   for(const c of gPt.children){
-    if(c.tagName==="circle"){c.setAttribute("r",(c.dataset.r*s).toFixed(2));
+    if(c.tagName==="circle"){c.setAttribute("r",(c.dataset.r*Math.pow(s,.85)).toFixed(2));
       c.setAttribute("stroke-width",(1*s).toFixed(2));}
     else c.setAttribute("font-size",(9*s).toFixed(2));
   }
@@ -303,11 +319,14 @@ document.getElementById("find").addEventListener("keydown",e=>{
 });
 
 /* --------------------------------------------------------------- layers --- */
+/* Separate groups keep the drawing order fixed: grey at the bottom, amber above
+ * it, green on top. Before this, a green arc could hide behind a grey one. */
 const gGrat=el("g",{class:"grat"}), gLand=el("g",{class:"land"}),
-      gArc=el("g",{}), gPt=el("g",{});
+      gPlain=el("g",{}), gNear=el("g",{}), gMatch=el("g",{}), gPt=el("g",{});
 for(let lon=-180;lon<=180;lon+=30){const[x]=proj(lon,0);gGrat.appendChild(el("line",{x1:x,y1:0,x2:x,y2:H}));}
 for(let lat=-60;lat<=60;lat+=30){const[,y]=proj(0,lat);gGrat.appendChild(el("line",{x1:0,y1:y,x2:W,y2:y}));}
-svg.append(gGrat,gLand,gArc,gPt);
+svg.append(gGrat,gLand,gPlain,gNear,gMatch,gPt);
+const GROUP={plain:gPlain,near:gNear,match:gMatch};
 
 const ringPath=c=>"M"+c.map(p=>proj(p[0],p[1]).map(v=>v.toFixed(1)).join(" ")).join("L")+"Z";
 fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
@@ -354,46 +373,57 @@ function gcPath(a,b){
   }
   return out;
 }
-const statusColor=s=>/^MATCH/.test(s||"")?"var(--match)":/NEAR/.test(s||"")?"var(--near)":"var(--plain)";
 const isServed=p=>p.status && !NOSVC(p.status);
-function flyText(s){
-  const v=String(s||"");
-  if(/^MATCH/.test(v)) return '<span style="color:var(--match)">Yes, you own it</span>';
-  if(/NEAR/.test(v)) return '<span style="color:var(--near)">Almost, substitute</span>';
-  if(/^NO-/.test(v)) return '<span style="color:var(--plain)">No, not in fleet</span>';
-  return '<span style="color:var(--d)">Unknown</span>';
+
+/* Hover an airport to isolate its routes. Much easier than hunting through a
+ * dense cluster with filters. */
+function focusOn(icao){
+  svg.classList.add("focus");
+  for(const g of [gPlain,gNear,gMatch])
+    for(const p of g.children) p.classList.toggle("on", p.dataset.a===icao||p.dataset.b===icao);
+  for(const c of gPt.children)
+    if(c.tagName==="circle") c.classList.toggle("on", c.dataset.icao===icao);
+}
+function focusOff(){
+  svg.classList.remove("focus");
+  for(const g of [gPlain,gNear,gMatch]) for(const p of g.children) p.classList.remove("on");
+  for(const c of gPt.children) c.classList.remove("on");
 }
 
 /* ---------------------------------------------------------------- draw ---- */
 function draw(){
-  gArc.textContent=""; gPt.textContent="";
+  gPlain.textContent=""; gNear.textContent=""; gMatch.textContent=""; gPt.textContent="";
   const served=PAIRS.filter(isServed);
-  const shown=served.filter(p=>
-    (!active.match || /^MATCH/.test(p.status||"")) &&
-    (!active.sim   || p.simmable) &&
-    (!active.cargo || p.cargo));
+  const shown=served.filter(p=>{
+    if(!active[band(p.status)]) return false;
+    if(active.sim && !p.simmable) return false;
+    if(active.cargo && !p.cargo) return false;
+    return true;
+  });
 
-  if(active.arcs){
-    for(const p of shown){
-      const [x,y]=String(p.pair).split("-");
-      const a=AP[x], b=AP[y];
-      if(!a||!b) continue;
-      const d=gcPath(a,b);
-      if(!d) continue;
-      const w=p.simmable?1.7:1.1;
-      const path=el("path",{d,class:"arc",stroke:statusColor(p.status),"stroke-width":w});
-      path.dataset.w=w;
-      if(p.cargo) path.setAttribute("stroke-dasharray","4 3");
-      const ops=(p.operators||[]).map(o=>{const n=airlineName(o);return n?n:o;});
-      path.addEventListener("mousemove",e=>show(e,
-        "<b>"+esc(p.pair)+"</b><i>"+esc(p.from??x)+" - "+esc(p.to??y)+"</i>"+
-        "<i>"+nf(p.nm??0)+" NM"+(p.simmable?" &middot; fits a session":"")+
-        (p.cargo?" &middot; cargo":"")+"</i>"+
-        "<i>airlines: "+esc(ops.join(", ")||"-")+"</i>"+
-        "<i>aircraft: "+esc((p.types||[]).map(prettyType).join(", ")||"-")+"</i>"));
-      path.addEventListener("mouseleave",hide);
-      gArc.appendChild(path);
-    }
+  for(const p of shown){
+    const [x,y]=String(p.pair).split("-");
+    const a=AP[x], b=AP[y];
+    if(!a||!b) continue;
+    const d=gcPath(a,b);
+    if(!d) continue;
+    const bnd=band(p.status);
+    /* Thinner than before, and a lower opacity for the grey band, so overlap
+       reads as depth instead of noise. */
+    const w=p.simmable?1.1:0.8;
+    const path=el("path",{d,class:"arc",stroke:BANDCOLOR[bnd],"stroke-width":w,
+      opacity:bnd==="plain"?0.28:(bnd==="near"?0.5:0.62)});
+    path.dataset.w=w; path.dataset.a=x; path.dataset.b=y;
+    if(p.cargo) path.setAttribute("stroke-dasharray","5 4");
+    const ops=(p.operators||[]).map(o=>airlineName(o)||o);
+    path.addEventListener("mousemove",e=>show(e,
+      "<b>"+esc(p.pair)+"</b><i>"+esc(p.from??x)+" - "+esc(p.to??y)+"</i>"+
+      "<i>"+nf(p.nm??0)+" NM"+(p.simmable?" &middot; fits a session":"")+
+      (p.cargo?" &middot; cargo":"")+"</i>"+
+      "<i>airlines: "+esc(ops.slice(0,6).join(", ")||"-")+"</i>"+
+      "<i>aircraft: "+esc((p.types||[]).map(prettyType).join(", ")||"-")+"</i>"));
+    path.addEventListener("mouseleave",hide);
+    GROUP[bnd].appendChild(path);
   }
 
   const deg={};
@@ -407,31 +437,39 @@ function draw(){
     const fill=cand ? (focus.includes("cargo") && !focus.includes("pax") ? "var(--cargo)" : "var(--pax)")
                     : "var(--own)";
     const [x,y]=proj(a.lon,a.lat);
-    const r=cand?5:4.2;
+    /* Size follows how many routes touch the airport, so hubs read as hubs. */
+    const n=deg[a.icao]||0;
+    const r=(cand?3.4:3.0)+Math.min(2.6,Math.sqrt(n)*0.42);
     const c=el("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r,fill,class:"pt",
       "stroke-width":1,"fill-opacity":.95});
-    c.dataset.r=r;
+    c.dataset.r=r; c.dataset.icao=a.icao;
     const m=META[a.icao]||{};
+    c.addEventListener("mouseenter",()=>focusOn(a.icao));
     c.addEventListener("mousemove",e=>show(e,
       "<b>"+esc(a.icao)+(a.iata?" / "+esc(a.iata):"")+" - "+esc(a.name||"")+"</b>"+
       "<i>"+(cand?"on your wishlist ("+esc(focus)+")":"you own this airport")+
-      " &middot; "+(deg[a.icao]||0)+" routes with flights</i>"+
+      " &middot; "+n+" routes with flights</i>"+
       (m.longest_runway_ft?"<i>longest runway "+nf(m.longest_runway_ft)+" ft, "
         +(m.runway_count||"?")+" runways</i>":"")+
       (a.night?"<i>night: "+esc(tr(a.night))+"</i>":"")));
-    c.addEventListener("mouseleave",hide);
+    c.addEventListener("mouseleave",()=>{hide();focusOff();});
     gPt.appendChild(c);
     if(active.labels){
-      const tx=el("text",{x:(x+7).toFixed(1),y:(y+3).toFixed(1),class:"lbl","font-size":9});
+      const tx=el("text",{x:(x+r+2).toFixed(1),y:(y+3).toFixed(1),class:"lbl","font-size":9});
       tx.textContent=a.icao;
       gPt.appendChild(tx);
     }
   }
   applyView();
 
-  document.getElementById("cPairs").textContent=shown.length+" of "+PAIRS.length;
-  document.getElementById("tPairs").innerHTML=shown.slice().sort((a,b)=>(b.nm||0)-(a.nm||0))
-    .slice(0,300).map(p=>
+  const hidden=served.length-shown.length;
+  document.getElementById("hint").innerHTML=
+    "Scroll to zoom, drag to pan, double-click to reset. Point at an airport to isolate its routes."
+    +(hidden>0?" <b>"+hidden+"</b> route"+(hidden===1?"":"s")+" hidden by the filters above.":"");
+
+  document.getElementById("cPairs").textContent=shown.length+" of "+served.length+" served";
+  document.getElementById("tPairs").innerHTML=shown.slice()
+    .sort((a,b)=>(b.nm||0)-(a.nm||0)).slice(0,300).map(p=>
     '<tr><td class="mono">'+esc(p.pair)+'</td><td class="num">'+nf(p.nm??0)+' NM</td>'+
     '<td>'+((p.operators||[]).slice(0,6).map(opChip).join(" ")||"-")+'</td>'+
     '<td>'+esc((p.types||[]).slice(0,3).map(prettyType).join(", ")||"-")+'</td>'+
@@ -445,23 +483,23 @@ Promise.all([
   fetch("../data/airports-meta.json?"+Date.now()).then(r=>r.ok?r.json():{}).catch(()=>({}))
 ]).then(([d,meta])=>{
   META=meta||{};
-  SUM=d.summary||{}; PAIRS=d.pairs||[]; CAND=d.candidates||[];
+  SUM=d.summary||{}; PAIRS=d.pairs||[]; CAND=d.candidates||[]; AIRL=d.airlines||{};
   for(const a of d.airports||[]) if(a.icao) AP[a.icao]=a;
 
   const s=SUM;
   document.getElementById("meta").innerHTML=
     "<b>"+esc(s.season?.label||"")+"</b> &middot; updated "+esc(String(s.generated||"").slice(0,16));
 
-  document.getElementById("stats").innerHTML=[
+  const cards=[
     [s.airports ?? Object.values(AP).filter(a=>!a.candidate).length,"Airports you own"],
     [s.candidates ?? Object.values(AP).filter(a=>a.candidate).length,"Wishlist airports"],
-    [s.pairs_possible ?? PAIRS.length,"Possible airport pairs"],
     [s.pairs_served ?? PAIRS.filter(isServed).length,"Pairs with real flights"],
     [s.pairs_match ?? 0,"Flyable with your fleet"],
     [s.pairs_simmable ?? 0,"Fits a sim session"],
-    [s.cargo_pairs ?? 0,"Flown by cargo aircraft"],
-    [s.suspended ?? 0,"Paused routes"]
-  ].map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
+    [s.cargo_pairs ?? 0,"Flown by cargo aircraft"]];
+  if(s.airlines_known!==undefined) cards.push([s.airlines_known,"Airlines named automatically"]);
+  document.getElementById("stats").innerHTML=
+    cards.map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
 
   document.getElementById("cCand").textContent=CAND.length+" airports";
   document.getElementById("tCand").innerHTML=CAND.map(c=>
