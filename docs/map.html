@@ -28,10 +28,10 @@
   #meta b{color:var(--t)}
   main{padding:22px;max-width:1500px}
   h2{font-size:13px;color:var(--d);margin:0;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px;margin-bottom:18px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
   .card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
   .card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
-  .card span{color:var(--d);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+  .card span{color:var(--d);font-size:11.5px;display:block;line-height:1.35;margin-top:2px}
   .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
   .head{display:flex;gap:14px;align-items:center;justify-content:space-between;
     padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
@@ -61,18 +61,21 @@
   .note{padding:15px 16px;color:var(--d);font-size:13px;text-align:center}
   .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
     background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 11px;
-    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:300px}
+    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:320px}
   .tip b{display:block;margin-bottom:3px;font-size:13px}
   .tip i{color:var(--d);font-style:normal;display:block}
   .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
   @media(max-width:900px){.grid{grid-template-columns:1fr}}
-  table{width:100%;border-collapse:collapse;font-size:13px}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
   th,td{text-align:left;padding:7px 14px;border-bottom:1px solid var(--l)}
-  th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-    background:var(--p2);position:sticky;top:0}
+  thead th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    background:var(--p2);position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--l);
+    border-bottom:none}
   tbody tr:last-child td{border-bottom:none}
-  tr:hover td{background:#151c25}
+  tbody tr:hover td{background:#151c25}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+  .op{border-bottom:1px dotted #3d4759;cursor:help}
   .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
   .scroll{max-height:430px;overflow:auto}
   input{background:var(--p2);border:1px solid var(--l);color:var(--t);padding:5px 10px;
@@ -97,20 +100,20 @@
     <div class="head">
       <h2>Network</h2>
       <div class="legend">
-        <span><i class="dot" style="background:var(--own)"></i>owned</span>
-        <span><i class="dot" style="background:var(--pax)"></i>wishlist pax</span>
-        <span><i class="dot" style="background:var(--cargo)"></i>wishlist cargo</span>
-        <span><i class="bar" style="background:var(--match)"></i>MATCH</span>
-        <span><i class="bar" style="background:var(--near)"></i>NEAR-MATCH</span>
-        <span><i class="bar" style="background:var(--plain)"></i>other</span>
+        <span><i class="dot" style="background:var(--own)"></i>you own it</span>
+        <span><i class="dot" style="background:var(--pax)"></i>wishlist, passengers</span>
+        <span><i class="dot" style="background:var(--cargo)"></i>wishlist, cargo</span>
+        <span><i class="bar" style="background:var(--match)"></i>you own the aircraft</span>
+        <span><i class="bar" style="background:var(--near)"></i>close substitute</span>
+        <span><i class="bar" style="background:var(--plain)"></i>aircraft you do not own</span>
       </div>
       <div class="toggles">
         <button class="t" data-f="own" aria-pressed="true">Airports</button>
-        <button class="t" data-f="cand" aria-pressed="true">Candidates</button>
+        <button class="t" data-f="cand" aria-pressed="true">Wishlist</button>
         <button class="t" data-f="arcs" aria-pressed="true">Routes</button>
         <button class="t" data-f="labels" aria-pressed="false">Labels</button>
-        <button class="t" data-f="match" aria-pressed="false">MATCH only</button>
-        <button class="t" data-f="sim" aria-pressed="false">Simmable only</button>
+        <button class="t" data-f="match" aria-pressed="false">Flyable only</button>
+        <button class="t" data-f="sim" aria-pressed="false">Fits a session</button>
         <button class="t" data-f="cargo" aria-pressed="false">Cargo only</button>
       </div>
       <div class="zoombar">
@@ -132,16 +135,17 @@
 
   <div class="grid">
     <div class="panel">
-      <div class="head"><h2>Served pairs</h2><span class="pill" id="cPairs"></span></div>
+      <div class="head"><h2>Routes with real flights</h2><span class="pill" id="cPairs"></span></div>
       <div class="scroll">
-        <table><thead><tr><th>Pair</th><th>NM</th><th>Operators</th><th>Types</th><th>Status</th></tr></thead>
+        <table><thead><tr><th>Route</th><th>Distance</th><th>Operators</th><th>Aircraft</th>
+        <th>Can you fly it?</th></tr></thead>
         <tbody id="tPairs"></tbody></table>
       </div>
     </div>
     <div class="panel">
-      <div class="head"><h2>Buy advice</h2><span class="pill" id="cCand"></span></div>
+      <div class="head"><h2>Worth buying next</h2><span class="pill" id="cCand"></span></div>
       <div class="scroll">
-        <table><thead><tr><th>Airport</th><th>Focus</th><th>New</th><th>MATCH</th></tr></thead>
+        <table><thead><tr><th>Airport</th><th>Focus</th><th>New routes</th><th>Flyable</th></tr></thead>
         <tbody id="tCand"></tbody></table>
       </div>
     </div>
@@ -149,8 +153,8 @@
 
   <footer>
     Everything here comes from <span class="mono">docs/data.json</span>, refreshed by RouteWatch on every run.
-    Arcs are drawn only for pairs with an observed connection. Runway lengths appear in the tooltip
-    once <span class="mono">data/airports-meta.json</span> is filled.
+    Arcs are drawn only for routes where flights were actually observed. Runway lengths appear in the
+    tooltip once <span class="mono">data/airports-meta.json</span> is filled.
   </footer>
 </main>
 
@@ -161,14 +165,82 @@ const W=960, H=480, NS="http://www.w3.org/2000/svg";
 const svg=document.getElementById("map"), tip=document.getElementById("tip"), note=document.getElementById("note");
 const el=(t,at)=>{const e=document.createElementNS(NS,t);for(const k in at)e.setAttribute(k,at[k]);return e;};
 const proj=(lon,lat)=>[(lon+180)/360*W,(90-lat)/180*H];
+const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const nf=n=>Number(n).toLocaleString('en-GB');
 const show=(e,html)=>{tip.innerHTML=html;tip.style.opacity=1;
-  tip.style.left=Math.min(e.clientX+14,innerWidth-310)+"px";tip.style.top=(e.clientY+14)+"px";};
+  tip.style.left=Math.min(e.clientX+14,innerWidth-330)+"px";tip.style.top=(e.clientY+14)+"px";};
 const hide=()=>tip.style.opacity=0;
 
-/* Status text comes from routewatch.mjs and is partly Dutch. Translate on display
- * so the data file stays untouched. */
+/* Older runs wrote this sentinel in Dutch, newer runs write it in English. */
+const NOSVC=s=>{const v=String(s??"");return v==="GEEN VERBINDING"||v==="NO SERVICE";};
 const EN={"GEEN VERBINDING":"NO SERVICE","ONBEKEND":"UNKNOWN"};
 const tr=s=>EN[String(s||"")]||String(s||"");
+
+/* Aircraft codes spelled out, same table as the dashboard. */
+const TYPES={B733:"Boeing 737-300",B734:"Boeing 737-400",B735:"Boeing 737-500",
+ B736:"Boeing 737-600",B737:"Boeing 737-700",B738:"Boeing 737-800",B739:"Boeing 737-900",
+ B73H:"Boeing 737-800",B73Y:"Boeing 737-800 freighter",B738F:"Boeing 737-800 freighter",
+ B734F:"Boeing 737-400 freighter",
+ B37M:"Boeing 737 MAX 7",B38M:"Boeing 737 MAX 8",B38X:"Boeing 737 MAX 8-200",B39M:"Boeing 737 MAX 9",
+ B752:"Boeing 757-200",B763:"Boeing 767-300",B772:"Boeing 777-200",B77W:"Boeing 777-300ER",
+ B77L:"Boeing 777F",B77F:"Boeing 777F",
+ B788:"Boeing 787-8",B789:"Boeing 787-9",B78X:"Boeing 787-10",
+ BCS1:"Airbus A220-100",BCS3:"Airbus A220-300",
+ A319:"Airbus A319",A320:"Airbus A320",A321:"Airbus A321",
+ A19N:"Airbus A319neo",A20N:"Airbus A320neo",A21N:"Airbus A321neo",
+ A332:"Airbus A330-200",A333:"Airbus A330-300",A339:"Airbus A330-900neo",
+ A343:"Airbus A340-300",A359:"Airbus A350-900",A35K:"Airbus A350-1000",
+ E170:"Embraer E170",E175:"Embraer E175",E190:"Embraer E190",E195:"Embraer E195",
+ E290:"Embraer E190-E2",E295:"Embraer E195-E2",
+ AT43:"ATR 42",AT72:"ATR 72",AT75:"ATR 72-500",AT76:"ATR 72-600",
+ DH8D:"Dash 8 Q400",CRJ9:"Bombardier CRJ900",CRJX:"Bombardier CRJ1000",
+ SB20:"Saab 2000",SF34:"Saab 340"};
+function prettyType(s){
+  const k=String(s||"").trim().toUpperCase();
+  if(TYPES[k]) return TYPES[k];
+  return k.split(/\s+/).map(w=>w==="NEO"?"neo":/\d/.test(w)?w:w.charAt(0)+w.slice(1).toLowerCase())
+          .join(" ").replace(/ neo/g,"neo");
+}
+
+/* Operators arrive as IATA from AeroDataBox and as an ICAO callsign prefix from
+ * OpenSky, so both spellings map to the same airline name. */
+const AIRLINES={
+ KL:"KLM",KLM:"KLM",WA:"KLM Cityhopper",KLC:"KLM Cityhopper",
+ HV:"Transavia",TRA:"Transavia",TO:"Transavia France",TVF:"Transavia France",
+ AF:"Air France",AFR:"Air France",BA:"British Airways",BAW:"British Airways",
+ LH:"Lufthansa",DLH:"Lufthansa",LX:"Swiss",SWR:"Swiss",OS:"Austrian Airlines",AUA:"Austrian Airlines",
+ SN:"Brussels Airlines",BEL:"Brussels Airlines",EW:"Eurowings",EWG:"Eurowings",
+ "4Y":"Discover Airlines",OCN:"Discover Airlines",DE:"Condor",CFG:"Condor",
+ X3:"TUI fly Germany",TUI:"TUI fly Germany",BY:"TUI Airways",TOM:"TUI Airways",
+ TB:"TUI fly Belgium",JAF:"TUI fly Belgium",
+ FR:"Ryanair",RYR:"Ryanair",RK:"Ryanair UK",RUK:"Ryanair UK",
+ U2:"easyJet",EZY:"easyJet",EJU:"easyJet Europe",EC:"easyJet Europe",
+ VY:"Vueling",VLG:"Vueling",IB:"Iberia",IBE:"Iberia",I2:"Iberia Express",IBS:"Iberia Express",
+ UX:"Air Europa",AEA:"Air Europa",TP:"TAP Air Portugal",TAP:"TAP Air Portugal",
+ AZ:"ITA Airways",ITY:"ITA Airways",
+ SK:"SAS",SAS:"SAS",DY:"Norwegian",NAX:"Norwegian",D8:"Norwegian Sweden",IBK:"Norwegian Sweden",
+ AY:"Finnair",FIN:"Finnair",LO:"LOT Polish Airlines",LOT:"LOT Polish Airlines",
+ W6:"Wizz Air",WZZ:"Wizz Air",A3:"Aegean Airlines",AEE:"Aegean Airlines",
+ OA:"Olympic Air",OAL:"Olympic Air",TK:"Turkish Airlines",THY:"Turkish Airlines",
+ BT:"airBaltic",BTI:"airBaltic",LG:"Luxair",LGL:"Luxair",EI:"Aer Lingus",EIN:"Aer Lingus",
+ LS:"Jet2",EXS:"Jet2",FI:"Icelandair",ICE:"Icelandair",WF:"Wideroe",WIF:"Wideroe",
+ V7:"Volotea",VOE:"Volotea",PC:"Pegasus Airlines",PGT:"Pegasus Airlines",
+ QR:"Qatar Airways",QTR:"Qatar Airways",EK:"Emirates",UAE:"Emirates",
+ EY:"Etihad Airways",ETD:"Etihad Airways",
+ UA:"United Airlines",UAL:"United Airlines",AA:"American Airlines",AAL:"American Airlines",
+ DL:"Delta Air Lines",DAL:"Delta Air Lines",
+ SA:"South African Airways",SAA:"South African Airways",
+ NZ:"Air New Zealand",ANZ:"Air New Zealand",
+ /* Cargo carriers, codes verified against IATA and CAPA listings. */
+ FX:"FedEx Express",FDX:"FedEx Express","5X":"UPS Airlines",UPS:"UPS Airlines",
+ QY:"EAT Leipzig (DHL)",BCS:"EAT Leipzig (DHL)",
+ "3V":"ASL Airlines Belgium",TAY:"ASL Airlines Belgium",
+ "5O":"ASL Airlines France",FPO:"ASL Airlines France",
+ T2:"West Atlantic Sweden",SWN:"West Atlantic Sweden",NPT:"West Atlantic UK",
+ DJ:"Maersk Air Cargo",SRR:"Maersk Air Cargo",CV:"Cargolux",CLX:"Cargolux"};
+const airlineName=c=>AIRLINES[String(c||"").trim().toUpperCase()]||null;
+const opChip=c=>{const n=airlineName(c);
+  return n?'<span class="op" title="'+esc(n)+'">'+esc(c)+'</span>':esc(c);};
 
 const active={own:true,cand:true,arcs:true,labels:false,match:false,sim:false,cargo:false};
 let AP={}, PAIRS=[], SUM={}, CAND=[], META={};
@@ -186,9 +258,7 @@ function applyView(){
   svg.setAttribute("viewBox", view.x.toFixed(2)+" "+view.y.toFixed(2)+" "
     +(W/view.k).toFixed(2)+" "+(H/view.k).toFixed(2));
   document.getElementById("zlvl").textContent=view.k.toFixed(1)+"x";
-  // keep strokes and dots visually constant while zooming
   const s=1/view.k;
-  svg.style.setProperty("--s", s);
   gGrat.setAttribute("stroke-width",(0.5*s).toFixed(2));
   gLand.setAttribute("stroke-width",(0.4*s).toFixed(2));
   for(const p of gArc.children) p.setAttribute("stroke-width",(p.dataset.w*s).toFixed(2));
@@ -200,7 +270,6 @@ function applyView(){
 }
 function zoomAt(cx,cy,factor){
   const k0=view.k; view.k=Math.max(1,Math.min(12,k0*factor));
-  // keep the point under the cursor fixed
   view.x = cx - (cx-view.x)*(k0/view.k);
   view.y = cy - (cy-view.y)*(k0/view.k);
   applyView();
@@ -244,8 +313,8 @@ const ringPath=c=>"M"+c.map(p=>proj(p[0],p[1]).map(v=>v.toFixed(1)).join(" ")).j
 fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
   .then(r=>{if(!r.ok)throw 0;return r.json();})
   .then(topo=>{
-    const tr2=topo.transform, dec=arc=>{let x=0,y=0;return arc.map(p=>{x+=p[0];y+=p[1];
-      return [x*tr2.scale[0]+tr2.translate[0], y*tr2.scale[1]+tr2.translate[1]];});};
+    const tf=topo.transform, dec=arc=>{let x=0,y=0;return arc.map(p=>{x+=p[0];y+=p[1];
+      return [x*tf.scale[0]+tf.translate[0], y*tf.scale[1]+tf.translate[1]];});};
     const A=topo.arcs.map(dec);
     const line=idx=>{let o=[];for(const i of idx){const a=i<0?A[~i].slice().reverse():A[i];
       o=o.length?o.concat(a.slice(1)):a.slice();}return o;};
@@ -286,7 +355,14 @@ function gcPath(a,b){
   return out;
 }
 const statusColor=s=>/^MATCH/.test(s||"")?"var(--match)":/NEAR/.test(s||"")?"var(--near)":"var(--plain)";
-const isServed=p=>p.status && p.status!=="GEEN VERBINDING";
+const isServed=p=>p.status && !NOSVC(p.status);
+function flyText(s){
+  const v=String(s||"");
+  if(/^MATCH/.test(v)) return '<span style="color:var(--match)">Yes, you own it</span>';
+  if(/NEAR/.test(v)) return '<span style="color:var(--near)">Almost, substitute</span>';
+  if(/^NO-/.test(v)) return '<span style="color:var(--plain)">No, not in fleet</span>';
+  return '<span style="color:var(--d)">Unknown</span>';
+}
 
 /* ---------------------------------------------------------------- draw ---- */
 function draw(){
@@ -308,12 +384,13 @@ function draw(){
       const path=el("path",{d,class:"arc",stroke:statusColor(p.status),"stroke-width":w});
       path.dataset.w=w;
       if(p.cargo) path.setAttribute("stroke-dasharray","4 3");
+      const ops=(p.operators||[]).map(o=>{const n=airlineName(o);return n?n:o;});
       path.addEventListener("mousemove",e=>show(e,
-        "<b>"+p.pair+"</b><i>"+(p.from??x)+" - "+(p.to??y)+"</i>"+
-        "<i>"+(p.nm??"?")+" NM &middot; "+tr(p.status)+(p.simmable?" &middot; simmable":"")+
+        "<b>"+esc(p.pair)+"</b><i>"+esc(p.from??x)+" - "+esc(p.to??y)+"</i>"+
+        "<i>"+nf(p.nm??0)+" NM"+(p.simmable?" &middot; fits a session":"")+
         (p.cargo?" &middot; cargo":"")+"</i>"+
-        "<i>operators: "+((p.operators||[]).join(", ")||"-")+"</i>"+
-        "<i>types: "+((p.types||[]).join(", ")||"-")+"</i>"));
+        "<i>airlines: "+esc(ops.join(", ")||"-")+"</i>"+
+        "<i>aircraft: "+esc((p.types||[]).map(prettyType).join(", ")||"-")+"</i>"));
       path.addEventListener("mouseleave",hide);
       gArc.appendChild(path);
     }
@@ -336,10 +413,12 @@ function draw(){
     c.dataset.r=r;
     const m=META[a.icao]||{};
     c.addEventListener("mousemove",e=>show(e,
-      "<b>"+a.icao+(a.iata?" / "+a.iata:"")+" - "+(a.name||"")+"</b>"+
-      "<i>"+(cand?"candidate ("+focus+")":"owned")+" &middot; "+(deg[a.icao]||0)+" served pairs</i>"+
-      (m.longest_runway_ft?"<i>longest runway "+m.longest_runway_ft+" ft, "+(m.runway_count||"?")+" runways</i>":"")+
-      (a.night?"<i>night: "+a.night+"</i>":"")));
+      "<b>"+esc(a.icao)+(a.iata?" / "+esc(a.iata):"")+" - "+esc(a.name||"")+"</b>"+
+      "<i>"+(cand?"on your wishlist ("+esc(focus)+")":"you own this airport")+
+      " &middot; "+(deg[a.icao]||0)+" routes with flights</i>"+
+      (m.longest_runway_ft?"<i>longest runway "+nf(m.longest_runway_ft)+" ft, "
+        +(m.runway_count||"?")+" runways</i>":"")+
+      (a.night?"<i>night: "+esc(tr(a.night))+"</i>":"")));
     c.addEventListener("mouseleave",hide);
     gPt.appendChild(c);
     if(active.labels){
@@ -353,11 +432,11 @@ function draw(){
   document.getElementById("cPairs").textContent=shown.length+" of "+PAIRS.length;
   document.getElementById("tPairs").innerHTML=shown.slice().sort((a,b)=>(b.nm||0)-(a.nm||0))
     .slice(0,300).map(p=>
-    '<tr><td class="mono">'+p.pair+'</td><td>'+(p.nm??"")+'</td>'+
-    '<td>'+((p.operators||[]).slice(0,6).join(" "))+'</td>'+
-    '<td class="mono">'+((p.types||[]).slice(0,3).join(" "))+'</td>'+
-    '<td style="color:'+statusColor(p.status)+'">'+tr(p.status)+'</td></tr>').join("")
-    || '<tr><td colspan="5" style="color:var(--d)">No served pairs with these filters.</td></tr>';
+    '<tr><td class="mono">'+esc(p.pair)+'</td><td class="num">'+nf(p.nm??0)+' NM</td>'+
+    '<td>'+((p.operators||[]).slice(0,6).map(opChip).join(" ")||"-")+'</td>'+
+    '<td>'+esc((p.types||[]).slice(0,3).map(prettyType).join(", ")||"-")+'</td>'+
+    '<td>'+flyText(p.status)+'</td></tr>').join("")
+    || '<tr><td colspan="5" style="color:var(--d)">No routes match these filters.</td></tr>';
 }
 
 /* ---------------------------------------------------------------- data ---- */
@@ -371,28 +450,29 @@ Promise.all([
 
   const s=SUM;
   document.getElementById("meta").innerHTML=
-    "<b>"+(s.season?.label||"")+"</b> &middot; updated "+String(s.generated||"").slice(0,16);
+    "<b>"+esc(s.season?.label||"")+"</b> &middot; updated "+esc(String(s.generated||"").slice(0,16));
 
   document.getElementById("stats").innerHTML=[
-    ["airports owned", s.airports ?? Object.values(AP).filter(a=>!a.candidate).length],
-    ["candidates", s.candidates ?? Object.values(AP).filter(a=>a.candidate).length],
-    ["pairs possible", s.pairs_possible ?? PAIRS.length],
-    ["served", s.pairs_served ?? PAIRS.filter(isServed).length],
-    ["with MATCH", s.pairs_match ?? 0],
-    ["simmable", s.pairs_simmable ?? 0],
-    ["cargo pairs", s.cargo_pairs ?? 0],
-    ["suspended", s.suspended ?? 0]
-  ].map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join("");
+    [s.airports ?? Object.values(AP).filter(a=>!a.candidate).length,"Airports you own"],
+    [s.candidates ?? Object.values(AP).filter(a=>a.candidate).length,"Wishlist airports"],
+    [s.pairs_possible ?? PAIRS.length,"Possible airport pairs"],
+    [s.pairs_served ?? PAIRS.filter(isServed).length,"Pairs with real flights"],
+    [s.pairs_match ?? 0,"Flyable with your fleet"],
+    [s.pairs_simmable ?? 0,"Fits a sim session"],
+    [s.cargo_pairs ?? 0,"Flown by cargo aircraft"],
+    [s.suspended ?? 0,"Paused routes"]
+  ].map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
 
   document.getElementById("cCand").textContent=CAND.length+" airports";
   document.getElementById("tCand").innerHTML=CAND.map(c=>
-    '<tr><td class="mono">'+c.icao+'</td><td style="color:var(--d)">'+(c.focus||"")+'</td>'+
-    '<td>'+(c.gain?.new_pairs ?? 0)+'</td><td style="color:var(--match)">'+(c.gain?.match_pairs ?? 0)+'</td></tr>')
-    .join("") || '<tr><td colspan="4" style="color:var(--d)">No candidates in data.json.</td></tr>';
+    '<tr><td class="mono">'+esc(c.icao)+'</td><td style="color:var(--d)">'+esc(c.focus||"")+'</td>'+
+    '<td class="num">'+(c.gain?.new_pairs ?? 0)+'</td>'+
+    '<td class="num" style="color:var(--match)">'+(c.gain?.match_pairs ?? 0)+'</td></tr>')
+    .join("") || '<tr><td colspan="4" style="color:var(--d)">No wishlist airports in data.json.</td></tr>';
 
   if(!PAIRS.filter(isServed).length){
     note.hidden=false;
-    note.textContent="No served pairs in data.json yet - airports are already plotted, route arcs appear "
+    note.textContent="No routes with flights in data.json yet - airports are already plotted, arcs appear "
       +"once RouteWatch has processed flights.";
   }
   draw();
