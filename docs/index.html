@@ -44,7 +44,11 @@ table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
 th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--l);vertical-align:top}
 thead th{color:var(--d);position:sticky;top:0;z-index:3;background:var(--p2);font-weight:500;
   font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-  box-shadow:inset 0 -1px 0 var(--l);border-bottom:none}
+  box-shadow:inset 0 -1px 0 var(--l);border-bottom:none;white-space:nowrap}
+thead th.s{cursor:pointer;user-select:none}
+thead th.s:hover{color:var(--t)}
+thead th.on{color:var(--u)}
+.arw{font-size:9px;opacity:.75;margin-left:3px}
 tbody tr:last-child td{border-bottom:none}
 tbody tr:hover td{background:#151c25}
 code{background:#1c2430;padding:1px 5px;border-radius:4px;font-size:12px;
@@ -72,6 +76,7 @@ a{color:var(--u)}
 .rank{color:var(--u);font-weight:700;font-variant-numeric:tabular-nums}
 .gain b{font-size:15px;font-weight:650}
 .num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.op{border-bottom:1px dotted #3d4759;cursor:help}
 details{margin-top:6px}
 summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
 .stores{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
@@ -92,8 +97,7 @@ summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
 <script>
 let D=null, filter='all', prPage=1;
 const PAGE=200;
-const esc=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
-const cls=s=>!s?'u':s==='MATCH'?'m':s.startsWith('MATCH')?'n':s.startsWith('NEAR')?'n':s.startsWith('NO-')?'x':'u';
+const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const app=document.getElementById('app');
 const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="muted">+'+(a.length-n)+'</span>';};
 const nf=n=>Number(n).toLocaleString('en-GB');
@@ -116,6 +120,30 @@ const EN=[[/GEEN VERBINDING/g,'NO SERVICE'],[/ONBEKEND/g,'UNKNOWN'],
 const en=s=>{let o=String(s??'');for(const r of EN)o=o.replace(r[0],r[1]);return o;};
 
 const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead>';
+
+/* Clickable head: each entry is either a plain label or [label, sortKey].
+ * The arrow shows which column drives the current order. */
+function sortHead(cells,st,fn){
+  return '<thead><tr>'+cells.map(c=>{
+    if(!Array.isArray(c)) return '<th>'+c+'</th>';
+    const on=st.key===c[1];
+    return '<th class="s'+(on?' on':'')+'" onclick="'+fn+'(\''+c[1]+'\')" '
+      +'title="Click to sort">'+c[0]
+      +'<span class="arw">'+(on?(st.dir>0?'&#9650;':'&#9660;'):'')+'</span></th>';
+  }).join('')+'</tr></thead>';
+}
+/* Sorting runs on raw values, never on the rendered text: 1,017 NM must not
+ * land before 326 NM because of string comparison. */
+function sortRows(rows,keys,st){
+  const get=keys[st.key];
+  if(!get) return rows;
+  return rows.slice().sort((a,b)=>{
+    const x=get(a), y=get(b);
+    const c=(typeof x==='number'&&typeof y==='number')
+      ? x-y : String(x).localeCompare(String(y),'en');
+    return c*st.dir;
+  });
+}
 
 /* ------------------------------------------------------- plain language --- */
 /* Aircraft codes mean nothing to most people, so spell the common ones out. */
@@ -140,13 +168,57 @@ const TYPES={B733:'Boeing 737-300',B734:'Boeing 737-400',B735:'Boeing 737-500',
 function prettyType(s){
   const k=String(s||'').trim().toUpperCase();
   if(TYPES[k]) return TYPES[k];
-  /* Fall back to sentence case: AIRBUS A321 NEO -> Airbus A321neo */
   const words=k.split(/\s+/).map(w=>{
     if(w==='NEO') return 'neo';
     if(/\d/.test(w)) return w;
     return w.charAt(0)+w.slice(1).toLowerCase();
   });
   return words.join(' ').replace(/ neo/g,'neo');
+}
+
+/* Operators arrive as IATA from AeroDataBox and as an ICAO callsign prefix from
+ * OpenSky, so both spellings map to the same airline name. */
+const AIRLINES={
+ KL:'KLM',KLM:'KLM',WA:'KLM Cityhopper',KLC:'KLM Cityhopper',
+ HV:'Transavia',TRA:'Transavia',TO:'Transavia France',TVF:'Transavia France',
+ AF:'Air France',AFR:'Air France',BA:'British Airways',BAW:'British Airways',
+ LH:'Lufthansa',DLH:'Lufthansa',LX:'Swiss',SWR:'Swiss',OS:'Austrian Airlines',AUA:'Austrian Airlines',
+ SN:'Brussels Airlines',BEL:'Brussels Airlines',EW:'Eurowings',EWG:'Eurowings',
+ '4Y':'Discover Airlines',OCN:'Discover Airlines',DE:'Condor',CFG:'Condor',
+ X3:'TUI fly Germany',TUI:'TUI fly Germany',BY:'TUI Airways',TOM:'TUI Airways',
+ TB:'TUI fly Belgium',JAF:'TUI fly Belgium',
+ FR:'Ryanair',RYR:'Ryanair',RK:'Ryanair UK',RUK:'Ryanair UK',
+ U2:'easyJet',EZY:'easyJet',EJU:'easyJet Europe',EC:'easyJet Europe',
+ VY:'Vueling',VLG:'Vueling',IB:'Iberia',IBE:'Iberia',I2:'Iberia Express',IBS:'Iberia Express',
+ UX:'Air Europa',AEA:'Air Europa',TP:'TAP Air Portugal',TAP:'TAP Air Portugal',
+ AZ:'ITA Airways',ITY:'ITA Airways',
+ SK:'SAS',SAS:'SAS',DY:'Norwegian',NAX:'Norwegian',D8:'Norwegian Sweden',IBK:'Norwegian Sweden',
+ AY:'Finnair',FIN:'Finnair',LO:'LOT Polish Airlines',LOT:'LOT Polish Airlines',
+ W6:'Wizz Air',WZZ:'Wizz Air',A3:'Aegean Airlines',AEE:'Aegean Airlines',
+ OA:'Olympic Air',OAL:'Olympic Air',TK:'Turkish Airlines',THY:'Turkish Airlines',
+ BT:'airBaltic',BTI:'airBaltic',LG:'Luxair',LGL:'Luxair',EI:'Aer Lingus',EIN:'Aer Lingus',
+ LS:'Jet2',EXS:'Jet2',FI:'Icelandair',ICE:'Icelandair',WF:'Wideroe',WIF:'Wideroe',
+ V7:'Volotea',VOE:'Volotea',PC:'Pegasus Airlines',PGT:'Pegasus Airlines',
+ QR:'Qatar Airways',QTR:'Qatar Airways',EK:'Emirates',UAE:'Emirates',
+ EY:'Etihad Airways',ETD:'Etihad Airways',
+ UA:'United Airlines',UAL:'United Airlines',AA:'American Airlines',AAL:'American Airlines',
+ DL:'Delta Air Lines',DAL:'Delta Air Lines',
+ SA:'South African Airways',SAA:'South African Airways',
+ NZ:'Air New Zealand',ANZ:'Air New Zealand',
+ /* Cargo carriers, codes verified against IATA and CAPA listings. */
+ FX:'FedEx Express',FDX:'FedEx Express','5X':'UPS Airlines',UPS:'UPS Airlines',
+ QY:'EAT Leipzig (DHL)',BCS:'EAT Leipzig (DHL)',
+ '3V':'ASL Airlines Belgium',TAY:'ASL Airlines Belgium',
+ '5O':'ASL Airlines France',FPO:'ASL Airlines France',
+ T2:'West Atlantic Sweden',SWN:'West Atlantic Sweden',NPT:'West Atlantic UK',
+ DJ:'Maersk Air Cargo',SRR:'Maersk Air Cargo',CV:'Cargolux',CLX:'Cargolux'};
+const airlineName=c=>AIRLINES[String(c||'').trim().toUpperCase()]||null;
+/* Hover an operator code to read the airline name. */
+function opList(arr,n){
+  const a=arr||[]; if(!a.length) return '-';
+  const out=a.slice(0,n).map(c=>{const name=airlineName(c);
+    return name?'<span class="op" title="'+esc(name)+'">'+esc(c)+'</span>':esc(c);}).join(' ');
+  return out+(a.length>n?' <span class="muted">+'+(a.length-n)+'</span>':'');
 }
 
 const KINDS={ROUTE_NEW:'New route',ROUTE_GONE:'Route disappeared',ROUTE_BACK:'Route is back',
@@ -169,6 +241,15 @@ function flyText(st){
   if(s.startsWith('NEAR')) return '<span class="n">Almost, close substitute</span>';
   if(s.startsWith('NO-')) return '<span class="x">No, not in your fleet</span>';
   return '<span class="muted">Unknown</span>';
+}
+/* Sort order for that column: best answer first when descending. */
+function flyRank(st){
+  const s=String(st||'');
+  if(NOSVC(s)) return 0;
+  if(s.startsWith('MATCH')) return 4;
+  if(s.startsWith('NEAR')) return 3;
+  if(s.startsWith('NO-')) return 2;
+  return 1;
 }
 
 /* "n=1d, bronnen=1" is precise but unreadable. Say it in words instead. */
@@ -224,7 +305,7 @@ function evTable(rows){
       +'<td class="nowrap">'+esc(kindLabel(e.kind))+'</td>'
       +'<td class="nowrap">'+esc(e.pair)
         +(wish?' <span class="tag wish">wishlist</span>':'')+'</td>'
-      +'<td class="nowrap">'+esc(e.airline?String(e.airline)+' '+String(e.flight||''):(e.flight||'-'))+'</td>'
+      +'<td class="nowrap">'+(e.airline?opList([e.airline],1)+' '+esc(e.flight||''):esc(e.flight||'-'))+'</td>'
       +'<td class="nowrap">'+(seas?esc(seas):'<span class="muted">-</span>')+'</td>'
       +'<td class="num">'+(d.nm?nf(d.nm)+' NM':'<span class="muted">-</span>')+'</td>'
       +'<td>'+(ts.length?esc(ts.join(', ')):'<span class="muted">-</span>')+'</td>'
@@ -232,8 +313,8 @@ function evTable(rows){
       +'<td class="small">'+sureText(e.confidence)+'</td></tr>';
    }).join('')
    +'</tbody></table></div>'
-   +'<p class="muted small">Hover a row to see the raw record behind it. Season is worked out '
-   +'from the date when the run did not store one.</p>';
+   +'<p class="muted small">Hover a row to see the raw record behind it, or an airline code to see '
+   +'its name. Season is worked out from the date when the run did not store one.</p>';
 }
 
 /* ----------------------------------------------------------- overview ---- */
@@ -264,12 +345,31 @@ function ov(){
 }
 
 /* --------------------------------------------------------- pair matrix --- */
+let prSort={key:'nm',dir:-1};
+const PRKEYS={
+  pair:p=>String(p.pair||''),
+  airports:p=>String(p.from||''),
+  nm:p=>Number(p.nm||0),
+  operators:p=>(p.operators||[]).length,
+  types:p=>(p.types||[]).length,
+  status:p=>flyRank(p.status),
+  simmable:p=>p.simmable?1:0
+};
+window.prSortBy=k=>{
+  if(prSort.key===k) prSort={key:k,dir:-prSort.dir};
+  else prSort={key:k,dir:(k==='pair'||k==='airports')?1:-1};
+  prPage=1; pr();
+};
+
 function pr(){
   const f=filter;
   const ps=D.pairs.filter(p=>f==='all'||(f==='served'&&!NOSVC(p.status))
    ||(f==='unserved'&&NOSVC(p.status))||(f==='match'&&String(p.status).startsWith('MATCH'))
    ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
-  const shown=ps.slice(0,PAGE*prPage);
+  /* Sort the whole filtered set first, then page it. Sorting only the visible
+     200 rows would be misleading. */
+  const sorted=sortRows(ps,PRKEYS,prSort);
+  const shown=sorted.slice(0,PAGE*prPage);
   app.innerHTML='<div class="chips">'
    +[['all','All'],['served','Served'],['unserved','Unserved'],['match','MATCH'],
      ['simmable','Simmable'],['cargo','Cargo']]
@@ -277,10 +377,12 @@ function pr(){
    +'<input id="q" placeholder="filter by ICAO, operator or type"><span id="qn" class="muted small"></span></div>'
    +'<h2>Pair matrix &middot; '+ps.length+' rows</h2>'
    +'<div class="panel"><table id="t">'
-   +head(['Pair','Airports','Distance','Operators','Aircraft','Can you fly it?','Fits a session'])+'<tbody>'
-   +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td>'
+   +sortHead([['Pair','pair'],['Airports','airports'],['Distance','nm'],['Operators','operators'],
+              ['Aircraft','types'],['Can you fly it?','status'],['Fits a session','simmable']],
+             prSort,'prSortBy')+'<tbody>'
+   +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+esc(p.pair)+'</a></td>'
    +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="num">'+nf(p.nm)+' NM</td>'
-   +'<td>'+(cut(p.operators,6)||'-')+'</td>'
+   +'<td>'+opList(p.operators,6)+'</td>'
    +'<td>'+((p.types||[]).length?esc((p.types||[]).slice(0,3).map(prettyType).join(', '))
      +((p.types||[]).length>3?' <span class="muted">+'+((p.types||[]).length-3)+'</span>':''):'-')+'</td>'
    +'<td class="nowrap">'+flyText(p.status)+'</td>'
@@ -288,7 +390,9 @@ function pr(){
    +'</tbody></table>'
    +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
      +' more ('+shown.length+' of '+ps.length+')</button>':'')
-   +'</div>';
+   +'</div>'
+   +'<p class="muted small">Click a column heading to sort, click it again to reverse. '
+   +'Hover an operator code to see the airline name.</p>';
   const q=document.getElementById('q'), qn=document.getElementById('qn');
   q.oninput=e=>{const v=e.target.value.toUpperCase();let n=0;
     document.querySelectorAll('#t tbody tr').forEach(tr=>{
@@ -303,14 +407,15 @@ window.prMore=()=>{prPage++;pr();};
 window.pd=p=>{
   const o=D.pairs.find(x=>x.pair===p); if(!o) return;
   const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])), q=p.split('-');
-  app.innerHTML='<h2>'+p+' &middot; '+nf(o.nm)+' NM</h2>'
+  app.innerHTML='<h2>'+esc(p)+' &middot; '+nf(o.nm)+' NM</h2>'
    +'<p class="small">'+flyText(o.status)+'</p>'
-   +'<p class="muted small">Night restrictions &mdash; '+q[0]+': '+esc(en((ap[q[0]]||{}).night||'not established'))
-   +' &middot; '+q[1]+': '+esc(en((ap[q[1]]||{}).night||'not established'))+'</p>'
+   +'<p class="muted small">Night restrictions &mdash; '+esc(q[0])+': '+esc(en((ap[q[0]]||{}).night||'not established'))
+   +' &middot; '+esc(q[1])+': '+esc(en((ap[q[1]]||{}).night||'not established'))+'</p>'
    +'<h2>Flights on this route</h2><div class="panel"><table>'
    +head(['Operator','Flight','Aircraft (times seen)','Can you fly it?','Days','Departure',
           'Sources','First and last seen'])+'<tbody>'
-   +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td class="nowrap">'+esc(l.flight)+'</td>'
+   +o.legs.map(l=>'<tr><td class="nowrap">'+opList([l.airline],1)+'</td>'
+   +'<td class="nowrap">'+esc(l.flight)+'</td>'
    +'<td>'+esc(Object.entries(l.types).map(x=>prettyType(x[0])+' x'+x[1]).join(', '))+'</td>'
    +'<td class="nowrap">'+flyText(l.status)+'</td><td class="num">'+l.days+'</td>'
    +'<td class="nowrap">'+esc(l.std)+'</td><td class="small">'+esc((l.sources||[]).join(', '))+'</td>'
@@ -324,7 +429,8 @@ window.pd=p=>{
    +'<td>'+esc(Object.keys(x[1].types).map(prettyType).join(', '))+'</td>'
    +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')
    +'</tbody></table></div>'
-   +'<h2>Changes on this route</h2>'+evTable(D.events.filter(e=>e.pair===p));
+   +'<h2>Changes on this route</h2>'+evTable(D.events.filter(e=>e.pair===p))
+   +'<p><a onclick="V.pr()">&larr; back to the pair matrix</a></p>';
 };
 
 /* ---------------------------------------------------------- buy advice --- */
@@ -342,18 +448,36 @@ const PRICES_NOTE='RouteWatch does not compare shop prices itself. FSAddonCompar
  +'product URLs; the app then reads the schema.org JSON-LD price field. Off by default, because scraping is '
  +'fragile and shops set their own terms.';
 
+let buSort={key:'match',dir:-1};
+const BUKEYS={
+  icao:c=>String(c.icao||''),
+  name:c=>String(c.name||''),
+  focus:c=>String(c.focus||''),
+  new:c=>Number(c.gain?.new_pairs||0),
+  match:c=>Number(c.gain?.match_pairs||0),
+  sim:c=>Number(c.gain?.simmable_pairs||0),
+  cargo:c=>Number(c.gain?.cargo_pairs||0)
+};
+window.buSortBy=k=>{
+  if(buSort.key===k) buSort={key:k,dir:-buSort.dir};
+  else buSort={key:k,dir:(k==='icao'||k==='name'||k==='focus')?1:-1};
+  bu();
+};
+
 function bu(){
   const cs=D.candidates||[];
   if(!cs.length){app.innerHTML='<h2>Buy advice</h2><p class="muted small">No candidates measured yet. '
    +'Add an airport with <code>"candidate": true</code> in config/collection.json and run the workflow.</p>';return;}
+  const rows=sortRows(cs,BUKEYS,buSort);
   app.innerHTML='<h2>Which airport is worth buying next</h2>'
    +'<p class="lead">Each number below was counted, not guessed: these are routes where flights were '
    +'really observed, between airports you already own and this candidate. The higher the count, the more '
    +'new flying the purchase unlocks.</p>'
    +'<div class="panel"><table>'
-   +head(['#','Airport','Focus','New routes','Flyable with your fleet','Fits a session','Cargo',
-          'Connects with'])+'<tbody>'
-   +cs.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
+   +sortHead(['#',['Airport','icao'],['Focus','focus'],['New routes','new'],
+              ['Flyable with your fleet','match'],['Fits a session','sim'],['Cargo','cargo'],
+              'Connects with'],buSort,'buSortBy')+'<tbody>'
+   +rows.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
     +'<td class="nowrap"><a onclick="cd(\''+esc(c.icao)+'\')"><code>'+esc(c.icao)+'</code></a> '+esc(c.name)+'</td>'
     +'<td><span class="tag">'+esc(c.focus)+'</span></td>'
     +'<td class="gain num"><b>'+c.gain.new_pairs+'</b></td>'
@@ -361,7 +485,8 @@ function bu(){
     +'<td class="num">'+c.gain.simmable_pairs+'</td><td class="num">'+c.gain.cargo_pairs+'</td>'
     +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')
    +'</tbody></table></div>'
-   +'<p class="muted small">Click an ICAO code for the reasoning and shop links. '+PRICES_NOTE+'</p>';
+   +'<p class="muted small">Click a column heading to sort. The number in the first column is the rank '
+   +'in the current order. Click an ICAO code for the reasoning and shop links. '+PRICES_NOTE+'</p>';
 }
 
 window.cd=icao=>{
