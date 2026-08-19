@@ -30,6 +30,19 @@ jobs:
         with:
           node-version: "20"
 
+      # 0. Validate the config FIRST. routewatch.mjs feeds config lat/lon straight
+      #    into a Math.acos distance formula, so a null coordinate produces NaN,
+      #    and `nm > range_nm` against NaN is false. The result is a leg silently
+      #    reported as not simmable instead of an error. scan-sim.mjs --write
+      #    intentionally proposes airports with needs_coordinates:true, so this is
+      #    the guard between that proposal and a live config. Running it before the
+      #    collector also means a broken config costs 0 units instead of 82.
+      - name: Validate config
+        env:
+          ADB_UNITS_PER_CALL: '2'
+          ENRICH_UNIT_CAP: '60'
+        run: node scripts/check-config.mjs
+
       # 1. Collect: one call per airport; time window rotates each week.
       #    This step costs API units. Keep BACKFILL_DAYS at 1.
       - name: Collect flight data (budget-aware)
