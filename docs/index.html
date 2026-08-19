@@ -23,14 +23,17 @@ main{padding:22px;max-width:1500px}
 h2{font-size:13px;color:var(--d);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
 h2:first-child{margin-top:0}
 h3{font-size:14px;margin:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
 .card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
-.card span{color:var(--d);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.card span{color:var(--d);font-size:11.5px;display:block;line-height:1.35;margin-top:2px}
+.lead{font-size:13.5px;color:var(--d);margin:0 0 14px;max-width:900px}
+.key{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;color:var(--d)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:9px;height:9px;border-radius:50%;display:inline-block}
 
-/* The panel is the scroll container for its own table. That is what makes the
-   sticky head reliable: it anchors to the top of this box instead of fighting
-   with the page header. No header-height maths needed anywhere. */
+/* The panel is the scroll container for its own table, which is what keeps the
+   sticky head anchored to the top of the box instead of fighting the header. */
 .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);
   overflow:auto;max-height:74vh;position:relative}
 .panel::-webkit-scrollbar{width:10px;height:10px}
@@ -65,8 +68,10 @@ input:focus{outline:none;border-color:var(--u)}
 a{color:var(--u)}
 .tag{font-size:10.5px;border:1px solid var(--l);border-radius:999px;padding:2px 9px;color:var(--d);
   white-space:nowrap}
+.tag.wish{border-color:#4d3f16;color:var(--n)}
 .rank{color:var(--u);font-weight:700;font-variant-numeric:tabular-nums}
 .gain b{font-size:15px;font-weight:650}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 details{margin-top:6px}
 summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
 .stores{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
@@ -91,6 +96,7 @@ const esc=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp
 const cls=s=>!s?'u':s==='MATCH'?'m':s.startsWith('MATCH')?'n':s.startsWith('NEAR')?'n':s.startsWith('NO-')?'x':'u';
 const app=document.getElementById('app');
 const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="muted">+'+(a.length-n)+'</span>';};
+const nf=n=>Number(n).toLocaleString('en-GB');
 
 /* Some labels are written in Dutch by routewatch.mjs and stored that way in
  * data.json. Translate at display time only, so the data files stay untouched
@@ -99,36 +105,142 @@ const EN=[[/GEEN VERBINDING/g,'NO SERVICE'],[/ONBEKEND/g,'UNKNOWN'],
           [/kandidaat/g,'candidate'],[/bronnen/g,'sources']];
 const en=s=>{let o=String(s??'');for(const r of EN)o=o.replace(r[0],r[1]);return o;};
 
-/* Every table gets a real thead. Sticky only behaves predictably on thead cells
- * inside a scrolling ancestor, and .panel is that ancestor. */
 const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead>';
+
+/* ------------------------------------------------------- plain language --- */
+/* Aircraft codes mean nothing to most people, so spell the common ones out. */
+const TYPES={B733:'Boeing 737-300',B734:'Boeing 737-400',B735:'Boeing 737-500',
+ B736:'Boeing 737-600',B737:'Boeing 737-700',B738:'Boeing 737-800',B739:'Boeing 737-900',
+ B37M:'Boeing 737 MAX 7',B38M:'Boeing 737 MAX 8',B39M:'Boeing 737 MAX 9',
+ B752:'Boeing 757-200',B763:'Boeing 767-300',B772:'Boeing 777-200',B77W:'Boeing 777-300ER',
+ B788:'Boeing 787-8',B789:'Boeing 787-9',B78X:'Boeing 787-10',
+ BCS1:'Airbus A220-100',BCS3:'Airbus A220-300',
+ A319:'Airbus A319',A320:'Airbus A320',A321:'Airbus A321',
+ A19N:'Airbus A319neo',A20N:'Airbus A320neo',A21N:'Airbus A321neo',
+ A332:'Airbus A330-200',A333:'Airbus A330-300',A339:'Airbus A330-900neo',
+ A343:'Airbus A340-300',A359:'Airbus A350-900',A35K:'Airbus A350-1000',
+ E170:'Embraer E170',E175:'Embraer E175',E190:'Embraer E190',E195:'Embraer E195',
+ E290:'Embraer E190-E2',E295:'Embraer E195-E2',
+ AT43:'ATR 42',AT72:'ATR 72',AT75:'ATR 72-500',AT76:'ATR 72-600',
+ DH8D:'Dash 8 Q400',CRJ9:'Bombardier CRJ900',CRJX:'Bombardier CRJ1000',
+ SB20:'Saab 2000',SF34:'Saab 340'};
+function prettyType(s){
+  const k=String(s||'').trim().toUpperCase();
+  if(TYPES[k]) return TYPES[k];
+  /* Fall back to sentence case: AIRBUS A321 NEO -> Airbus A321neo */
+  const words=k.split(/\s+/).map(w=>{
+    if(w==='NEO') return 'neo';
+    if(/\d/.test(w)) return w;
+    return w.charAt(0)+w.slice(1).toLowerCase();
+  });
+  return words.join(' ').replace(/ neo/g,'neo');
+}
+
+const KINDS={ROUTE_NEW:'New route',ROUTE_GONE:'Route disappeared',ROUTE_BACK:'Route is back',
+ TYPE_NEW:'Different aircraft',TYPE_GONE:'Aircraft no longer used',
+ STATUS_CHANGE:'Fleet match changed',SEASON_START:'Season started',SEASON_END:'Season ended',
+ SUSPENDED:'Paused, not seen for a while',RESUMED:'Flying again'};
+const kindLabel=k=>KINDS[k]||String(k||'').replace(/_/g,' ').toLowerCase()
+  .replace(/^./,c=>c.toUpperCase());
+
+/* Can you actually fly this leg with the aircraft you own? */
+function flyText(st){
+  const s=String(st||'');
+  if(s==='MATCH'||s.startsWith('MATCH')) return '<span class="m">Yes, you own this aircraft</span>';
+  if(s.startsWith('NEAR')) return '<span class="n">Almost, close substitute</span>';
+  if(s.startsWith('NO-')) return '<span class="x">No, not in your fleet</span>';
+  return '<span class="muted">Unknown</span>';
+}
+
+/* "n=1d, bronnen=1" is precise but unreadable. Say it in words instead. */
+function sureText(c){
+  const s=en(String(c||''));
+  const d=s.match(/n=(\d+)\s*d/i), src=s.match(/sources=(\d+)/i);
+  if(!d&&!src) return esc(s)||'<span class="muted">-</span>';
+  const parts=[];
+  if(d) parts.push(d[1]+(d[1]==='1'?' day':' days')+' of data');
+  if(src) parts.push(src[1]+(src[1]==='1'?' source':' sources'));
+  return '<span class="muted">'+parts.join(', ')+'</span>';
+}
+
+function fmtWhen(at){
+  const s=String(at||'');
+  const d=new Date(s);
+  if(isNaN(d)) return s.slice(0,16);
+  const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+  const p=n=>String(n).padStart(2,'0');
+  return d.getDate()+' '+mon+' '+p(d.getHours())+':'+p(d.getMinutes());
+}
+
+/* Season is not stored on every event, but it follows entirely from the date:
+ * IATA summer runs from the last Sunday of March to the day before the last
+ * Sunday of October. So we work it out instead of leaving the column empty. */
+function lastSunday(year,month){
+  const d=new Date(Date.UTC(year,month+1,0));
+  d.setUTCDate(d.getUTCDate()-d.getUTCDay());
+  return d;
+}
+function seasonOf(at){
+  const d=new Date(at);
+  if(isNaN(d)) return '';
+  const y=d.getUTCFullYear();
+  const s=lastSunday(y,2), w=lastSunday(y,9);
+  if(d>=s&&d<w) return 'S'+String(y).slice(2);
+  if(d<s) return 'W'+String(y-1).slice(2);
+  return 'W'+String(y).slice(2);
+}
 
 /* ------------------------------------------------------------ changes ---- */
 function evTable(rows){
-  if(!rows||!rows.length) return '<p class="muted small">No changes recorded yet.</p>';
+  if(!rows||!rows.length) return '<p class="muted small">Nothing has changed yet.</p>';
   return '<div class="panel"><table>'
-   +head(['When','Kind','Pair','Flight','Season','Detail','Confidence'])+'<tbody>'
-   +rows.map(e=>'<tr class="'+esc(e.severity)+'"><td class="nowrap">'+esc(String(e.at).slice(0,16))+'</td>'
-   +'<td class="nowrap">'+esc(e.kind)+'</td><td class="nowrap">'+esc(e.pair)+'</td>'
-   +'<td class="nowrap">'+esc(e.airline)+' '+esc(e.flight)+'</td><td>'+esc(e.season)+'</td>'
-   +'<td><code>'+esc(en(JSON.stringify(e.detail)))+'</code></td>'
-   +'<td class="muted small">'+esc(en(e.confidence))+'</td></tr>').join('')
-   +'</tbody></table></div>';
+   +head(['When','What happened','Route','Flight','Season','Distance','Aircraft',
+          'Can you fly it?','How sure'])+'<tbody>'
+   +rows.map(e=>{
+     const d=e.detail||{}, ts=(d.types||[]).map(prettyType);
+     const seas=e.season||seasonOf(e.at);
+     return '<tr class="'+esc(e.severity)+'" title="'+esc(en(JSON.stringify(d)))+'">'
+      +'<td class="nowrap">'+esc(fmtWhen(e.at))+'</td>'
+      +'<td class="nowrap">'+esc(kindLabel(e.kind))+'</td>'
+      +'<td class="nowrap">'+esc(e.pair)
+        +(d.candidate?' <span class="tag wish">wishlist</span>':'')+'</td>'
+      +'<td class="nowrap">'+esc(e.airline?String(e.airline)+' '+String(e.flight||''):(e.flight||'-'))+'</td>'
+      +'<td class="nowrap">'+(seas?esc(seas):'<span class="muted">-</span>')+'</td>'
+      +'<td class="num">'+(d.nm?nf(d.nm)+' NM':'<span class="muted">-</span>')+'</td>'
+      +'<td>'+(ts.length?esc(ts.join(', ')):'<span class="muted">-</span>')+'</td>'
+      +'<td class="nowrap">'+flyText(d.status)+'</td>'
+      +'<td class="small">'+sureText(e.confidence)+'</td></tr>';
+   }).join('')
+   +'</tbody></table></div>'
+   +'<p class="muted small">Hover a row to see the raw record behind it. Season is worked out '
+   +'from the date when the run did not store one.</p>';
 }
 
 /* ----------------------------------------------------------- overview ---- */
 function ov(){
   const s=D.summary;
-  app.innerHTML='<div class="cards">'+[
-    ['airports owned',s.airports],['candidates',s.candidates],
-    ['pairs possible',s.pairs_possible],['served',s.pairs_served],['unserved',s.pairs_unserved],
-    ['with MATCH',s.pairs_match],['simmable',s.pairs_simmable],['cargo pairs',s.cargo_pairs],
-    ['suspended',s.suspended]]
-    .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
-   +'<h2>Changes in the latest run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
-   +'<p class="muted small">Comparison runs against a baseline ledger in the repository, not against '
-   +'yesterday. A source that returns nothing for one day therefore produces no false alarms: absence is '
-   +'counted and SUSPENDED only follows after several missed opportunities.</p>';
+  app.innerHTML='<p class="lead">RouteWatch watches which flights really operate between the airports '
+   +'you own in the simulator, and tells you which add-on airport would open up the most new routes '
+   +'you can actually fly with the aircraft in your hangar.</p>'
+   +'<div class="cards">'+[
+    [s.airports,'Airports you own'],
+    [s.candidates,'Wishlist airports being measured'],
+    [s.pairs_possible,'Possible airport pairs'],
+    [s.pairs_served,'Pairs with real flights'],
+    [s.pairs_unserved,'Pairs with no flights seen'],
+    [s.pairs_match,'Pairs you can fly with your fleet'],
+    [s.pairs_simmable,'Pairs that fit a sim session'],
+    [s.cargo_pairs,'Pairs flown by cargo aircraft'],
+    [s.suspended,'Routes paused after repeated absence']]
+    .map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
+   +'<div class="key"><span><i style="background:var(--m)"></i>you own the aircraft</span>'
+   +'<span><i style="background:var(--n)"></i>close substitute in your fleet</span>'
+   +'<span><i style="background:var(--x)"></i>aircraft you do not own</span></div>'
+   +'<h2>What changed in the latest run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
+   +'<p class="muted small">Every run is compared against a stored history, not against yesterday. '
+   +'If a source returns nothing for a day, that is recorded as a miss rather than a change, and a route '
+   +'is only marked as paused after several misses in a row. That is why one quiet day never causes '
+   +'a false alarm.</p>';
 }
 
 /* --------------------------------------------------------- pair matrix --- */
@@ -145,11 +257,13 @@ function pr(){
    +'<input id="q" placeholder="filter by ICAO, operator or type"><span id="qn" class="muted small"></span></div>'
    +'<h2>Pair matrix &middot; '+ps.length+' rows</h2>'
    +'<div class="panel"><table id="t">'
-   +head(['Pair','Airports','NM','Operators','Types','Status','Simmable'])+'<tbody>'
+   +head(['Pair','Airports','Distance','Operators','Aircraft','Can you fly it?','Fits a session'])+'<tbody>'
    +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+p.pair+'</a></td>'
-   +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="nowrap">'+p.nm+'</td>'
-   +'<td>'+(cut(p.operators,6)||'-')+'</td><td><code>'+(cut(p.types,3)||'-')+'</code></td>'
-   +'<td class="'+cls(p.status)+' nowrap">'+esc(en(p.status))+'</td>'
+   +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="num">'+nf(p.nm)+' NM</td>'
+   +'<td>'+(cut(p.operators,6)||'-')+'</td>'
+   +'<td>'+((p.types||[]).length?esc((p.types||[]).slice(0,3).map(prettyType).join(', '))
+     +((p.types||[]).length>3?' <span class="muted">+'+((p.types||[]).length-3)+'</span>':''):'-')+'</td>'
+   +'<td class="nowrap">'+(p.status==='GEEN VERBINDING'?'<span class="muted">no flights seen</span>':flyText(p.status))+'</td>'
    +'<td>'+(p.simmable?'<span class="m">yes</span>':'<span class="muted">no</span>')+'</td></tr>').join('')
    +'</tbody></table>'
    +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
@@ -169,34 +283,31 @@ window.prMore=()=>{prPage++;pr();};
 window.pd=p=>{
   const o=D.pairs.find(x=>x.pair===p); if(!o) return;
   const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])), q=p.split('-');
-  app.innerHTML='<h2>'+p+' &middot; '+o.nm+' NM &middot; '+esc(en(o.status))+'</h2>'
+  app.innerHTML='<h2>'+p+' &middot; '+nf(o.nm)+' NM</h2>'
+   +'<p class="small">'+flyText(o.status)+'</p>'
    +'<p class="muted small">Night restrictions &mdash; '+q[0]+': '+esc(en((ap[q[0]]||{}).night||'not established'))
    +' &middot; '+q[1]+': '+esc(en((ap[q[1]]||{}).night||'not established'))+'</p>'
-   +'<h2>Flight-level rows</h2><div class="panel"><table>'
-   +head(['Operator','Flight','Types (times seen)','Status','Days','STD','Sources','Seen'])+'<tbody>'
+   +'<h2>Flights on this route</h2><div class="panel"><table>'
+   +head(['Operator','Flight','Aircraft (times seen)','Can you fly it?','Days','Departure',
+          'Sources','First and last seen'])+'<tbody>'
    +o.legs.map(l=>'<tr><td>'+esc(l.airline)+'</td><td class="nowrap">'+esc(l.flight)+'</td>'
-   +'<td><code>'+esc(Object.entries(l.types).map(x=>x[0]+' x'+x[1]).join(', '))+'</code></td>'
-   +'<td class="'+cls(l.status)+' nowrap">'+esc(en(l.status))+'</td><td>'+l.days+'</td>'
+   +'<td>'+esc(Object.entries(l.types).map(x=>prettyType(x[0])+' x'+x[1]).join(', '))+'</td>'
+   +'<td class="nowrap">'+flyText(l.status)+'</td><td class="num">'+l.days+'</td>'
    +'<td class="nowrap">'+esc(l.std)+'</td><td class="small">'+esc((l.sources||[]).join(', '))+'</td>'
    +'<td class="nowrap small">'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')
    +'</tbody></table></div>'
-   +'<h2>Per season (observed boundaries)</h2><div class="panel"><table>'
-   +head(['Season','Flight','From','To','Days','Types','STD'])+'<tbody>'
+   +'<h2>Per season (as observed)</h2><div class="panel"><table>'
+   +head(['Season','Flight','From','To','Days','Aircraft','Departure'])+'<tbody>'
    +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td>'
    +'<td class="nowrap">'+esc(l.flight)+'</td><td class="nowrap">'+esc(x[1].first)+'</td>'
-   +'<td class="nowrap">'+esc(x[1].last)+'</td><td>'+x[1].days+'</td>'
-   +'<td><code>'+esc(Object.keys(x[1].types).join(', '))+'</code></td>'
+   +'<td class="nowrap">'+esc(x[1].last)+'</td><td class="num">'+x[1].days+'</td>'
+   +'<td>'+esc(Object.keys(x[1].types).map(prettyType).join(', '))+'</td>'
    +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')
    +'</tbody></table></div>'
-   +'<h2>Changes on this pair</h2>'+evTable(D.events.filter(e=>e.pair===p));
+   +'<h2>Changes on this route</h2>'+evTable(D.events.filter(e=>e.pair===p));
 };
 
 /* ---------------------------------------------------------- buy advice --- */
-/* Store search links: the config already holds price_search per candidate. We keep
- * those, but add a second query based on the airport name because searching on a
- * bare IATA code returns noise in most shops. Real product URLs would require a
- * catalogue feed from each store, which does not exist - FSAddonCompare is the
- * actual price comparison tool. */
 const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
   simmarket:'https://secure.simmarket.com/?s=',contrail:'https://contrail.co.uk/?s=',
   orbx:'https://orbxdirect.com/search?q=',inibuilds:'https://www.inibuilds.com/search?q=',
@@ -216,30 +327,33 @@ function bu(){
   const cs=D.candidates||[];
   if(!cs.length){app.innerHTML='<h2>Buy advice</h2><p class="muted small">No candidates measured yet. '
    +'Add an airport with <code>"candidate": true</code> in config/collection.json and run the workflow.</p>';return;}
-  app.innerHTML='<h2>Buy advice, ranked by network gain</h2>'
-   +'<p class="muted small">Measured, not estimated: the number of pairs with your current fleet and '
-   +'airports where flights were actually observed. RouteWatch tells you WHAT to buy; price comparison '
-   +'is one click away per candidate.</p>'
+  app.innerHTML='<h2>Which airport is worth buying next</h2>'
+   +'<p class="lead">Each number below was counted, not guessed: these are routes where flights were '
+   +'really observed, between airports you already own and this candidate. The higher the count, the more '
+   +'new flying the purchase unlocks.</p>'
    +'<div class="panel"><table>'
-   +head(['#','Airport','Focus','New pairs','MATCH','Simmable','Cargo','Connects with'])+'<tbody>'
+   +head(['#','Airport','Focus','New routes','Flyable with your fleet','Fits a session','Cargo',
+          'Connects with'])+'<tbody>'
    +cs.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
     +'<td class="nowrap"><a onclick="cd(\''+esc(c.icao)+'\')"><code>'+esc(c.icao)+'</code></a> '+esc(c.name)+'</td>'
     +'<td><span class="tag">'+esc(c.focus)+'</span></td>'
-    +'<td class="gain"><b>'+c.gain.new_pairs+'</b></td>'
-    +'<td class="gain m"><b>'+c.gain.match_pairs+'</b></td>'
-    +'<td>'+c.gain.simmable_pairs+'</td><td>'+c.gain.cargo_pairs+'</td>'
+    +'<td class="gain num"><b>'+c.gain.new_pairs+'</b></td>'
+    +'<td class="gain m num"><b>'+c.gain.match_pairs+'</b></td>'
+    +'<td class="num">'+c.gain.simmable_pairs+'</td><td class="num">'+c.gain.cargo_pairs+'</td>'
     +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')
    +'</tbody></table></div>'
-   +'<p class="muted small">Click an ICAO code for the rationale and store links. '+PRICES_NOTE+'</p>';
+   +'<p class="muted small">Click an ICAO code for the reasoning and shop links. '+PRICES_NOTE+'</p>';
 }
 
 window.cd=icao=>{
   const c=(D.candidates||[]).find(x=>x.icao===icao); if(!c) return;
   const city=cityOf(c.name);
   app.innerHTML='<h2>'+esc(c.icao)+' &middot; '+esc(c.name)+'</h2>'
-   +'<div class="cards">'+[['new pairs',c.gain.new_pairs],['with MATCH',c.gain.match_pairs],
-     ['simmable',c.gain.simmable_pairs],['cargo',c.gain.cargo_pairs]]
-     .map(x=>'<div class="card"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>').join('')+'</div>'
+   +'<div class="cards">'+[[c.gain.new_pairs,'New routes this unlocks'],
+     [c.gain.match_pairs,'Of those, flyable with your fleet'],
+     [c.gain.simmable_pairs,'Short enough for one session'],
+     [c.gain.cargo_pairs,'Flown by cargo aircraft']]
+     .map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
    +'<h2>Why</h2><p class="small">'+esc(en(c.why||''))+'</p>'
    +(c.known_developers?'<p class="muted small">Known developers: '+esc(c.known_developers.join(' | '))+'</p>':'')
    +(c.gain.connects.length?'<h2>Connects with</h2><p><code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
@@ -260,28 +374,32 @@ window.cd=icao=>{
 };
 
 /* ------------------------------------------------- changes, seasons, fleet */
-function ev(){app.innerHTML='<h2>All stored changes ('+D.events.length+')</h2>'+evTable(D.events);}
+function ev(){app.innerHTML='<h2>Everything that changed ('+D.events.length+')</h2>'+evTable(D.events);}
 
 function se(){
   const s=D.summary;
-  app.innerHTML='<h2>Seasons</h2><p class="small">Current: <b>'+esc(s.season.label)+'</b> '
-   +s.season.start+' through '+s.season.end+'. Counter season: <b>'+esc(s.counter_season)+'</b>.</p>'
-   +'<p class="muted small">IATA rule: last Sunday of March through the day before the last Sunday of '
-   +'October. This also works for seasons that do not exist yet.</p>'
+  app.innerHTML='<h2>Seasons</h2><p class="small">Current: <b>'+esc(s.season.label)+'</b>, '
+   +s.season.start+' through '+s.season.end+'. The opposite season is <b>'+esc(s.counter_season)+'</b>.</p>'
+   +'<p class="muted small">Airlines change their timetable twice a year. Summer runs from the last Sunday '
+   +'of March to the day before the last Sunday of October, winter covers the rest. RouteWatch works this '
+   +'out from the date, so future seasons need no configuration.</p>'
    +'<h2>Season events</h2>'+evTable(D.events.filter(e=>String(e.kind).startsWith('SEASON')));
 }
 
 function fl(){
-  app.innerHTML='<h2>Owned fleet</h2><div class="panel"><table>'
-   +head(['Key','Name','Role','Range','Types'])+'<tbody>'
+  app.innerHTML='<h2>Aircraft you own</h2><div class="panel"><table>'
+   +head(['Key','Name','Role','Range','Counts as'])+'<tbody>'
    +D.fleet.owned.map(f=>'<tr><td><code>'+esc(f.key)+'</code></td><td>'+esc(f.name)+'</td>'
-   +'<td>'+esc(f.role)+'</td><td class="nowrap">'+f.range_nm+' NM</td>'
-   +'<td><code>'+esc(f.types.join(', '))+'</code></td></tr>').join('')
+   +'<td>'+esc(f.role)+'</td><td class="num">'+nf(f.range_nm)+' NM</td>'
+   +'<td class="small">'+esc(f.types.map(prettyType).join(', '))+'</td></tr>').join('')
    +'</tbody></table></div>'
-   +'<h2>Near-match rules</h2><div class="panel"><table>'
-   +head(['Type','Substitute','Concession'])+'<tbody>'
-   +Object.entries(D.fleet.near_match).map(x=>'<tr><td><code>'+esc(x[0])+'</code></td>'
-   +'<td><code>'+esc(x[1].substitute)+'</code></td><td class="small">'+esc(en(x[1].concession))+'</td></tr>').join('')
+   +'<h2>Close-enough substitutes</h2>'
+   +'<p class="muted small">If the real flight uses an aircraft you do not own, RouteWatch checks '
+   +'whether something in your hangar is close enough to fly it anyway.</p>'
+   +'<div class="panel"><table>'
+   +head(['Real aircraft','You would fly','What you give up'])+'<tbody>'
+   +Object.entries(D.fleet.near_match).map(x=>'<tr><td>'+esc(prettyType(x[0]))+'</td>'
+   +'<td>'+esc(prettyType(x[1].substitute))+'</td><td class="small">'+esc(en(x[1].concession))+'</td></tr>').join('')
    +'</tbody></table></div>'
    +'<p class="muted small">Edit fleet and airports in the <a href="editor.html">Editor</a>, '
    +'which produces valid JSON for config/collection.json.</p>';
