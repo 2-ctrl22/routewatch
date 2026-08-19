@@ -13,14 +13,18 @@
  * older Dutch wording, because data/events.json keeps up to 3000 historical
  * records that were written before that change.
  *
- * Two fixes in this version:
- *  1. Registrations are now stored per flight line as `regs`. enrich-adb.mjs
- *     reads exactly that field; it used to find nothing, which is why
+ * Fixes and additions in this version:
+ *  1. Registrations are stored per flight line as `regs`. enrich-adb.mjs reads
+ *     exactly that field; it used to find nothing, which is why
  *     data/aircraft-meta.json stayed empty.
  *  2. The AeroDataBox destination is read from arrival.airport first and only
  *     then from movement.airport. With withLeg=true the API replaces movement
- *     with departure and arrival, so the old code always got undefined. Same
- *     bug that collect-adb.mjs already documents and fixes.
+ *     with departure and arrival, so the old code always got undefined.
+ *  3. AIRLINE NAMES BUILD THEMSELVES. Every observation may carry the airline
+ *     name the source already returns. Those names accumulate in
+ *     data/airlines.json and travel along in docs/data.json, so the pages never
+ *     depend on a hand-kept list. A name that changes is recorded as a rename
+ *     and reported as an AIRLINE_RENAMED event; the previous name is kept.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 
@@ -89,8 +93,11 @@ function simmable(pair,types,nm,cargo){const [a,b]=pair.split("-");
   return true;} return false;}
 
 const REGF="data/registry.json";
+const AIRLF="data/airlines.json";
 const load=(p,d)=>{try{return JSON.parse(readFileSync(p,"utf8"));}catch{return d;}};
 const REG=load(REGF,{}), LEDGER=load("data/ledger.json",{}), OLDEV=load("data/events.json",[]);
+/* Code -> {name, aka[], first_seen, last_seen, sources[]}. Grows by itself. */
+const AIRL=load(AIRLF,{});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
 async function openSky(icao,day){
@@ -111,7 +118,9 @@ async function openSky(icao,day){
   out.push({layer:"actual",source:"opensky",dep:icao,arr,
    airline:String(r.callsign??"").trim().slice(0,3)||"?",flight:String(r.callsign??"").trim()||"?",
    std:new Date(r.firstSeen*1000).toISOString().slice(11,16),
-   type:meta?normType(meta.typeCode??meta.model):null, reg:meta?meta.registration??null:null, cargo:0});}
+   type:meta?normType(meta.typeCode??meta.model):null, reg:meta?meta.registration??null:null,
+   /* OpenSky returns the operator on the aircraft record, not on the flight. */
+   airline_name:meta?meta.operator??meta.owner??null:null, cargo:0});}
  return out;}
 
 async function aeroDataBox(icao,day){
@@ -132,6 +141,7 @@ async function aeroDataBox(icao,day){
      airline:f?.airline?.iata??f?.airline?.icao??"?",flight:String(f?.number??"").replace(/\s/g,"")||"?",
      std:String(dep?.scheduledTime?.local??dep?.scheduledTimeLocal??"").slice(11,16)||null,
      type:normType(f?.aircraft?.model??f?.aircraft?.typeCode),reg:f?.aircraft?.reg??null,
+     airline_name:f?.airline?.name??null,
      cargo:String(f?.isCargo??"").toLowerCase()==="true"?1:0});}
   }catch{} await sleep(1100);}
  return out;}
@@ -144,7 +154,8 @@ function manual(icao,day){
   cols.forEach((c,i)=>o[c]=(v[i]??"").trim());
   return {layer:"schedule",source:"manual",dep:icao,arr:String(o.arr_icao).toUpperCase(),
    airline:o.airline||"?",flight:o.flight_no||"?",std:o.std||null,type:normType(o.type_raw),
-   reg:o.reg||null,cargo:Number(o.cargo||0)};}).filter(o=>ALL[o.arr]&&o.arr!==icao);}
+   reg:o.reg||null,airline_name:o.airline_name||null,
+   cargo:Number(o.cargo||0)};}).filter(o=>ALL[o.arr]&&o.arr!==icao);}
 
 /** Optional and off by default: price from the schema.org JSON-LD of a product URL. */
 async function scrapePrice(url){
@@ -159,7 +170,7 @@ async function scrapePrice(url){
  }catch{return null;}}
 
 const HIGH=new Set(["PAIR_NEW","PAIR_GONE","ROUTE_NEW","SUSPENDED","RESUMED","MATCH_CHANGED","SIMMABLE_CHANGED","SEASON_NEW","SEASON_NOT_RETURNING","CANDIDATE_GAIN_UP"]);
-const MED=new Set(["TYPE_NEW","TYPE_MIX_SHIFT","SEASON_TYPE_SWAP","DOW_PATTERN_CHANGE","PRICE_DROP"]);
+const MED=new Set(["TYPE_NEW","TYPE_MIX_SHIFT","SEASON_TYPE_SWAP","DOW_PATTERN_CHANGE","PRICE_DROP","AIRLINE_RENAMED"]);
 const events=[];
 const evt=(kind,o)=>events.push({at:new Date().toISOString(),kind,
  severity:HIGH.has(kind)?"high":MED.has(kind)?"medium":"low",...o});
@@ -175,6 +186,36 @@ for(let d=1;d<=days;d++){
   for(const o of rows) fresh.push({...o,day,season:seasonFor(day).label,
    dow:new Date(day+"T00:00:00Z").getUTCDay()});}
  process.stderr.write(`${day}: ${fresh.length} observations so far\n`);}
+
+/* ---------- airline names, learned from the observations themselves -------- */
+/* The sources hand us the airline name for free. Collecting it here means the
+ * dashboard never needs a list that somebody has to maintain by hand, and a
+ * carrier that renames itself is noticed instead of silently going stale. */
+const today=iso(new Date());
+let airlNew=0, airlRenamed=0;
+for(const o of fresh){
+  const code=String(o.airline??"").trim().toUpperCase();
+  const name=String(o.airline_name??"").trim();
+  if(!code||code==="?"||!name) continue;
+  const cur=AIRL[code];
+  if(!cur){
+    AIRL[code]={name,aka:[],first_seen:o.day,last_seen:o.day,sources:[o.source]};
+    airlNew++;
+    continue;
+  }
+  if(!Array.isArray(cur.aka)) cur.aka=[];
+  if(cur.name!==name){
+    /* Keep the old spelling: useful when reading back older events. */
+    if(!cur.aka.includes(cur.name)) cur.aka.push(cur.name);
+    evt("AIRLINE_RENAMED",{pair:null,airline:code,
+      detail:{from:cur.name,to:name},confidence:`seen on ${o.day} via ${o.source}`});
+    cur.name=name;
+    airlRenamed++;
+  }
+  if(!cur.sources.includes(o.source)) cur.sources.push(o.source);
+  if(!cur.last_seen||o.day>cur.last_seen) cur.last_seen=o.day;
+  if(!cur.first_seen||o.day<cur.first_seen) cur.first_seen=o.day;
+}
 
 const group=new Map();
 for(const o of fresh){const k=`${pk(o.dep,o.arr)}|${o.airline}|${o.flight}`;
@@ -303,20 +344,27 @@ writeFileSync("data/candidates.json",JSON.stringify(Object.fromEntries(
 mkdirSync("data",{recursive:true}); mkdirSync("docs",{recursive:true});
 writeFileSync("data/ledger.json",JSON.stringify(LEDGER,null,1));
 writeFileSync(REGF,JSON.stringify(REG));
+writeFileSync(AIRLF,JSON.stringify(AIRL,null,1));
 const allEv=[...events,...OLDEV].slice(0,3000);
 writeFileSync("data/events.json",JSON.stringify(allEv,null,1));
 const knownRegs=new Set();
 for(const x of Object.values(LEDGER)) for(const r of x.regs??[]) knownRegs.add(r);
+/* Codes that appear on a route but still have no name anywhere. */
+const usedCodes=new Set(active.map(x=>String(x.airline||"").toUpperCase()).filter(c=>c&&c!=="?"));
+const unnamed=[...usedCodes].filter(c=>!AIRL[c]).sort();
 const summary={generated:new Date().toISOString(),season:seasonFor(iso(new Date())),counter_season:othS,
  airports:OWN.length,candidates:CAND.length,pairs_possible:pairs.length,pairs_served:served,
  pairs_unserved:pairs.length-served,pairs_match:pairs.filter(p=>p.status.startsWith("MATCH")).length,
  pairs_simmable:pairs.filter(p=>p.simmable).length,cargo_pairs:pairs.filter(p=>p.cargo).length,
  flightlines:active.filter(l=>!l.candidate).length,registrations:knownRegs.size,
+ airlines_known:Object.keys(AIRL).length,airlines_unnamed:unnamed.length,
  suspended:Object.values(LEDGER).filter(x=>x.state==="suspended").length,new_events:events.length,
  price_scrape:!!S.price_scrape};
-/* _prices is the English key; _prijzen is still read so an older config keeps working. */
+/* _prices is the English key; _prijzen is still read so an older config keeps working.
+ * airlines travels along so the pages need no second request and no hand-kept list. */
 writeFileSync("docs/data.json",JSON.stringify({summary,pairs,candidates,
  events:allEv.slice(0,800),fleet:CFG.fleet,airports:CFG.airports,
+ airlines:Object.fromEntries(Object.entries(AIRL).map(([c,v])=>[c,v.name])),
  prices_note:CFG._prices ?? CFG._prijzen ?? null}));
 
 const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
@@ -324,6 +372,8 @@ const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
  `- pairs with a connection: **${served}** of ${pairs.length}`,
  `- with MATCH: **${summary.pairs_match}** &middot; simmable: **${summary.pairs_simmable}**`,
  `- registrations known: **${knownRegs.size}**`,
+ `- airlines named: **${Object.keys(AIRL).length}** (${airlNew} new, ${airlRenamed} renamed`
+  + (unnamed.length?`, still unnamed: ${unnamed.slice(0,12).join(" ")}`:"")+`)`,
  `- new changes: **${events.length}**`,"","### Buy advice by network gain",""];
 for(const c of candidates.slice(0,6))
  md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} pairs, +${c.gain.match_pairs} with MATCH`
@@ -334,4 +384,6 @@ writeFileSync("data/last-run.md",md.join("\n"));
 if(process.env.ROUTEWATCH_WEBHOOK && events.length)
  await fetch(process.env.ROUTEWATCH_WEBHOOK,{method:"POST",headers:{"content-type":"application/json"},
   body:JSON.stringify({text:md.join("\n")})}).catch(()=>{});
-console.log(`done: ${served}/${pairs.length} pairs, ${events.length} changes, ${candidates.length} candidates, ${knownRegs.size} registrations`);
+console.log(`done: ${served}/${pairs.length} pairs, ${events.length} changes, ${candidates.length} candidates, `
+ +`${knownRegs.size} registrations, ${Object.keys(AIRL).length} airlines named`
+ +(unnamed.length?`, ${unnamed.length} codes still unnamed`:""));
