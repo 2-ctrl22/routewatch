@@ -5,7 +5,7 @@
  * Does NOT touch routewatch.mjs. Writes CSVs in the shape the existing manual()
  * provider already reads:
  *     data/manual/{ICAO}_{YYYY-MM-DD}.csv
- *     arr_icao,airline,flight_no,std,type_raw,cargo,reg
+ *     arr_icao,airline,flight_no,std,type_raw,cargo,reg,airline_name
  *
  * ------------------------------------------------------------------ FIX v2 --
  * WHAT WAS WRONG: the URL sets withLeg=true. The documentation says about that:
@@ -24,12 +24,20 @@
  * giving up.
  *
  * ------------------------------------------------------------------ FIX v3 --
- * The registration is now written as a seventh column. routewatch.mjs stores it
- * per flight line in the ledger as `regs`, and enrich-adb.mjs reads exactly that
+ * The registration is written as a seventh column. routewatch.mjs stores it per
+ * flight line in the ledger as `regs`, and enrich-adb.mjs reads exactly that
  * field to look up aircraft. Without this column that lookup has nothing to
  * work with and data/aircraft-meta.json stays empty.
- * The column is appended at the end, and manual() reads columns by name, so
- * older CSVs without it keep working.
+ *
+ * -------------------------------------------------------------------- v4 ---
+ * AIRLINE NAMES, FOR FREE. Every flight object already carries f.airline.name,
+ * and we used to throw it away after picking the code. It is now written as an
+ * eighth column, so routewatch.mjs can build data/airlines.json from your own
+ * observations. No extra API units, and a new or renamed airline names itself
+ * the first time it shows up in your network.
+ *
+ * Both new columns are appended at the end, and manual() maps columns by name,
+ * so older CSVs without them keep working.
  *
  * BUDGET (AeroDataBox BASIC: 600 units/month, 2400 requests, 1 req/second)
  *   Tier 1 = 1 unit, Tier 2 = 2, Tier 3 = 6, Tier 4 = 60.
@@ -114,9 +122,9 @@ function windowFor(day) {
 
 /* ------------------------------------------------------------------ csv --- */
 
-/* reg is last on purpose: manual() in routewatch.mjs maps columns by name, so
-   appending a column never breaks the CSVs that are already on disk. */
-const HEADER = "arr_icao,airline,flight_no,std,type_raw,cargo,reg";
+/* reg and airline_name are last on purpose: manual() in routewatch.mjs maps
+   columns by name, so appending a column never breaks CSVs already on disk. */
+const HEADER = "arr_icao,airline,flight_no,std,type_raw,cargo,reg,airline_name";
 const clean = v => String(v ?? "").replace(/[,\r\n]/g, " ").trim();
 
 function writeCsv(icao, day, rows) {
@@ -124,11 +132,12 @@ function writeCsv(icao, day, rows) {
   const path = `data/manual/${icao}_${day}.csv`;
   const body = rows.map(r =>
     [clean(r.arr), clean(r.airline), clean(r.flight), clean(r.std), clean(r.type),
-     r.cargo ? 1 : 0, clean(r.reg)].join(",")
+     r.cargo ? 1 : 0, clean(r.reg), clean(r.airline_name)].join(",")
   );
   writeFileSync(path, [HEADER, ...body].join("\n") + "\n");
   const withReg = rows.filter(r => r.reg).length;
-  LOG(`wrote ${path}: ${rows.length} rows, ${withReg} with a registration`);
+  const withName = rows.filter(r => r.airline_name).length;
+  LOG(`wrote ${path}: ${rows.length} rows, ${withReg} with a registration, ${withName} with an airline name`);
 }
 
 /* -------------------------------------------------------- destination ----- */
@@ -167,6 +176,9 @@ function diagnose(f) {
   const ac = f?.aircraft;
   if (ac) LOG(`diagnosis - aircraft keys: ${Object.keys(ac).join(", ")} | reg=${ac.reg ?? "-"}`);
   else LOG(`diagnosis - no aircraft block, so no registrations this run`);
+  const al = f?.airline;
+  if (al) LOG(`diagnosis - airline keys: ${Object.keys(al).join(", ")} | iata=${al.iata ?? "-"} icao=${al.icao ?? "-"} name=${al.name ?? "-"}`);
+  else LOG(`diagnosis - no airline block, so no airline names this run`);
 }
 
 /* ------------------------------------------------------------- fetching --- */
@@ -217,7 +229,9 @@ async function fetchAirportDay(icao, day, retried = false) {
         type: f?.aircraft?.model ?? f?.aircraft?.typeCode ?? "",
         cargo: String(f?.isCargo ?? "").toLowerCase() === "true" ? 1 : 0,
         /* Feeds ledger.regs, which enrich-adb.mjs turns into aircraft-meta.json. */
-        reg: f?.aircraft?.reg ?? ""
+        reg: f?.aircraft?.reg ?? "",
+        /* Feeds data/airlines.json, so the dashboard never needs a hand-kept list. */
+        airline_name: f?.airline?.name ?? ""
       });
     }
     LOG(`${icao} ${day} ${START}+12h: ${deps.length} departures, ${rows.length} inside your collection (units ${spent}/${UNIT_CAP})`);
@@ -234,6 +248,7 @@ LOG(`round ${weekIndex}: window ${START}+12h, day shift ${DAY_SHIFT}, ${DAYS} da
 LOG(`cap ${UNIT_CAP} units, ${UNITS_PER_CALL} per call, pause ${SLEEP_MS} ms, so at most ${Math.floor(UNIT_CAP / UNITS_PER_CALL)} calls this run`);
 
 let written = 0, skipped = 0, totalRows = 0, totalRegs = 0;
+const namesSeen = new Map();
 
 outer:
 for (let d = 1; d <= DAYS; d++) {
@@ -248,6 +263,7 @@ for (let d = 1; d <= DAYS; d++) {
       writeCsv(icao, day, rows);
       written++; totalRows += rows.length;
       totalRegs += rows.filter(r => r.reg).length;
+      for (const r of rows) if (r.airline && r.airline_name) namesSeen.set(r.airline, r.airline_name);
     }
     await sleep(SLEEP_MS);
   }
@@ -255,6 +271,9 @@ for (let d = 1; d <= DAYS; d++) {
 
 LOG(`done: ${written} CSVs with ${totalRows} rows (${totalRegs} carrying a registration), `
   + `${skipped} skipped because they already existed, ${spent} units used`);
+LOG(`airline names seen this run: ${namesSeen.size}`
+  + (namesSeen.size ? ` (for example ${[...namesSeen].slice(0, 4).map(([c, n]) => c + "=" + n).join(", ")})` : ""));
 if (stopped) LOG("note: the run stopped early to protect your quota");
 if (!written && !skipped) LOG("zero CSVs: check the diagnosis line above to see what the destination is called in the answer");
 if (written && !totalRegs) LOG("note: rows were written but no registrations came back, so aircraft-meta.json cannot fill up yet");
+if (written && !namesSeen.size) LOG("note: rows were written but no airline names came back, so the dashboard falls back to its built-in list");
