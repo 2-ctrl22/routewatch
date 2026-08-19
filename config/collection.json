@@ -1,11 +1,11 @@
 {
-  "_hoe_uitbreiden": {
-    "waar": "Dit bestand is het enige dat je aanraakt. Na wijzigen: commit, of Actions -> RouteWatch -> Run workflow.",
-    "luchthaven": "Object toevoegen aan airports. Verplicht: icao, name, lat, lon.",
-    "vliegtuig": "Object toevoegen aan fleet.owned met key, name, role, range_nm en types. Voeg near_match-regels toe.",
-    "kandidaat": "Een veld met candidate:true doet WEL mee in het ophalen maar NIET in je hoofdmatrix. De app meet hoeveel nieuwe bediende paren en nieuwe MATCH-paren die aankoop oplevert. Bevalt het: haal candidate weg en het veld schuift in je collectie."
+  "_how_to_extend": {
+    "where": "This file is the only one you touch. After changing it: commit, or Actions -> RouteWatch -> Run workflow.",
+    "airport": "Add an object to airports. Required: icao, name, lat, lon.",
+    "aircraft": "Add an object to fleet.owned with key, name, role, range_nm and types. Add near_match rules as well.",
+    "candidate": "An airport with candidate:true IS collected but does NOT count towards your main matrix. The app measures how many new served pairs and new MATCH pairs that purchase would unlock. Happy with it? Remove candidate and the airport joins your collection."
   },
-  "_prijzen": "RouteWatch vergelijkt zelf geen winkelprijzen. FSAddonCompare doet dat al voor 9000+ add-ons over Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket en de Marketplace, met prijshistorie en sale-alerts. Per kandidaat staan hieronder directe zoeklinks. Wil je toch prijzen in dit dashboard, zet settings.price_scrape op true en vul per kandidaat price_urls in met directe product-URLs; de app leest dan het schema.org/JSON-LD prijsveld. Standaard UIT: dat scrapen is fragiel en winkels stellen eigen voorwaarden.",
+  "_prices": "RouteWatch does not compare shop prices itself. FSAddonCompare already does that for 9000+ add-ons across Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket and the Marketplace, with price history and sale alerts. Direct search links per candidate are below. If you do want prices in this dashboard, set settings.price_scrape to true and fill price_urls per candidate with direct product URLs; the app then reads the schema.org JSON-LD price field. Off by default: scraping is fragile and shops set their own terms.",
   "settings": {
     "missed_before_suspend": 6,
     "type_share_delta": 0.2,
@@ -76,39 +76,39 @@
     "near_match": {
       "B38M": {
         "substitute": "B738",
-        "concession": "737 MAX 8: LEAP-motoren, 197 vs 189 stoelen, ca. 8% zuiniger"
+        "concession": "737 MAX 8: LEAP engines, 197 vs 189 seats, about 8% more efficient"
       },
       "B38X": {
         "substitute": "B738",
-        "concession": "737 MAX 8-200 (Ryanair), 197 stoelen"
+        "concession": "737 MAX 8-200 (Ryanair), 197 seats"
       },
       "B737": {
         "substitute": "B738",
-        "concession": "737-700: korter en lichter, hogere klimsnelheid"
+        "concession": "737-700: shorter and lighter, climbs faster"
       },
       "A21N": {
         "substitute": "A320",
-        "concession": "A321neo: 7 m langer, hoger MTOW"
+        "concession": "A321neo: 7 m longer, higher MTOW"
       },
       "A319": {
         "substitute": "A320",
-        "concession": "A319: 3,7 m korter; verwaarloosbaar"
+        "concession": "A319: 3.7 m shorter, negligible difference"
       },
       "A321": {
         "substitute": "A320",
-        "concession": "A321ceo: langer, zwaarder, oudere motoren"
+        "concession": "A321ceo: longer, heavier, older engines"
       },
       "A332": {
         "substitute": "A350",
-        "concession": "A330-200 in plaats van A350"
+        "concession": "A330-200 instead of an A350"
       },
       "A333": {
         "substitute": "A350",
-        "concession": "A330-300 in plaats van A350"
+        "concession": "A330-300 instead of an A350"
       },
       "B734F": {
         "substitute": "B738F",
-        "concession": "737-400F: generatie ouder, ca. 4 ton minder payload"
+        "concession": "737-400F: one generation older, about 4 tonnes less payload"
       }
     }
   },
@@ -120,7 +120,7 @@
       "country": "NL",
       "lat": 52.3086,
       "lon": 4.7639,
-      "night": "nachtslot verplicht 23:00-07:00",
+      "night": "night slot required 23:00-07:00",
       "narrowbody_allowed": true
     },
     {
@@ -130,7 +130,7 @@
       "country": "BE",
       "lat": 50.9014,
       "lon": 4.4844,
-      "night": "nacht 23:00-05:59; 16.000 nachtslots/jaar; stille weekendnachten",
+      "night": "night 23:00-05:59; 16,000 night slots per year; quiet weekend nights",
       "narrowbody_allowed": true
     },
     {
@@ -145,11 +145,11 @@
     {
       "icao": "EDDK",
       "iata": "CGN",
-      "name": "Koeln/Bonn",
+      "name": "Cologne/Bonn",
       "country": "DE",
       "lat": 50.8659,
       "lon": 7.1427,
-      "night": "24-uurs; pax-verbod 00:00-05:00, VRACHT UITGEZONDERD",
+      "night": "24 hours; passenger ban 00:00-05:00, CARGO EXEMPT",
       "narrowbody_allowed": true
     },
     {
@@ -204,7 +204,7 @@
       "country": "GB",
       "lat": 51.4706,
       "lon": -0.4619,
-      "night": "nachtquotum - nog te verifieren",
+      "night": "night quota - still to be verified",
       "narrowbody_allowed": true
     },
     {
@@ -232,13 +232,13 @@
       "country": "CH",
       "lat": 47.4647,
       "lon": 8.5492,
-      "night": "06:00-23:30; geplande vertrekken niet na 23:00",
+      "night": "06:00-23:30; scheduled departures not after 23:00",
       "narrowbody_allowed": true
     },
     {
       "icao": "LSGG",
       "iata": "GVA",
-      "name": "Geneve",
+      "name": "Geneva",
       "country": "CH",
       "lat": 46.2381,
       "lon": 6.109,
@@ -251,7 +251,7 @@
       "country": "AT",
       "lat": 47.2602,
       "lon": 11.3439,
-      "night": "06:30-20:00 lokaal; jetvertrek na 20:00 in principe niet",
+      "night": "06:30-20:00 local; jet departures after 20:00 in principle not allowed",
       "narrowbody_allowed": true
     },
     {
@@ -275,7 +275,7 @@
     {
       "icao": "LEZL",
       "iata": "SVQ",
-      "name": "Sevilla",
+      "name": "Seville",
       "country": "ES",
       "lat": 37.418,
       "lon": -5.8931,
@@ -302,7 +302,7 @@
     {
       "icao": "LGAV",
       "iata": "ATH",
-      "name": "Athene",
+      "name": "Athens",
       "country": "GR",
       "lat": 37.9364,
       "lon": 23.9445,
@@ -356,7 +356,7 @@
     {
       "icao": "EPWA",
       "iata": "WAW",
-      "name": "Warschau Chopin",
+      "name": "Warsaw Chopin",
       "country": "PL",
       "lat": 52.1657,
       "lon": 20.9671,
@@ -374,7 +374,7 @@
     {
       "icao": "FACT",
       "iata": "CPT",
-      "name": "Kaapstad",
+      "name": "Cape Town",
       "country": "ZA",
       "lat": -33.9648,
       "lon": 18.6017,
@@ -401,15 +401,15 @@
     {
       "icao": "EKCH",
       "iata": "CPH",
-      "name": "Kopenhagen Kastrup",
+      "name": "Copenhagen Kastrup",
       "country": "DK",
       "lat": 55.6181,
       "lon": 12.6561,
       "candidate": true,
       "focus": "pax",
-      "why": "Drukste paar vanaf ENGM, ESSA, EFHK en EPWA; plus SAS naar KSFO en QR naar OTHH. Ontsluit twee long-haul-eilanden in een aankoop.",
+      "why": "Busiest pair from ENGM, ESSA, EFHK and EPWA; plus SAS to KSFO and Qatar Airways to OTHH. Unlocks two long-haul islands in a single purchase.",
       "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CPH+Kopenhagen",
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CPH+Copenhagen",
         "simmarket": "https://secure.simmarket.com/?s=CPH",
         "contrail": "https://contrail.co.uk/?s=CPH",
         "orbx": "https://orbxdirect.com/search?q=CPH",
@@ -418,7 +418,7 @@
         "justflight": "https://www.justflight.com/searchresults?searchterm=CPH"
       },
       "known_developers": [
-        "SimNord - MSFS 2020 en 2024, uitgebracht augustus 2025",
+        "SimNord - MSFS 2020 and 2024, released August 2025",
         "FlyTampa"
       ]
     },
@@ -431,7 +431,7 @@
       "lon": 8.5706,
       "candidate": true,
       "focus": "pax",
-      "why": "Top-5-bestemming vanaf alle vier Nordics-velden; Lufthansa naar KSFO en de nieuwe FRA-CPT-vlucht; vult het gat naast EDDS, EDDK en EDLV.",
+      "why": "Top-5 destination from all four Nordic airports; Lufthansa to KSFO and the new FRA-CPT flight; fills the gap next to EDDS, EDDK and EDLV.",
       "price_search": {
         "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=FRA+Frankfurt",
         "simmarket": "https://secure.simmarket.com/?s=FRA",
@@ -445,15 +445,15 @@
     {
       "icao": "EDDM",
       "iata": "MUC",
-      "name": "Muenchen",
+      "name": "Munich",
       "country": "DE",
       "lat": 48.3538,
       "lon": 11.7861,
       "candidate": true,
       "focus": "pax",
-      "why": "Sterk vanaf de Nordics; Allegris-A350 naar Kaapstad.",
+      "why": "Strong from the Nordics; Allegris A350 to Cape Town.",
       "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MUC+Muenchen",
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MUC+Munich",
         "simmarket": "https://secure.simmarket.com/?s=MUC",
         "contrail": "https://contrail.co.uk/?s=MUC",
         "orbx": "https://orbxdirect.com/search?q=MUC",
@@ -471,7 +471,7 @@
       "lon": -3.5626,
       "candidate": true,
       "focus": "pax",
-      "why": "Completeert het Iberische cluster; Iberia naar KSFO; QR 18-21 weekly naar OTHH; ook QR Cargo-station.",
+      "why": "Completes the Iberian cluster; Iberia to KSFO; Qatar Airways 18-21 weekly to OTHH; also a Qatar Airways Cargo station.",
       "price_search": {
         "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MAD+Madrid",
         "simmarket": "https://secure.simmarket.com/?s=MAD",
@@ -485,15 +485,15 @@
     {
       "icao": "LIMC",
       "iata": "MXP",
-      "name": "Milaan Malpensa",
+      "name": "Milan Malpensa",
       "country": "IT",
       "lat": 45.6306,
       "lon": 8.7281,
       "candidate": true,
       "focus": "pax+cargo",
-      "why": "Tweede Italiaans veld naast LIRF; QR 18 weekly; QR Cargo via STN-MXP; FedEx BOM-MXP-MEM.",
+      "why": "Second Italian airport next to LIRF; Qatar Airways 18 weekly; Qatar Airways Cargo via STN-MXP; FedEx BOM-MXP-MEM.",
       "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MXP+Milaan",
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MXP+Milan",
         "simmarket": "https://secure.simmarket.com/?s=MXP",
         "contrail": "https://contrail.co.uk/?s=MXP",
         "orbx": "https://orbxdirect.com/search?q=MXP",
@@ -511,7 +511,7 @@
       "lon": -0.1903,
       "candidate": true,
       "focus": "pax",
-      "why": "De ontbrekende Londen-schakel voor LFBD, LFBZ, LEZL, LPPR en LGKR: die hebben wel Londen-verkeer, maar niet op EGLL.",
+      "why": "The missing London link for LFBD, LFBZ, LEZL, LPPR and LGKR: they do have London traffic, just not to EGLL.",
       "price_search": {
         "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGW+London",
         "simmarket": "https://secure.simmarket.com/?s=LGW",
@@ -525,15 +525,15 @@
     {
       "icao": "EBLG",
       "iata": "LGG",
-      "name": "Luik",
+      "name": "Liege",
       "country": "BE",
       "lat": 50.6374,
       "lon": 5.4432,
       "candidate": true,
       "focus": "cargo",
-      "why": "VRACHT nummer 1: thuisbasis ASL Airlines Belgium met 24 stuks 737-800BCF, plus QR Cargo-station. Ontsluit je hele B7-blok, dat nu nul paren heeft.",
+      "why": "CARGO number 1: home base of ASL Airlines Belgium with 24 Boeing 737-800BCFs, plus a Qatar Airways Cargo station. Unlocks your entire B7 block, which currently has zero pairs.",
       "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGG+Luik",
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGG+Liege",
         "simmarket": "https://secure.simmarket.com/?s=LGG",
         "contrail": "https://contrail.co.uk/?s=LGG",
         "orbx": "https://orbxdirect.com/search?q=LGG",
@@ -541,20 +541,20 @@
         "aerosoft": "https://www.aerosoft.com/en/search?q=LGG",
         "justflight": "https://www.justflight.com/searchresults?searchterm=LGG"
       },
-      "night": "24-uurs vrachthub"
+      "night": "24-hour cargo hub"
     },
     {
       "icao": "LFPG",
       "iata": "CDG",
-      "name": "Parijs Charles de Gaulle",
+      "name": "Paris Charles de Gaulle",
       "country": "FR",
       "lat": 49.0097,
       "lon": 2.5479,
       "candidate": true,
       "focus": "cargo",
-      "why": "VRACHT nummer 2: basis van ASL France en West Atlantic, grootste FedEx-hub van Europa, QR Cargo-station. Maakt CDG-ATH en OPO-CDG met de 737-800BCF simbaar.",
+      "why": "CARGO number 2: base of ASL Airlines France and West Atlantic, the largest FedEx hub in Europe, and a Qatar Airways Cargo station. Makes CDG-ATH and OPO-CDG flyable with the 737-800BCF.",
       "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CDG+Parijs",
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CDG+Paris",
         "simmarket": "https://secure.simmarket.com/?s=CDG",
         "contrail": "https://contrail.co.uk/?s=CDG",
         "orbx": "https://orbxdirect.com/search?q=CDG",
@@ -572,7 +572,7 @@
       "lon": 0.235,
       "candidate": true,
       "focus": "cargo",
-      "why": "VRACHT: QR Cargo 777F op STN-BRU en STN-MXP. Levert direct twee nieuwe 777F-paren met EBBR.",
+      "why": "CARGO: Qatar Airways Cargo 777F on STN-BRU and STN-MXP. Immediately adds two new 777F pairs with EBBR.",
       "price_search": {
         "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=STN+London",
         "simmarket": "https://secure.simmarket.com/?s=STN",
@@ -592,7 +592,7 @@
       "lon": 12.2364,
       "candidate": true,
       "focus": "cargo",
-      "why": "VRACHT: DHL-hub; EAT Leipzig en Star Air, die je al bij LFBD tegenkwam.",
+      "why": "CARGO: DHL hub; EAT Leipzig and Star Air, which you already came across at LFBD.",
       "price_search": {
         "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LEJ+Leipzig/Halle",
         "simmarket": "https://secure.simmarket.com/?s=LEJ",
