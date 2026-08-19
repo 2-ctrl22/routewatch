@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------- RouteWatch
+#
+# Two categories are deliberately kept out of the repository.
+#
+# 1. CACHED API CONTENT
+#    AeroDataBox Terms of Use, Article 5.5, caps cached Contents at seven days,
+#    and 5.2(g) forbids building a permanent database out of them. A file that is
+#    committed lives in git history forever, which is the opposite of a cache.
+#    RouteWatch reads these CSVs on every run and keeps only its own computed
+#    results, so nothing of value is lost by not committing them.
+#
+# 2. THE IMMERSION VARIANT
+#    docs/community-immersion.json carries flight numbers, departure times and
+#    airline per route. Those are Contents, not a Derived Work. Anything under
+#    docs/ is served publicly by GitHub Pages, so committing it would publish it.
+#    It stays ignored until AeroDataBox confirms in writing that the Plan Terms
+#    permit showing those fields to end users (Articles 5.6 and 5.3).
+#
+#    Remove those two lines once that permission is on paper.
+
+# Cached API responses, seven-day retention
+data/manual/*.csv
+
+# Flight-level variant: not public until permission is in writing
+docs/community-immersion.json
+data/community-immersion.json
+
+# Local scanner output: describes one person's machine, not the project
+data/sim-scan.json
+data/sim-scan.md
+config/collection.scan.json
+
+# Reports regenerated on every run
+data/retention-check.md
+data/variant-comparison.md
+
+# Local noise
+node_modules/
+.DS_Store
+.env
+*.log

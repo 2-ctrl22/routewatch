@@ -7,8 +7,8 @@
  *   node scripts/publish-derived.mjs --sweep    also delete expired cached CSVs
  *   node scripts/publish-derived.mjs --audit    report only, write nothing
  *
- * VARIANT A - docs/community.json          aggregate only
- * VARIANT B - docs/community-immersion.json aggregate plus flight-level detail
+ * VARIANT A - docs/community.json           aggregate only, safe to serve
+ * VARIANT B - data/community-immersion.json aggregate plus flight-level detail
  *
  * -------------------------------------------------------------- THE TRADE-OFF
  * A tells a user "Amsterdam to Munich is served and you can fly it".
@@ -35,10 +35,14 @@
  * VARIANT B adds flight numbers, departure times, airline and aircraft type per
  * route. Those are Contents, not analysis. Article 5.2 explicitly rules out
  * handing over "lightly changed data - reformatted, translated, or with fields
- * renamed". So B needs written permission from AeroDataBox before it is served to
- * anyone, and it is written to a file that is deliberately easy to keep private.
+ * renamed".
  *
- * Until that permission exists: use A publicly, use B for yourself.
+ * So B defaults to data/, which GitHub Pages does not serve, and .gitignore keeps
+ * it out of the repository entirely. Two independent safeguards, because a flag
+ * you have to remember is not a safeguard. Point it at docs/ only once the
+ * permission is on paper:
+ *
+ *   IMMERSION_DIR=docs node scripts/publish-derived.mjs
  */
 
 import { readFileSync, writeFileSync, readdirSync, existsSync, unlinkSync, mkdirSync, statSync } from "node:fs";
@@ -52,9 +56,9 @@ const kb=n=>Math.round(n/1024)+" kB";
 
 const RETENTION_DAYS=Number(process.env.RETENTION_DAYS??7);
 const OUTDIR=process.env.PUBLISH_DIR??"docs";
-/* Variant B is the one that needs permission, so it is opt-out by default only
- * for serving, not for building: you want to see it to judge it. */
-const IMMERSION_DIR=process.env.IMMERSION_DIR??OUTDIR;
+/* Default is data/, not docs/: anything under docs/ is published by Pages the
+ * moment it is committed, and variant B is not cleared for that yet. */
+const IMMERSION_DIR=process.env.IMMERSION_DIR??"data";
 
 /* ------------------------------------------------------------ 1. the sweep --- */
 
@@ -153,8 +157,6 @@ function buildAggregate(D){
 }
 
 /* ------------------------------------------- VARIANT B: immersion, gated ---- */
-/* Everything in A, plus the fields that let a user recreate a real flight. Those
- * fields are Contents. Do not serve this without written permission. */
 
 function buildImmersion(D){
   return {
@@ -223,6 +225,9 @@ function auditRetention(){
   if(existsSync(join("docs","data.json")))
     findings.push(`docs/data.json is served publicly by GitHub Pages and contains legs `
       +`with flight numbers, departure times and per-season records. That is Contents.`);
+  if(existsSync(join("docs","community-immersion.json")))
+    findings.push(`docs/community-immersion.json exists and IS served by Pages. Move it to `
+      +`data/ unless the permission is on paper.`);
   return findings;
 }
 
@@ -244,15 +249,17 @@ if(!AUDIT){
   writeFileSync(join(OUTDIR,"community.json"),JSON.stringify(A));
   mkdirSync(IMMERSION_DIR,{recursive:true});
   writeFileSync(join(IMMERSION_DIR,"community-immersion.json"),JSON.stringify(B));
-  LOG(`variant A: ${join(OUTDIR,"community.json")} ${kb(sizeA)}`);
+  LOG(`variant A: ${join(OUTDIR,"community.json")} ${kb(sizeA)} - safe to serve`);
   LOG(`variant B: ${join(IMMERSION_DIR,"community-immersion.json")} ${kb(sizeB)}, `
      +`${flights} flights, ${withTime} with a departure time`);
-  LOG("variant B needs written permission before you serve it to anyone");
+  if(IMMERSION_DIR==="docs")
+    LOG("WARNING: variant B is in docs/, which Pages serves. Only do this with permission on paper.");
+  else
+    LOG("variant B is not served and is gitignored. Set IMMERSION_DIR=docs once permitted.");
 }
 
 /* ------------------------------------------------------ the comparison ------ */
 
-const pct=(a,b)=>b?Math.round(a/b*100):0;
 const servedA=A.pairs.filter(p=>p.flyable!=="none").length;
 const ownA=A.pairs.filter(p=>p.flyable==="own").length;
 
@@ -268,7 +275,8 @@ const md=[
 `## Size and content`,``,
 `| | Variant A | Variant B |`,
 `|---|---|---|`,
-`| File | \`community.json\` | \`community-immersion.json\` |`,
+`| File | \`${join(OUTDIR,"community.json")}\` | \`${join(IMMERSION_DIR,"community-immersion.json")}\` |`,
+`| Served by Pages | yes | ${IMMERSION_DIR==="docs"?"**yes**":"no"} |`,
 `| Size | ${kb(sizeA)} | ${kb(sizeB)} |`,
 `| Airport pairs | ${A.pairs.length} | ${B.pairs.length} |`,
 `| Individual flights | none | ${flights} |`,
@@ -299,7 +307,8 @@ const md=[
 `that keeps the immersion without distributing anything:`,``,
 `- ship variant A as the public file`,
 `- have the paid app call the API with the **user's own key** for the flight-level`,
-`  detail, on the handful of airports that user owns`,`- then nothing is redistributed at all, because each user retrieves their own data`,
+`  detail, on the handful of airports that user owns`,
+`- then nothing is redistributed at all, because each user retrieves their own data`,
 `  under their own subscription, and your paywall sits on the software`,``,
 `That costs the user a few dollars a month on top of a one-time purchase, which`,
 `this community dislikes. It is the only version that needs no permission at all,`,
@@ -312,10 +321,9 @@ const md=[
 if(findings.length) for(const f of findings) md.push(`- ${f}`);
 else md.push(`- nothing over the limit.`);
 md.push(``,`## Note on git history`,``,
-`Deleting a CSV removes it from the working tree, not from earlier commits. The`,
-`same applies to \`community-immersion.json\`: once committed it stays in history,`,
-`even if you later decide not to publish it. Add it to .gitignore if you want to`,
-`keep that option open.`);
+`Deleting a file removes it from the working tree, not from earlier commits. Both`,
+`data/manual/*.csv and the immersion variant are in .gitignore for that reason: a`,
+`cache that lives in git history forever is not a cache.`);
 
 mkdirSync("data",{recursive:true});
 writeFileSync("data/variant-comparison.md",md.join("\n")+"\n");
