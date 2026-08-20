@@ -4,6 +4,7 @@
  *
  *   node scripts/budget.mjs                        show the current position
  *   node scripts/budget.mjs --check                exit 1 if the next run does not fit
+ *   node scripts/budget.mjs --plan 60 --reserve 34 print enrich_cap for the workflow
  *   node scripts/budget.mjs --record 101 142       record a finished run: calls, units
  *   node scripts/budget.mjs --seed 260 169         seed from the dashboard: units, calls
  *   node scripts/budget.mjs --period 2026-08-18 31 set period start and length
@@ -55,12 +56,28 @@
  *
  * Consequence for this period, and it is the strict variant: four Mondays fall
  * inside it - 24 and 31 August, 7 and 14 September. At 142 units per run that is
- * 568 units against 340 remaining, so only two full runs fit. Lower
- * ENRICH_UNIT_CAP, drop airports, or skip a week.
+ * 568 units against 340 remaining, so only two full runs fit.
  *
- * After every reset, re-run --period and --seed against the dashboard. A ledger
- * left on an expired period reports units that no longer exist, which blocks runs
- * that would in fact have fitted.
+ * ------------------------------------------------------- AUTOMATIC ROLLOVER
+ * The period rolls forward on its own, by calendar month rather than by a fixed
+ * number of days, so it can never drift off the 18th. A ledger left on an expired
+ * period would report units that no longer exist and block runs that in fact fit.
+ *
+ * The roll happens one day AFTER the anniversary, not on it. The reset itself is at
+ * 19:19 while the workflow starts at 05:00 UTC, so rolling on the day itself could
+ * hand out a clean budget hours before RapidAPI has actually reset. Recorded runs
+ * are kept and filtered by date, not deleted, so nothing is lost if a run and a
+ * roll land on the same day.
+ *
+ * A roll is announced in the log. Verify it against the dashboard when convenient
+ * with --seed; the roll assumes a full quota, it does not measure one.
+ *
+ * ------------------------------------------------------------------ PLANNING
+ * --plan MAX --reserve N prints key=value lines on stdout and nothing else, so a
+ * workflow can append it to $GITHUB_OUTPUT. Every human-readable line goes to
+ * stderr in that mode. The collector is treated as non-negotiable: enrichment gets
+ * what is left after the collector and the reserve, capped at MAX, rounded down to
+ * an even number because a flight number costs 2 units.
  *
  * Overage note: API Overage Spend reads $0 and this is a free plan, so exceeding
  * the quota blocks calls with HTTP 429 rather than charging money. The risk being
@@ -68,12 +85,17 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 
-const LOG = (...a) => console.log("[budget]", ...a);
 const FILE = "data/unit-budget.json";
 const argv = process.argv.slice(2);
 const has = f => argv.includes(f);
 const after = (f, n = 1) => { const i = argv.indexOf(f); return i < 0 ? null : argv[i + n]; };
 const numOr = (v, d) => { const n = Number(v); return Number.isFinite(n) ? n : d; };
+
+/* In --plan mode stdout carries key=value lines only. Everything else goes to
+ * stderr, otherwise the log would end up in $GITHUB_OUTPUT. */
+const PLAN = has("--plan");
+const LOG = (...a) => (PLAN ? console.error : console.log)("[budget]", ...a);
+const OUT = (k, v) => console.log(`${k}=${v}`);
 
 /* Verified unit cost per endpoint. Unknown endpoints cost 2, never 1, so an
  * unrecognised call can never make the projection look cheaper than reality. */
@@ -97,13 +119,40 @@ L ??= {
     + "units are tier-weighted, requests are raw call counts.",
   _period_verified: "Verified on 20 August 2026 against the RapidAPI Subscriptions view: "
     + "Date Subscribed 18 aug 2026 19:19. RapidAPI resets per subscription period, not per "
-    + "calendar month, so re-run --period and --seed after every reset.",
+    + "calendar month. The period rolls forward by itself; confirm with --seed.",
   period_start: "2026-08-18",
   period_days: 30,
   seeded_units: 0,
   seeded_calls: 0,
   runs: []
 };
+
+/* Same day of the month, one month on. A 31st in a 30-day month clamps to the last
+ * day of that month instead of spilling into the next one. */
+function nextAnniversary(iso) {
+  const [y, m, d] = String(iso).split("-").map(Number);
+  const t = new Date(Date.UTC(y, m, d));
+  if (t.getUTCDate() !== d) t.setUTCDate(0);
+  return t.toISOString().slice(0, 10);
+}
+const daysBetween = (a, b) =>
+  Math.round((new Date(b + "T00:00:00Z") - new Date(a + "T00:00:00Z")) / 864e5);
+
+if (!has("--period")) {
+  let rolls = 0;
+  while (rolls < 24) {
+    const anniversary = nextAnniversary(L.period_start);
+    const rollAt = new Date(anniversary + "T00:00:00Z").getTime() + 864e5;
+    if (Date.now() < rollAt) break;
+    L.period_start = anniversary;
+    L.period_days = daysBetween(anniversary, nextAnniversary(anniversary));
+    L.seeded_units = 0;
+    L.seeded_calls = 0;
+    rolls++;
+  }
+  if (rolls) LOG(`period rolled forward to ${L.period_start} for ${L.period_days} days, `
+    + `counters cleared - confirm against the RapidAPI dashboard with --seed`);
+}
 
 if (has("--period")) {
   const d = after("--period"), days = numOr(after("--period", 2), 30);
@@ -179,6 +228,28 @@ const mondaysLeft = (() => {
 LOG(`period ${L.period_start} for ${L.period_days} days, ${daysLeft} day(s) left, ${mondaysLeft} Monday(s) to go`);
 LOG(`units ${usedUnits} of ${UNIT_LIMIT}, ${leftUnits} left`);
 LOG(`requests ${usedCalls} of ${REQ_LIMIT}, ${leftCalls} left`);
+
+if (PLAN) {
+  const max = Math.max(0, numOr(after("--plan"), 60));
+  const reserve = Math.max(0, numOr(after("--reserve"), 0));
+  if (airports === null) {
+    LOG("config/collection.json unreadable, so enrichment gets 0 units");
+    OUT("airports", 0);
+    OUT("collector_units", 0);
+    OUT("enrich_cap", 0);
+  } else {
+    const collectorUnits = airports * COLLECT_PER_CALL;
+    let cap = Math.min(max, leftUnits - collectorUnits - reserve);
+    if (!Number.isFinite(cap) || cap < 0) cap = 0;
+    cap -= cap % 2;
+    LOG(`plan: ${leftUnits} units left, collector ${collectorUnits}, reserve ${reserve}, `
+      + `so enrichment gets ${cap} of at most ${max}`);
+    if (cap === 0) LOG("plan: no room for enrichment this run, the collector goes alone");
+    OUT("airports", airports);
+    OUT("collector_units", collectorUnits);
+    OUT("enrich_cap", cap);
+  }
+}
 
 let fail = false;
 if (projUnits === null) {
