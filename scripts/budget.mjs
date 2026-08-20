@@ -4,7 +4,7 @@
  *
  *   node scripts/budget.mjs                        show the current position
  *   node scripts/budget.mjs --check                exit 1 if the next run does not fit
- *   node scripts/budget.mjs --plan 60 --reserve 34 print enrich_cap for the workflow
+ *   node scripts/budget.mjs --plan 60 --reserve auto --margin 34   plan a run
  *   node scripts/budget.mjs --record 101 142       record a finished run: calls, units
  *   node scripts/budget.mjs --seed 260 169         seed from the dashboard: units, calls
  *   node scripts/budget.mjs --period 2026-08-18 31 set period start and length
@@ -73,11 +73,22 @@
  * with --seed; the roll assumes a full quota, it does not measure one.
  *
  * ------------------------------------------------------------------ PLANNING
- * --plan MAX --reserve N prints key=value lines on stdout and nothing else, so a
- * workflow can append it to $GITHUB_OUTPUT. Every human-readable line goes to
- * stderr in that mode. The collector is treated as non-negotiable: enrichment gets
- * what is left after the collector and the reserve, capped at MAX, rounded down to
- * an even number because a flight number costs 2 units.
+ * --plan MAX prints key=value lines on stdout and nothing else, so a workflow can
+ * append it to $GITHUB_OUTPUT. Every human-readable line goes to stderr in that
+ * mode. The collector is non-negotiable; enrichment gets what is left after the
+ * reserve, capped at MAX and rounded down to an even number because a flight
+ * number costs 2 units.
+ *
+ * --reserve auto keeps the collector funded for every remaining Monday except the
+ * last one. A tight period therefore costs the rotation first, and at most the
+ * final week of collection, never a week in the middle: the ledger the alpha
+ * depends on keeps growing every Monday. --margin is added on top of the reserve in
+ * both modes and is what remains available for a retry after a 429.
+ *
+ * Worked example, 20 August 2026 with 340 units left and 4 Mondays to go:
+ * reserve = 82 x (4 - 2) + 34 = 198, so enrichment gets min(60, 340 - 82 - 198) =
+ * 60 on 24 August. The two Mondays after that fall back to collector only, and
+ * 14 September is stopped by --check before a single unit is spent.
  *
  * Overage note: API Overage Spend reads $0 and this is a free plan, so exceeding
  * the quota blocks calls with HTTP 429 rather than charging money. The risk being
@@ -231,7 +242,9 @@ LOG(`requests ${usedCalls} of ${REQ_LIMIT}, ${leftCalls} left`);
 
 if (PLAN) {
   const max = Math.max(0, numOr(after("--plan"), 60));
-  const reserve = Math.max(0, numOr(after("--reserve"), 0));
+  const margin = Math.max(0, numOr(after("--margin"), 0));
+  const reserveArg = after("--reserve");
+  const auto = String(reserveArg) === "auto";
   if (airports === null) {
     LOG("config/collection.json unreadable, so enrichment gets 0 units");
     OUT("airports", 0);
@@ -239,11 +252,14 @@ if (PLAN) {
     OUT("enrich_cap", 0);
   } else {
     const collectorUnits = airports * COLLECT_PER_CALL;
+    const futureMondays = Math.max(0, mondaysLeft - 2);
+    const reserve = (auto ? collectorUnits * futureMondays : Math.max(0, numOr(reserveArg, 0))) + margin;
     let cap = Math.min(max, leftUnits - collectorUnits - reserve);
     if (!Number.isFinite(cap) || cap < 0) cap = 0;
     cap -= cap % 2;
-    LOG(`plan: ${leftUnits} units left, collector ${collectorUnits}, reserve ${reserve}, `
-      + `so enrichment gets ${cap} of at most ${max}`);
+    LOG(`plan: ${leftUnits} units left, collector ${collectorUnits}, reserve ${reserve}`
+      + (auto ? ` (${futureMondays} Monday(s) of collector plus margin ${margin})` : "")
+      + `, so enrichment gets ${cap} of at most ${max}`);
     if (cap === 0) LOG("plan: no room for enrichment this run, the collector goes alone");
     OUT("airports", airports);
     OUT("collector_units", collectorUnits);

@@ -1,8 +1,10 @@
 name: RouteWatch
 
 on:
-  # Weekly: the free AeroDataBox plan provides 600 units per month.
-  # One collection round costs 82 units (41 airports x 2), so 4.33 rounds/month fit.
+  # Weekly: the free AeroDataBox plan provides 600 units per subscription period.
+  # One collection round costs 82 units (41 airports x 2). The cron stays weekly all
+  # year; what a run may spend is decided by scripts/budget.mjs in the preflight, so
+  # a tight period costs the rotation instead of the weekly ledger.
   schedule:
     - cron: "0 5 * * 1"          # every Monday at 05:00 UTC
   workflow_dispatch:
@@ -50,6 +52,28 @@ jobs:
           ADB_UNITS_PER_CALL: '2'
           ENRICH_UNIT_CAP: '60'
         run: node scripts/check-config.mjs
+
+      # 0b. Budget preflight. Costs zero units and decides what this run may spend.
+      #
+      #     --check runs with ENRICH_UNIT_CAP=0, so it only asks whether the
+      #     collector itself still fits. If it does not, the job stops here with
+      #     exit 1 and the week is skipped before a single unit is spent. That is
+      #     deliberate: a stalled half-run is worse than no run.
+      #
+      #     --plan then decides the enrichment cap. --reserve auto holds back one
+      #     collector round for every remaining Monday except the last, and --margin
+      #     34 keeps a retry after a 429 affordable. In a period with room the cap
+      #     lands on 60 every week; in a tight period it drops to 0 and the
+      #     collector goes alone, which protects the ledger the alpha depends on.
+      - name: Budget preflight
+        id: budget
+        env:
+          ADB_UNITS_PER_CALL: '2'
+          ENRICH_UNIT_CAP: '0'
+        run: |
+          set -o pipefail
+          node scripts/budget.mjs --check
+          node scripts/budget.mjs --plan 60 --reserve auto --margin 34 >> "$GITHUB_OUTPUT"
 
       # 1. Collect: one call per airport; time window rotates each week.
       #    This step costs API units. Keep BACKFILL_DAYS at 1.
@@ -135,13 +159,42 @@ jobs:
       #    enrich-adb.mjs unchanged and only translates its log output to English.
       #    Quota handling, 429 backoff and the priority rotation live in
       #    enrich-adb.mjs and are untouched.
+      #
+      #    ENRICH_UNIT_CAP comes from the preflight instead of a hard 60, and the
+      #    step skips itself entirely when the plan says 0. Inside the cap,
+      #    enrich-adb.mjs splits the units per section (ENRICH_RUNWAY_UNITS 8,
+      #    ENRICH_REG_UNITS 20, the remainder to the type rotation), so the rotation
+      #    can no longer be starved by the runway section.
       - name: Enrich airports, aircraft and flight types
+        if: steps.budget.outputs.enrich_cap != '0'
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
-          ENRICH_UNIT_CAP: '60'
+          ENRICH_UNIT_CAP: ${{ steps.budget.outputs.enrich_cap }}
           ENRICH_FLIGHTS: '25'
           ENRICH_RUNWAYS: 'true'
         run: node scripts/run-enrich.mjs
+
+      # 4b. Record what this run actually spent, so nobody has to type numbers into
+      #     the ledger. The collector is deterministic: one call per airport at
+      #     ADB_UNITS_PER_CALL. Enrichment reports its own total in
+      #     data/last-enrich.md, and contributes 0 when the step was skipped.
+      #     Calls are counted conservatively: enrichment units are used as an upper
+      #     bound on its call count, because its cheapest call costs 1 unit.
+      - name: Record the run in the unit ledger
+        if: always() && steps.budget.outputs.collector_units != ''
+        env:
+          PLANNED_CAP: ${{ steps.budget.outputs.enrich_cap }}
+          COLLECTOR_UNITS: ${{ steps.budget.outputs.collector_units }}
+          AIRPORTS: ${{ steps.budget.outputs.airports }}
+        run: |
+          set -o pipefail
+          ENRICH_UNITS=0
+          if [ "$PLANNED_CAP" != "0" ] && [ -f data/last-enrich.md ]; then
+            ENRICH_UNITS=$(sed -n 's/^- API units used this run: \([0-9][0-9]*\) of cap.*/\1/p' data/last-enrich.md | tail -n 1)
+            ENRICH_UNITS=${ENRICH_UNITS:-0}
+          fi
+          echo "[record] collector $COLLECTOR_UNITS units, enrichment $ENRICH_UNITS units"
+          node scripts/budget.mjs --record "$((AIRPORTS + ENRICH_UNITS))" "$((COLLECTOR_UNITS + ENRICH_UNITS))"
 
       - name: Commit generated data
         run: |
