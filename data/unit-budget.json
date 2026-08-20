@@ -1,0 +1,11 @@
+{
+ "_what_this_is": "Units and requests per subscription period. Two independent limits: units are tier-weighted, requests are raw call counts.",
+ "_period_is_unverified": "Assumed to start on the 18th, the subscription date. RapidAPI resets per subscription period, not per calendar month. Correct with --period.",
+ "period_start": "2026-08-18",
+ "period_days": 31,
+ "seeded_units": 260,
+ "seeded_calls": 169,
+ "runs": [],
+ "unit_limit": 600,
+ "request_limit": 2400
+}
