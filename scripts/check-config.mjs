@@ -20,6 +20,12 @@
  * config/collection.json without filling the coordinates is what breaks things.
  * This validator is the guard between those two states.
  *
+ * Since 20 August 2026 routewatch.mjs carries the same rule at runtime: an airport
+ * that fails these coordinate tests is skipped everywhere and reported as an
+ * AIRPORT_NO_COORDINATES event. The two definitions are deliberately identical, and
+ * this validator stays the stricter of the two because it stops the run before the
+ * collector spends a single unit.
+ *
  * It is read-only: it never edits config, never calls an API, never spends units.
  * It exits 1 on an error so the workflow stops BEFORE the collector spends its
  * 82 units on a config that cannot produce correct output.
@@ -157,16 +163,20 @@ if (!S) {
   if (p.aerodatabox) notes.push("aerodatabox provider is ON inside routewatch.mjs, which spends units on top of the collector");
 }
 
-/* --------------------------------------------------------- projected budget */
+/* ------------------------------------------------- cost of one run, for information
+ * scripts/budget.mjs is the authority on the budget. It holds the measured position
+ * for the current subscription period, reserves a collector round for the remaining
+ * Mondays and exits 1 when the next run does not fit. This block therefore states
+ * what one run costs and stops there. It deliberately no longer projects a monthly
+ * total: two independent projections that can disagree are worse than one that is
+ * verified against the dashboard. */
 
 const perCall = Number(process.env.ADB_UNITS_PER_CALL || 2);
 const collect = seen.size * perCall;
 const enrich = Number(process.env.ENRICH_UNIT_CAP || 60);
-const monthly = (collect + enrich) * 4;
 notes.push(`${seen.size} airports (${own} own, ${cand} candidate) at ${perCall} units per call = ${collect} units per collection round`);
-notes.push(`with an enrichment cap of ${enrich}, one weekly run costs about ${collect + enrich} units, roughly ${monthly} per month against a 600-unit plan`);
-if (monthly > 600)
-  W(`projected monthly cost ${monthly} exceeds the 600-unit plan; remove airports, lower ENRICH_UNIT_CAP, or run less often`);
+notes.push(`with an enrichment cap of ${enrich}, one run costs at most ${collect + enrich} units; `
+  + `run scripts/budget.mjs --check for the position in this period`);
 
 /* ---------------------------------------------------------------- reporting */
 
