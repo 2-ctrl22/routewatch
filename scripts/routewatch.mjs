@@ -31,9 +31,21 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 const CFG = JSON.parse(readFileSync("config/collection.json", "utf8"));
 const S = CFG.settings;
 const ALL = Object.fromEntries(CFG.airports.map(a => [a.icao, a]));
-const OWN = CFG.airports.filter(a => !a.candidate).map(a => a.icao);
-const CAND = CFG.airports.filter(a => a.candidate).map(a => a.icao);
-const CODES = Object.keys(ALL);
+
+/* Coordinate guard. gcNm() feeds lat and lon straight into Math.acos, so a null or
+ * non-numeric coordinate yields NaN nautical miles, and `nm > range_nm` against NaN is
+ * false: the leg would silently report as not simmable instead of as an error. The sim
+ * scanners propose airports with needs_coordinates:true, so this is the line between a
+ * proposal and a live matrix. An airport that fails is skipped everywhere, and loudly. */
+const coordOk = v => typeof v === "number" && Number.isFinite(v);
+const badCoords = a => !coordOk(a?.lat) || !coordOk(a?.lon)
+  || Math.abs(a.lat) > 90 || Math.abs(a.lon) > 180;
+const NOCOORD = CFG.airports.filter(badCoords).map(a => a.icao);
+const USABLE = CFG.airports.filter(a => !badCoords(a));
+
+const OWN = USABLE.filter(a => !a.candidate).map(a => a.icao);
+const CAND = USABLE.filter(a => a.candidate).map(a => a.icao);
+const CODES = USABLE.map(a => a.icao);
 const isOwn = c => !ALL[c]?.candidate;
 
 /* IATA -> ICAO, so a source that answers with AMS still resolves to EHAM. */
@@ -74,7 +86,9 @@ const ALIAS={"BOEING 737-800":"B738","737-800":"B738","73H":"B738","738":"B738",
  "A350-1000":"A35K","BOEING 777F":"B77L","777F":"B77L","EMBRAER 195-E2":"E295","EMBRAER 195":"E195",
  "EMBRAER 175":"E175","AIRBUS A220-300":"BCS3","ATR 72-600":"AT76","BOEING 787-9":"B789","BOEING 777-300ER":"B77W"};
 const normType = r => r ? (ALIAS[String(r).trim().toUpperCase()] ?? String(r).trim().toUpperCase()) : null;
-const gcNm=(a,b)=>{const r=Math.PI/180,p1=a.lat*r,p2=b.lat*r,dl=(b.lon-a.lon)*r;
+const gcNm=(a,b)=>{
+ if(!a||!b||!coordOk(a.lat)||!coordOk(a.lon)||!coordOk(b.lat)||!coordOk(b.lon)) return null;
+ const r=Math.PI/180,p1=a.lat*r,p2=b.lat*r,dl=(b.lon-a.lon)*r;
  return Math.round(3440.065*Math.acos(Math.min(1,Math.sin(p1)*Math.sin(p2)+Math.cos(p1)*Math.cos(p2)*Math.cos(dl))));};
 const pk=(a,b)=>[a,b].sort().join("-");
 
@@ -84,7 +98,9 @@ function matchStatus(types){const t=new Set();
  if(t.size===1) return [...t][0];
  if(t.has("MATCH")) return "MATCH+"+[...t].filter(x=>x!=="MATCH").sort().join("+");
  return "NEAR-MATCH+NO-MATCH";}
-function simmable(pair,types,nm,cargo){const [a,b]=pair.split("-");
+function simmable(pair,types,nm,cargo){const [a,b]=pair.split("-"); /* null or NaN nm must never reach `nm>spec.range_nm`: that comparison is false either
+  * way, which would report the leg as simmable. Fail closed instead. */
+ if(!Number.isFinite(nm)) return false;
  const nbOk = ALL[a]?.narrowbody_allowed!==false && ALL[b]?.narrowbody_allowed!==false;
  const need = cargo?"cargo":"pax";
  for(const t of types){const spec=OWNED[t] ?? (NEAR[t]?BYKEY[NEAR[t].substitute]:null);
@@ -175,6 +191,13 @@ const events=[];
 const evt=(kind,o)=>events.push({at:new Date().toISOString(),kind,
  severity:HIGH.has(kind)?"high":MED.has(kind)?"medium":"low",...o});
 
+for(const icao of NOCOORD)
+ evt("AIRPORT_NO_COORDINATES",{pair:null,airline:null,flight:null,
+  detail:{icao,lat:ALL[icao]?.lat??null,lon:ALL[icao]?.lon??null,
+   needs_coordinates:ALL[icao]?.needs_coordinates??null,
+   effect:"skipped in collection and matrix until both coordinates are numeric"},
+  severity:"high",confidence:"read from config, not estimated"});
+
 const days=Math.max(1,Math.min(30,Number(process.env.BACKFILL_DAYS||1)));
 const fresh=[];
 for(let d=1;d<=days;d++){
@@ -226,6 +249,12 @@ const touched=new Set();
 for(const [key,rows] of group){
  touched.add(key);
  const pair=key.split("|")[0],[a,b]=pair.split("-");
+   if(NOCOORD.includes(a)||NOCOORD.includes(b)){
+  evt("LEG_SKIPPED_NO_COORDINATES",{pair,airline:rows[0].airline,flight:rows[0].flight,
+   detail:{missing:[a,b].filter(x=>NOCOORD.includes(x)),
+    effect:"ledger entry left untouched and not counted as missed"},
+   severity:"high",confidence:"read from config, not estimated"});
+  continue;}
  const nm=gcNm(ALL[a],ALL[b]);
  const cargo=rows.some(r=>r.cargo)?1:0;
  const cur=LEDGER[key]??{pair,airline:rows[0].airline,flight:rows[0].flight,nm,cargo,
@@ -353,7 +382,7 @@ for(const x of Object.values(LEDGER)) for(const r of x.regs??[]) knownRegs.add(r
 const usedCodes=new Set(active.map(x=>String(x.airline||"").toUpperCase()).filter(c=>c&&c!=="?"));
 const unnamed=[...usedCodes].filter(c=>!AIRL[c]).sort();
 const summary={generated:new Date().toISOString(),season:seasonFor(iso(new Date())),counter_season:othS,
- airports:OWN.length,candidates:CAND.length,pairs_possible:pairs.length,pairs_served:served,
+airports:OWN.length,airports_no_coordinates:NOCOORD.length,candidates:CAND.length,pairs_possible:pairs.length,pairs_served:served,
  pairs_unserved:pairs.length-served,pairs_match:pairs.filter(p=>p.status.startsWith("MATCH")).length,
  pairs_simmable:pairs.filter(p=>p.simmable).length,cargo_pairs:pairs.filter(p=>p.cargo).length,
  flightlines:active.filter(l=>!l.candidate).length,registrations:knownRegs.size,
@@ -374,7 +403,8 @@ const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
  `- registrations known: **${knownRegs.size}**`,
  `- airlines named: **${Object.keys(AIRL).length}** (${airlNew} new, ${airlRenamed} renamed`
   + (unnamed.length?`, still unnamed: ${unnamed.slice(0,12).join(" ")}`:"")+`)`,
- `- new changes: **${events.length}**`,"","### Buy advice by network gain",""];
+ `- new changes: **${events.length}**`,"","### Buy advice by network gain",""]; ...(NOCOORD.length?[`- **airports skipped for missing coordinates: ${NOCOORD.join(" ")}** `
+  + `- fix lat/lon in config/collection.json`]:[]),
 for(const c of candidates.slice(0,6))
  md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} pairs, +${c.gain.match_pairs} with MATCH`
   + (c.prices?.[0]?` &middot; cheapest now ${c.prices[0].price} ${c.prices[0].currency??""} at ${c.prices[0].store}`:""));
