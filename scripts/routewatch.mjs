@@ -38,7 +38,7 @@ const ALL = Object.fromEntries(CFG.airports.map(a => [a.icao, a]));
  * scanners propose airports with needs_coordinates:true, so this is the line between a
  * proposal and a live matrix. An airport that fails is skipped everywhere, and loudly. */
 const coordOk = v => typeof v === "number" && Number.isFinite(v);
-const badCoords = a => !coordOk(a?.lat) || !coordOk(a?.lon)
+const badCoords = a => a?.needs_coordinates === true || !coordOk(a?.lat) || !coordOk(a?.lon)
   || Math.abs(a.lat) > 90 || Math.abs(a.lon) > 180;
 const NOCOORD = CFG.airports.filter(badCoords).map(a => a.icao);
 const USABLE = CFG.airports.filter(a => !badCoords(a));
