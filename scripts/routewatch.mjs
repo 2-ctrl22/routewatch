@@ -403,13 +403,15 @@ const md=[`## RouteWatch ${summary.generated.slice(0,16)}`,"",
  `- registrations known: **${knownRegs.size}**`,
  `- airlines named: **${Object.keys(AIRL).length}** (${airlNew} new, ${airlRenamed} renamed`
   + (unnamed.length?`, still unnamed: ${unnamed.slice(0,12).join(" ")}`:"")+`)`,
- `- new changes: **${events.length}**`,"","### Buy advice by network gain",""]; ...(NOCOORD.length?[`- **airports skipped for missing coordinates: ${NOCOORD.join(" ")}** `
-  + `- fix lat/lon in config/collection.json`]:[]),
+ `- new changes: **${events.length}**`,"","### Buy advice by network gain",""];
 for(const c of candidates.slice(0,6))
  md.push(`- **${c.icao} ${c.name}** (${c.focus}): +${c.gain.new_pairs} pairs, +${c.gain.match_pairs} with MATCH`
   + (c.prices?.[0]?` &middot; cheapest now ${c.prices[0].price} ${c.prices[0].currency??""} at ${c.prices[0].store}`:""));
 md.push("");
 for(const e of events.slice(0,40)) md.push(`- \`${e.kind}\` ${e.pair??""} ${e.airline??""} ${e.flight??""} - ${JSON.stringify(e.detail)}`);
+if(NOCOORD.length)
+ md.push("",`- **airports skipped for missing coordinates: ${NOCOORD.join(" ")}**`
+  + ` - fix lat/lon in config/collection.json`);
 writeFileSync("data/last-run.md",md.join("\n"));
 if(process.env.ROUTEWATCH_WEBHOOK && events.length)
  await fetch(process.env.ROUTEWATCH_WEBHOOK,{method:"POST",headers:{"content-type":"application/json"},
