@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * enrich-adb.mjs v3 - verrijking bovenop RouteWatch, budgetbewust
+ * enrich-adb.mjs v3.1 - verrijking bovenop RouteWatch, budgetbewust
  *
  * Raakt routewatch.mjs NIET aan. Schrijft:
  *   data/airports-meta.json   baangegevens per veld            (Tier 1, 2 units/veld)
@@ -29,6 +29,20 @@
  *     prio 3  de rest, drukste eerst        -> laagste waarde, komt zelden aan bod
  *   De log meldt hoeveel weken een volledige ronde per prioriteit kost.
  *
+ * -------------------------------------------------------------- FIX v3.1 ---
+ * PROBLEEM 4: v3 gaf elke sectie zijn eigen 429-vlag, maar niet zijn eigen
+ *   unitbudget. Er was een enkele gedeelde CAP, dus de banensectie kon die in
+ *   haar geheel opmaken (60 units = 30 velden) en dan bleef er niets over voor
+ *   de registraties en de rotatie. Symptoom op 19 augustus 2026: cap volledig
+ *   in banen, aircraft-meta.json leeg, "rotatie: 0 nummers deze run".
+ *   NU: elke sectie heeft een eigen sub-budget binnen CAP. Loopt een sectie
+ *   leeg, dan stopt alleen die sectie en gaan de volgende gewoon door.
+ *     ENRICH_RUNWAY_UNITS    banensectie      (default 8  = 4 velden)
+ *     ENRICH_REG_UNITS       registraties     (default 20 = 20 registraties)
+ *     ENRICH_ROTATION_UNITS  typerotatie      (default 0  = al het restant)
+ *   CAP blijft het harde plafond voor de hele run; de sub-budgetten verdelen
+ *   dat plafond en kunnen het nooit verhogen.
+ *
  * BUDGET (AeroDataBox BASIC: 600 units/maand, 2400 requests, Tier 1=1, Tier 2=2)
  *   collect-adb wekelijks 82, banen eenmalig 82, rotatie 25 x 2 = 50 per week.
  */
@@ -50,6 +64,20 @@ const DO_RUNWAYS = String(process.env.ENRICH_RUNWAYS ?? "true").toLowerCase() !=
 const SLEEP_MS = Number(process.env.ENRICH_SLEEP_MS ?? 3000);
 const BACKOFFS = [45000, 90000];
 
+/* Sub-budgetten per sectie (v3.1). ROT_UNITS = 0 betekent: alles wat de eerste
+ * twee secties niet hebben opgemaakt, dus een onderbenutte banensectie geeft
+ * haar restant automatisch aan de rotatie. */
+const RW_UNITS = Number(process.env.ENRICH_RUNWAY_UNITS ?? 8);
+const REG_UNITS = Number(process.env.ENRICH_REG_UNITS ?? 20);
+const ROT_UNITS = Number(process.env.ENRICH_ROTATION_UNITS ?? 0);
+
+const SEC_SPENT = { runways: 0, aircraft: 0, rotation: 0 };
+const secCap = s =>
+  s === "runways" ? Math.min(RW_UNITS, CAP)
+  : s === "aircraft" ? Math.min(REG_UNITS, Math.max(0, CAP - SEC_SPENT.runways))
+  : ROT_UNITS > 0 ? Math.min(ROT_UNITS, Math.max(0, CAP - SEC_SPENT.runways - SEC_SPENT.aircraft))
+  : Math.max(0, CAP - SEC_SPENT.runways - SEC_SPENT.aircraft);
+
 let spent = 0;
 let hardStop = false;             // 403 of unitplafond: hele run stopt
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -60,19 +88,27 @@ const iso = d => d.toISOString().slice(0, 10);
  *   object     gelukt
  *   undefined  overslaan (404 of andere fout), sectie mag doorgaan
  *   null       deze sectie stoppen (429 na alle pogingen)
- *   false      hele run stoppen (403 of plafond)
+ *   "BUDGET"   deze sectie stoppen (sub-budget op), kost 0 units, run gaat door
+ *   false      hele run stoppen (403 of CAP)
  */
-async function get(url, units, label) {
+async function get(url, units, label, section) {
   if (hardStop) return false;
   if (spent + units > CAP) {
     LOG(`unitplafond ${CAP} bereikt na ${spent} units - ${label} en de rest overgeslagen`);
     hardStop = true;
     return false;
   }
+  if (section) {
+    const cap = secCap(section);
+    if (SEC_SPENT[section] + units > cap) {
+      LOG(`sub-budget ${section} is op: ${SEC_SPENT[section]}/${cap} units - ${label} overgeslagen, volgende secties gaan door`);
+      return "BUDGET";
+    }
+  }
   for (let attempt = 0; attempt <= BACKOFFS.length; attempt++) {
     try {
       const res = await fetch(url, { headers: H });
-      if (attempt === 0) spent += units;
+      if (attempt === 0) { spent += units; if (section) SEC_SPENT[section] += units; }
       if (res.status === 429) {
         if (attempt < BACKOFFS.length) {
           const w = BACKOFFS[attempt];
@@ -105,10 +141,15 @@ const MBS = CFG.settings?.missed_before_suspend;
 LOG(`config: ${CFG.airports.length} velden, missed_before_suspend = ${MBS ?? "niet gezet (script gebruikt 3)"}`);
 if ((MBS ?? 3) < 6) LOG(`WAARSCHUWING: missed_before_suspend is ${MBS ?? 3}. Met roterende vensters is 6 of hoger nodig.`);
 
+LOG(`budget: CAP ${CAP} units - banen ${RW_UNITS}, registraties ${REG_UNITS}, rotatie ${ROT_UNITS > 0 ? ROT_UNITS : "restant"}`);
+if (RW_UNITS + REG_UNITS > CAP) LOG(`WAARSCHUWING: banen ${RW_UNITS} + registraties ${REG_UNITS} is meer dan CAP ${CAP} - de rotatie krijgt niets`);
+if (RW_UNITS % 2) LOG(`WAARSCHUWING: ENRICH_RUNWAY_UNITS is ${RW_UNITS} en oneven. Een veld kost 2 units, dus 1 unit blijft onbenut.`);
+if (ROT_UNITS > 0 && ROT_UNITS % 2) LOG(`WAARSCHUWING: ENRICH_ROTATION_UNITS is ${ROT_UNITS} en oneven. Een vluchtnummer kost 2 units, dus 1 unit blijft onbenut.`);
+
 /* ============================== 1. BAANGEGEVENS (Tier 1) ================== */
 
 const META = load("data/airports-meta.json", {});
-let metaNew = 0, metaStopped = false;
+let metaNew = 0, metaStopped = false, metaBudget = false;
 const missing = CFG.airports.filter(a => !META[a.icao] || FORCE);
 
 if (!DO_RUNWAYS) {
@@ -116,14 +157,23 @@ if (!DO_RUNWAYS) {
 } else if (!missing.length) {
   LOG(`banensectie: alle ${CFG.airports.length} velden zitten al in de cache, 0 units`);
 } else {
-  LOG(`banensectie: nog ${missing.length} van ${CFG.airports.length} velden te doen`);
+  LOG(`banensectie: nog ${missing.length} van ${CFG.airports.length} velden te doen, sub-budget ${secCap("runways")} units = ${Math.floor(secCap("runways") / 2)} velden`);
   for (const a of missing) {
-    if (hardStop || metaStopped) break;
-    const info = await get(`https://${HOST}/airports/icao/${a.icao}`, 1, `airport ${a.icao}`);
+    if (hardStop || metaStopped || metaBudget) break;
+    /* Een veld kost altijd 2 units (record + banen). Nooit aan een veld beginnen
+     * dat niet meer helemaal past, anders is de eerste unit weggegooid. */
+    if (SEC_SPENT.runways + 2 > secCap("runways")) {
+      LOG(`sub-budget banen is op: ${SEC_SPENT.runways}/${secCap("runways")} units - ${missing.length - metaNew} velden blijven staan voor de volgende run`);
+      metaBudget = true;
+      break;
+    }
+    const info = await get(`https://${HOST}/airports/icao/${a.icao}`, 1, `airport ${a.icao}`, "runways");
     if (info === false) break;
+    if (info === "BUDGET") { metaBudget = true; break; }
     if (info === null) { metaStopped = true; break; }
-    const rw = await get(`https://${HOST}/airports/icao/${a.icao}/runways`, 1, `runways ${a.icao}`);
+    const rw = await get(`https://${HOST}/airports/icao/${a.icao}/runways`, 1, `runways ${a.icao}`, "runways");
     if (rw === false) break;
+    if (rw === "BUDGET") { metaBudget = true; break; }
     if (rw === null) { metaStopped = true; break; }
 
     const runways = Array.isArray(rw) ? rw : (rw?.runways ?? []);
@@ -151,7 +201,7 @@ if (!DO_RUNWAYS) {
   }
   writeFileSync("data/airports-meta.json", JSON.stringify(META, null, 1));
   LOG(`airports-meta.json: ${Object.keys(META).length} van ${CFG.airports.length} velden, ${metaNew} nieuw` +
-      (metaStopped ? " (sectie gestopt op 429)" : ""));
+      (metaStopped ? " (sectie gestopt op 429)" : metaBudget ? " (sectie gestopt op sub-budget)" : ""));
 }
 
 /* ============================== 2. REGISTRATIES (Tier 1) ================== */
@@ -163,12 +213,16 @@ for (const row of Object.values(LEDGER)) {
   for (const r of row?.regs ?? []) if (r) regs.add(String(r).toUpperCase());
 }
 
-let acNew = 0, acStopped = false;
+const regsTodo = [...regs].filter(r => ACM[r] === undefined || FORCE);
+LOG(`registratiesectie: ${regsTodo.length} van ${regs.size} registraties nog niet gecacht, sub-budget ${secCap("aircraft")} units`);
+
+let acNew = 0, acStopped = false, acBudget = false;
 for (const reg of regs) {
-  if (hardStop || acStopped) break;
+  if (hardStop || acStopped || acBudget) break;
   if (ACM[reg] !== undefined && !FORCE) continue;
-  const j = await get(`https://${HOST}/aircrafts/reg/${encodeURIComponent(reg)}`, 1, `aircraft ${reg}`);
+  const j = await get(`https://${HOST}/aircrafts/reg/${encodeURIComponent(reg)}`, 1, `aircraft ${reg}`, "aircraft");
   if (j === false) break;
+  if (j === "BUDGET") { acBudget = true; break; }
   if (j === null) { acStopped = true; break; }
   const ac = Array.isArray(j) ? j[0] : j;
   ACM[reg] = ac ? {
@@ -183,6 +237,7 @@ for (const reg of regs) {
 }
 writeFileSync("data/aircraft-meta.json", JSON.stringify(ACM, null, 1));
 LOG(`aircraft-meta.json: ${Object.keys(ACM).length} registraties, ${acNew} nieuw` +
+    (acStopped ? " (sectie gestopt op 429)" : acBudget ? " (sectie gestopt op sub-budget)" : "") +
     (regs.size ? "" : " (geen registraties in de ledger)"));
 
 /* ============ 3. TYPEVERIFICATIE, GEPRIORITEERD EN ROTEREND (Tier 2) ===== */
@@ -233,8 +288,9 @@ if (N_FLIGHTS > 0) {
   LOG(`bij ${N_FLIGHTS} per week: urgente groep rond in ${Math.ceil(urgent / N_FLIGHTS)} weken, ` +
       `alles in ${Math.ceil(ALLCAND.length / N_FLIGHTS)} weken`);
 }
+LOG(`rotatiesectie: sub-budget ${secCap("rotation")} units = ${Math.floor(secCap("rotation") / 2)} vluchtnummers, gevraagd ${N_FLIGHTS}`);
 
-let thNew = 0, thStopped = false;
+let thNew = 0, thStopped = false, thBudget = false;
 if (!ALLCAND.length) {
   LOG("nog geen vluchtnummers in de ledger - draai eerst collect-adb en routewatch");
 } else {
@@ -242,15 +298,16 @@ if (!ALLCAND.length) {
   if (i >= ALLCAND.length) { i = 0; CUR.rounds = (Number(CUR.rounds) || 0) + 1; }
   let seen = 0;
 
-  while (thNew < N_FLIGHTS && seen < ALLCAND.length && !hardStop && !thStopped) {
+  while (thNew < N_FLIGHTS && seen < ALLCAND.length && !hardStop && !thStopped && !thBudget) {
     const c = ALLCAND[i % ALLCAND.length];
     i++; seen++;
 
     if (!TH[c.fn]) TH[c.fn] = {};
     if (TH[c.fn][weekKey] && !FORCE) continue;          // deze week al gedaan, 0 units
 
-    const j = await get(`https://${HOST}/flights/number/${encodeURIComponent(c.fn)}/${from}/${to}`, 2, `flight ${c.fn}`);
+    const j = await get(`https://${HOST}/flights/number/${encodeURIComponent(c.fn)}/${from}/${to}`, 2, `flight ${c.fn}`, "rotation");
     if (j === false) break;
+    if (j === "BUDGET") { thBudget = true; break; }
     if (j === null) { thStopped = true; break; }
     if (j === undefined) { thNew++; continue; }         // 404: geteld, anders blijven we hangen
 
@@ -279,7 +336,7 @@ if (!ALLCAND.length) {
   CUR.total_candidates = ALLCAND.length;
   writeFileSync("data/enrich-cursor.json", JSON.stringify(CUR, null, 1));
   LOG(`rotatie: ${thNew} nummers deze run, cursor ${CUR.index}/${ALLCAND.length}, ronde ${CUR.rounds}` +
-      (thStopped ? " (sectie gestopt op 429)" : ""));
+      (thStopped ? " (sectie gestopt op 429)" : thBudget ? " (sectie gestopt op sub-budget)" : ""));
 }
 writeFileSync("data/type-history.json", JSON.stringify(TH, null, 1));
 
@@ -292,11 +349,12 @@ const mixedFound = Object.entries(TH)
 const report = [
   `# Enrichment ${new Date().toISOString().slice(0, 16)}`,
   ``,
-  `- runway data: ${Object.keys(META).length} of ${CFG.airports.length} airports (${metaNew} new)${metaStopped ? " - section hit 429" : ""}`,
-  `- aircraft registrations cached: ${Object.keys(ACM).length} (${acNew} new)`,
-  `- flight numbers in type history: ${Object.keys(TH).length} of ${ALLCAND.length} candidates`,
+  `- runway data: ${Object.keys(META).length} of ${CFG.airports.length} airports (${metaNew} new)${metaStopped ? " - section hit 429" : metaBudget ? " - section hit its sub-budget" : ""}`,
+  `- aircraft registrations cached: ${Object.keys(ACM).length} (${acNew} new)${acStopped ? " - section hit 429" : acBudget ? " - section hit its sub-budget" : ""}`,
+  `- flight numbers in type history: ${Object.keys(TH).length} of ${ALLCAND.length} candidates${thStopped ? " - section hit 429" : thBudget ? " - section hit its sub-budget" : ""}`,
   `- rotation cursor: ${CUR.index ?? 0}/${ALLCAND.length}, full rounds: ${CUR.rounds ?? 0}`,
   `- API units used this run: ${spent} of cap ${CAP}`,
+  `- units per section: runways ${SEC_SPENT.runways}/${RW_UNITS}, registrations ${SEC_SPENT.aircraft}/${REG_UNITS}, rotation ${SEC_SPENT.rotation}/${ROT_UNITS > 0 ? ROT_UNITS : "remainder"}`,
   hardStop ? `- NOTE: run stopped early to protect your quota` : `- completed`,
   ``,
   `## Mixed fleet confirmed (${mixedFound.length})`,
