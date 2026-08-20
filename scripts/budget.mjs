@@ -5,8 +5,8 @@
  *   node scripts/budget.mjs                        show the current position
  *   node scripts/budget.mjs --check                exit 1 if the next run does not fit
  *   node scripts/budget.mjs --record 101 142       record a finished run: calls, units
- *   node scripts/budget.mjs --seed 251 169         seed from the dashboard: units, calls
- *   node scripts/budget.mjs --period 2026-08-18 30 set period start and length
+ *   node scripts/budget.mjs --seed 260 169         seed from the dashboard: units, calls
+ *   node scripts/budget.mjs --period 2026-08-18 31 set period start and length
  *
  * ------------------------------------------------------------------ WHY THIS EXISTS
  * On 19 August 2026 the budget was estimated three times and the estimate changed
@@ -31,27 +31,36 @@
  * line "units 2/60" after the first airport is therefore correct, not a
  * double-count. A cap of 60 buys 30 airports and costs 60 real units.
  *
- * ------------------------------------------------------- MEASURED, 19 AUGUST 2026
- *   RapidAPI 7-day view:   169 calls in total
- *   RapidAPI 30-day view:   68 calls, active on 18 August only (one day behind)
- *   Difference:            101 calls on 19 August
+ * ---------------------------------------------------- MEASURED, 19-20 AUGUST 2026
+ *   RapidAPI 7-day view:     169 calls in total
+ *   RapidAPI 30-day view:     68 calls, active on 18 August only (one day behind)
+ *   Difference:              101 calls on 19 August
+ *   Subscriptions view:      Quota Usage 43.33 % of 600 units = 260 units used
  *
  * The 19 August run: 41 collector calls at 2 units = 82, plus 30 airports at
  * 2 units = 60, so 101 calls and 142 units. That matches the graph exactly.
  *
- * For 18 August only the call count is known, not the mix, so units there are
- * between 68 and 136. Roughly 109 is the realistic figure: 41 collector calls at
- * 2 units plus 27 tier-1 calls at 1 unit.
+ * 18 August now follows by subtraction, because the total is measured rather than
+ * estimated: 68 calls and 118 units, which resolves to 50 calls at 2 units plus 18
+ * calls at 1 unit. Those 18 single-unit calls are the 9 airports that were already
+ * cached before the 19 August run, at 2 calls each. The earlier figure of "roughly
+ * 109 units" was an estimate and it was wrong. Do not reintroduce it.
  *
  * ------------------------------------------------------------------ THE PERIOD
- * Still unverified: RapidAPI quotas reset per subscription period, not per
- * calendar month, and neither dashboard view shows the reset date. The 30-day
- * view is a rolling window, not a billing period.
+ * Verified on 20 August 2026. The RapidAPI Subscriptions view lists AeroDataBox
+ * Basic ($0.00/mo), status Active, Date Subscribed 18 aug 2026 19:19, Quota Usage
+ * 43.33 %, Bandwidth Quota 0.04 %. RapidAPI resets per subscription period, so the
+ * next reset is 18 September 2026 at 19:19, not the first of the month. The 30-day
+ * view stays a rolling window and is not a billing period.
  *
- * The default below therefore assumes the period starts on the 18th, the day the
- * subscription was taken. That is the STRICTER assumption: it puts four Mondays in
- * the period instead of two. Correct it with --period once you know, because the
- * difference decides whether two runs fit or four.
+ * Consequence for this period, and it is the strict variant: four Mondays fall
+ * inside it - 24 and 31 August, 7 and 14 September. At 142 units per run that is
+ * 568 units against 340 remaining, so only two full runs fit. Lower
+ * ENRICH_UNIT_CAP, drop airports, or skip a week.
+ *
+ * After every reset, re-run --period and --seed against the dashboard. A ledger
+ * left on an expired period reports units that no longer exist, which blocks runs
+ * that would in fact have fitted.
  *
  * Overage note: API Overage Spend reads $0 and this is a free plan, so exceeding
  * the quota blocks calls with HTTP 429 rather than charging money. The risk being
@@ -86,8 +95,9 @@ try { L = JSON.parse(readFileSync(FILE, "utf8")); } catch { L = null; }
 L ??= {
   _what_this_is: "Units and requests per subscription period. Two independent limits: "
     + "units are tier-weighted, requests are raw call counts.",
-  _period_is_unverified: "Assumed to start on the 18th, the subscription date. RapidAPI resets "
-    + "per subscription period, not per calendar month. Correct with --period.",
+  _period_verified: "Verified on 20 August 2026 against the RapidAPI Subscriptions view: "
+    + "Date Subscribed 18 aug 2026 19:19. RapidAPI resets per subscription period, not per "
+    + "calendar month, so re-run --period and --seed after every reset.",
   period_start: "2026-08-18",
   period_days: 30,
   seeded_units: 0,
