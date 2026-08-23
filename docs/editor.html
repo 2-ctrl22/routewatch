@@ -35,6 +35,8 @@
     padding:6px 13px;font-size:13px}
   button.act:hover{border-color:#31415a}
   button.act.pri{border-color:var(--u);color:var(--u)}
+  button.act.ok2{border-color:var(--ok);color:var(--ok)}
+  button.act:disabled{opacity:.45;cursor:not-allowed}
   button.del{background:none;border:1px solid var(--l);color:var(--d);border-radius:6px;
     width:24px;height:24px;line-height:1;font-size:14px}
   button.del:hover{border-color:var(--bad);color:var(--bad)}
@@ -58,6 +60,7 @@
   .msg{padding:10px 16px;font-size:13px;border-top:1px solid var(--l)}
   .msg.ok{color:var(--ok)}
   .msg.bad{color:var(--bad)}
+  .msg.warn{color:var(--warn)}
   .note{padding:14px 16px;color:var(--d);font-size:13px}
   .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
   .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
@@ -65,6 +68,11 @@
   ol{margin:6px 0 0 18px;padding:0}
   ol li{margin:3px 0}
   footer{color:var(--d);font-size:12.5px;margin-top:8px}
+  input[type=password]{background:#0d131a;border:1px solid var(--l);color:var(--t);
+    border-radius:8px;padding:6px 10px;font:inherit;font-size:13px;min-width:280px}
+  input[type=password]:focus{outline:none;border-color:var(--u)}
+  label.tokLbl{font-size:12.5px;color:var(--d);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -87,8 +95,7 @@
     </div>
   </div>
   <div class="note" id="srcNote">
-    Reading <code>config/collection.json</code>. Nothing is written back automatically:
-    you copy the result and commit it yourself.
+    Reading <code>config/collection.json</code>.
   </div>
   <div id="pasteBox" hidden>
     <textarea id="pasteIn" placeholder="Paste the full contents of config/collection.json here, then press Load"></textarea>
@@ -115,15 +122,37 @@
   <div class="head">
     <h2>Result</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="act pri" id="copy">Copy JSON</button>
+      <button class="act" id="copy">Copy JSON</button>
       <button class="act" id="download">Download</button>
       <button class="act" id="revert">Revert all edits</button>
     </div>
   </div>
   <textarea id="out" spellcheck="false" readonly></textarea>
   <div class="msg" id="outMsg"></div>
+
   <div class="note">
-    <b>How to commit</b>
+    <b>Commit to GitHub automatically</b>
+    <p style="margin:6px 0 10px">
+      Paste a fine-grained Personal Access Token with <b>Contents: Read and write</b> on this repo.
+      It is used only in this browser tab to call the GitHub API directly and is never sent anywhere else
+      or written into the repo. It is kept in <code>sessionStorage</code> so it survives a reload but clears
+      when you close the tab.
+    </p>
+    <div class="row">
+      <label class="tokLbl">
+        Token
+        <input type="password" id="token" placeholder="github_pat_..." autocomplete="off">
+      </label>
+      <button class="act" id="tokClear">Clear token</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="act ok2 pri" id="commitBtn" disabled>Commit to main</button>
+      <span id="commitMsg" class="mono" style="color:var(--d)"></span>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Manual fallback</b>
     <ol>
       <li>Press <b>Copy JSON</b>.</li>
       <li>Open <code>config/collection.json</code> on GitHub and click the pencil icon.</li>
@@ -141,9 +170,11 @@
 </main>
 
 <script>
-const RAW="https://raw.githubusercontent.com/2-ctrl22/routewatch/main/config/collection.json";
+const OWNER="2-ctrl22", REPO="routewatch", BRANCH="main", CFG_PATH="config/collection.json";
+const API_URL=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${CFG_PATH}`;
+const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${CFG_PATH}`;
 const $=id=>document.getElementById(id);
-let ORIG=null, DATA=null, SECTIONS=[], cur=0;
+let ORIG=null, DATA=null, SECTIONS=[], cur=0, CURRENT_SHA=null;
 
 const isObj=v=>v&&typeof v==="object"&&!Array.isArray(v);
 const isRowArray=v=>Array.isArray(v)&&v.length>0&&v.every(isObj);
@@ -241,18 +272,29 @@ function addRow(){
   if(last){const f=last.querySelector("input"); if(f)f.focus();}
 }
 
+function updateCommitState(){
+  const tok=$("token").value.trim();
+  const valid = $("outMsg").className==="msg ok";
+  $("commitBtn").disabled = !(tok && valid && CURRENT_SHA);
+  if(!CURRENT_SHA) $("commitMsg").textContent="no known SHA yet (reload from GitHub, not paste, to enable committing)";
+  else if(!tok) $("commitMsg").textContent="paste a token to enable committing";
+  else if(!valid) $("commitMsg").textContent="fix invalid JSON first";
+  else $("commitMsg").textContent="";
+}
+
 function emit(){
   let txt;
   try{ txt=JSON.stringify(DATA,null,2)+"\n"; }
-  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Cannot serialize: "+e.message; return; }
+  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Cannot serialize: "+e.message; updateCommitState(); return; }
   $("out").value=txt;
   try{ JSON.parse(txt); }
-  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Invalid JSON: "+e.message; return; }
+  catch(e){ $("outMsg").className="msg bad"; $("outMsg").textContent="Invalid JSON: "+e.message; updateCommitState(); return; }
   const total=SECTIONS.reduce((n,s)=>n+s.ref.length,0);
   const changed=txt!==JSON.stringify(ORIG,null,2)+"\n";
   $("outMsg").className="msg ok";
   $("outMsg").textContent="Valid JSON, "+txt.length.toLocaleString("en")+" bytes, "+total+
     " rows across "+SECTIONS.length+" lists"+(changed?" - edited, ready to commit":" - unchanged");
+  updateCommitState();
 }
 
 function load(obj,how){
@@ -273,25 +315,76 @@ function load(obj,how){
 
 function fetchConfig(){
   $("state").textContent="loading config...";
-  fetch("../config/collection.json?"+Date.now())
+  CURRENT_SHA=null;
+  // Use the GitHub Contents API first: it is the only source that also gives us
+  // the blob SHA needed to commit back. Falls back to the relative path (Pages)
+  // and then raw.githubusercontent, in which case committing stays disabled
+  // until a reload via the API succeeds.
+  fetch(API_URL+"?ref="+BRANCH+"&_="+Date.now(),{headers:{Accept:"application/vnd.github+json"}})
     .then(r=>r.ok?r.json():Promise.reject())
-    .then(d=>load(d,"loaded from repo path"))
-    .catch(()=>fetch(RAW+"?"+Date.now())
+    .then(j=>{
+      CURRENT_SHA=j.sha;
+      const decoded=decodeURIComponent(escape(atob(j.content.replace(/\n/g,""))));
+      load(JSON.parse(decoded),"loaded from GitHub API");
+    })
+    .catch(()=>fetch("../config/collection.json?"+Date.now())
       .then(r=>r.ok?r.json():Promise.reject())
-      .then(d=>load(d,"loaded from raw.githubusercontent"))
-      .catch(()=>{
-        $("state").textContent="could not load";
-        $("srcNote").innerHTML="Could not read <code>config/collection.json</code>. "+
-          "On GitHub Pages only the <code>docs</code> folder is served, so the relative path fails "+
-          "and the raw fallback was blocked too. Use <b>Paste JSON instead</b>.";
-        $("pasteBox").hidden=false;
-      }));
+      .then(d=>load(d,"loaded from repo path (no SHA, reload to enable commit)"))
+      .catch(()=>fetch(RAW+"?"+Date.now())
+        .then(r=>r.ok?r.json():Promise.reject())
+        .then(d=>load(d,"loaded from raw.githubusercontent (no SHA, reload to enable commit)"))
+        .catch(()=>{
+          $("state").textContent="could not load";
+          $("srcNote").innerHTML="Could not read <code>config/collection.json</code> from any source. "+
+            "Use <b>Paste JSON instead</b>.";
+          $("pasteBox").hidden=false;
+        })));
+}
+
+async function commitToGitHub(){
+  const token=$("token").value.trim();
+  if(!token||!CURRENT_SHA) return;
+  $("commitBtn").disabled=true;
+  $("commitMsg").textContent="committing...";
+  try{
+    const content=$("out").value;
+    const b64=btoa(unescape(encodeURIComponent(content)));
+    const res=await fetch(API_URL,{
+      method:"PUT",
+      headers:{
+        "Accept":"application/vnd.github+json",
+        "Authorization":"Bearer "+token,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        message:"editor.html: update config/collection.json",
+        content:b64,
+        sha:CURRENT_SHA,
+        branch:BRANCH
+      })
+    });
+    const j=await res.json();
+    if(!res.ok){
+      $("commitMsg").innerHTML='<span style="color:var(--bad)">Commit failed ('+res.status+'): '+
+        (j.message||"unknown error")+'</span>';
+      updateCommitState();
+      return;
+    }
+    CURRENT_SHA=j.content.sha;
+    ORIG=JSON.parse(JSON.stringify(DATA));
+    $("commitMsg").innerHTML='<span style="color:var(--ok)">Committed to '+BRANCH+
+      ' - the next scheduled run picks this up automatically.</span>';
+    emit();
+  }catch(e){
+    $("commitMsg").innerHTML='<span style="color:var(--bad)">Commit failed: '+e.message+'</span>';
+    updateCommitState();
+  }
 }
 
 $("reload").onclick=fetchConfig;
 $("pasteMode").onclick=()=>{$("pasteBox").hidden=!$("pasteBox").hidden;};
 $("pasteLoad").onclick=()=>{
-  try{ load(JSON.parse($("pasteIn").value),"loaded from paste"); $("pasteBox").hidden=true; }
+  try{ load(JSON.parse($("pasteIn").value),"loaded from paste (no SHA, reload to enable commit)"); $("pasteBox").hidden=true; }
   catch(e){ alert("That is not valid JSON: "+e.message); }
 };
 $("addRow").onclick=addRow;
@@ -306,6 +399,18 @@ $("download").onclick=()=>{
   a.download="collection.json"; a.click(); URL.revokeObjectURL(a.href);
 };
 $("revert").onclick=()=>{ if(ORIG) load(JSON.parse(JSON.stringify(ORIG)),"reverted"); };
+
+$("token").addEventListener("input",()=>{
+  sessionStorage.setItem("rw_editor_token",$("token").value.trim());
+  updateCommitState();
+});
+$("tokClear").onclick=()=>{
+  $("token").value=""; sessionStorage.removeItem("rw_editor_token"); updateCommitState();
+};
+$("commitBtn").onclick=commitToGitHub;
+
+const savedTok=sessionStorage.getItem("rw_editor_token");
+if(savedTok) $("token").value=savedTok;
 
 fetchConfig();
 </script>
