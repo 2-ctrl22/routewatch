@@ -619,6 +619,33 @@
       "lat": 22.3089,
       "lon": 113.9146,
       "narrowbody_allowed": false
+    },
+    {
+      "icao": "VTBS",
+      "iata": "BKK",
+      "name": "Bangkok Suvarnabhumi",
+      "country": "TH",
+      "lat": 13.6811,
+      "lon": 100.7477,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "ZSPD",
+      "iata": "PVG",
+      "name": "Shanghai Pudong",
+      "country": "CN",
+      "lat": 31.1434,
+      "lon": 121.8052,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "WSSS",
+      "iata": "SIN",
+      "name": "Singapore Changi",
+      "country": "SG",
+      "lat": 1.3502,
+      "lon": 103.9944,
+      "narrowbody_allowed": false
     }
   ]
 }
