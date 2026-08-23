@@ -134,9 +134,10 @@
     <b>Commit to GitHub automatically</b>
     <p style="margin:6px 0 10px">
       Paste a fine-grained Personal Access Token with <b>Contents: Read and write</b> on this repo.
-      It is used only in this browser tab to call the GitHub API directly and is never sent anywhere else
-      or written into the repo. It is kept in <code>sessionStorage</code> so it survives a reload but clears
-      when you close the tab.
+      It is used only in this browser to call the GitHub API directly and is never sent anywhere else
+      or written into the repo. It is kept in <code>localStorage</code> on this device, so it survives
+      closing the tab and reopening the browser later. Use <b>Clear token</b> before using a shared
+      or public computer.
     </p>
     <div class="row">
       <label class="tokLbl">
@@ -401,15 +402,15 @@ $("download").onclick=()=>{
 $("revert").onclick=()=>{ if(ORIG) load(JSON.parse(JSON.stringify(ORIG)),"reverted"); };
 
 $("token").addEventListener("input",()=>{
-  sessionStorage.setItem("rw_editor_token",$("token").value.trim());
+  localStorage.setItem("rw_editor_token",$("token").value.trim());
   updateCommitState();
 });
 $("tokClear").onclick=()=>{
-  $("token").value=""; sessionStorage.removeItem("rw_editor_token"); updateCommitState();
+  $("token").value=""; localStorage.removeItem("rw_editor_token"); updateCommitState();
 };
 $("commitBtn").onclick=commitToGitHub;
 
-const savedTok=sessionStorage.getItem("rw_editor_token");
+const savedTok=localStorage.getItem("rw_editor_token");
 if(savedTok) $("token").value=savedTok;
 
 fetchConfig();
