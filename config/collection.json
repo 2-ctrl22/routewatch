@@ -489,7 +489,6 @@
       "country": "IT",
       "lat": 45.6306,
       "lon": 8.7281,
-      "candidate": true,
       "focus": "pax+cargo",
       "why": "Second Italian airport next to LIRF; Qatar Airways 18 weekly; Qatar Airways Cargo via STN-MXP; FedEx BOM-MXP-MEM.",
       "price_search": {
@@ -602,6 +601,24 @@
         "aerosoft": "https://www.aerosoft.com/en/search?q=LEJ",
         "justflight": "https://www.justflight.com/searchresults?searchterm=LEJ"
       }
+    },
+    {
+      "icao": "OMDB",
+      "iata": "DXB",
+      "name": "Dubai International",
+      "country": "AE",
+      "lat": 25.2528,
+      "lon": 55.3644,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "VHHH",
+      "iata": "HKG",
+      "name": "Hong Kong International",
+      "country": "HK",
+      "lat": 22.3089,
+      "lon": 113.9146,
+      "narrowbody_allowed": false
     }
   ]
 }
