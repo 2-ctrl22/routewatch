@@ -27,6 +27,14 @@
  * it. All 46 x 45 x 20 = 41400 pairings survived. The readers now live in
  * scripts/find-sources.mjs and refuse what they cannot verify.
  *
+ * AUTOMATION
+ * ----------
+ * .github/workflows/find.yml rebuilds docs/find.json at 08:30 UTC, on manual
+ * dispatch, and on any push to main that touches config/collection.json, the
+ * airport or aircraft metadata, data/ledger.json, data/airlines.json, either of
+ * the two find scripts, or the workflow itself. It reports a dry run first and
+ * commits the result only when the file actually changed.
+ *
  * DETAIL LEVEL — Article 5.5 (see issue #1)
  * -----------------------------------------
  * This artifact is served publicly by GitHub Pages. Aero granted written

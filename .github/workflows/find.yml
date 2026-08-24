@@ -15,7 +15,11 @@ on:
       - 'config/collection.json'
       - 'data/aircraft-meta.json'
       - 'data/airports-meta.json'
+      - 'data/airlines.json'
+      - 'data/ledger.json'
       - 'scripts/publish-find.mjs'
+      - 'scripts/find-sources.mjs'
+      - '.github/workflows/find.yml'
 
 permissions:
   contents: write
