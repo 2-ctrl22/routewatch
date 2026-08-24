@@ -21,12 +21,15 @@
 // Two naming worlds have to meet here. The ledger records display names, the
 // fleet records ICAO codes, and the substitutes live in near_match. Everything is
 // matched on a squashed key (uppercase, non-alphanumerics removed) so that
-// "AIRBUS A321 NEO" and "Airbus A321neo" collapse onto the same string.
+// "AIRBUS A321 NEO" and "Airbus A321neo" collapse onto the same string, with a
+// second attempt that drops parenthetical qualifiers so that
+// "BOEING 737-800 (WINGLETS)" also finds "Boeing 737-800 (NG, winglets)".
 
 import { readFileSync, existsSync } from 'node:fs';
 
 export const norm = (s) => String(s ?? '').toUpperCase().replace(/\s+/g, ' ').trim();
 export const squash = (s) => String(s ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+export const squashBare = (s) => squash(String(s ?? '').replace(/\([^)]*\)/g, ' '));
 const num = (v) => { const n = Number(v); return Number.isFinite(n) ? n : null; };
 const readJson = (p) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : null);
 
@@ -144,7 +147,10 @@ export function readFleet(path = 'config/collection.json') {
       register(squash(c), t);
       if (ICAO_NAMES[String(c).toUpperCase()]) register(squash(ICAO_NAMES[String(c).toUpperCase()]), t);
     }
-    if (f?.name) register(squash(f.name), t);
+    if (f?.name) {
+      register(squash(f.name), t);
+      register(squashBare(f.name), t);
+    }
   }
 
   // near_match maps a real-world type onto a substitute you do own. Without this
@@ -168,14 +174,29 @@ export function readFleet(path = 'config/collection.json') {
 
 // bridge: an optional Map of squashed display name -> ICAO code, built from
 // data/aircraft-meta.json, tried when the alias table does not know a name.
+//
+// Two keys are attempted: the squashed name, and the squashed name with every
+// parenthetical qualifier removed. The ledger writes
+// "BOEING 737-800 (WINGLETS)" while fleet.owned names it "Boeing 737-800 (NG,
+// winglets)"; both reduce to BOEING737800, which ICAO_NAMES already registers.
 export function resolveType(name, byAlias, bridge) {
   if (!name) return null;
-  const key = squash(name);
-  const direct = byAlias.get(key);
-  if (direct) return direct;
+  const keys = [squash(name)];
+  const bare = squashBare(name);
+  if (bare && bare !== keys[0]) keys.push(bare);
+
+  for (const key of keys) {
+    const direct = byAlias.get(key);
+    if (direct) return direct;
+  }
   if (bridge) {
-    const code = bridge.get(key);
-    if (code) return byAlias.get(squash(code)) ?? null;
+    for (const key of keys) {
+      const code = bridge.get(key);
+      if (code) {
+        const viaCode = byAlias.get(squash(code));
+        if (viaCode) return viaCode;
+      }
+    }
   }
   return null;
 }
@@ -188,7 +209,10 @@ export function readAircraftRegs(path = 'data/aircraft-meta.json') {
   const records = Array.isArray(raw) ? raw : Object.values(raw);
   const nameToCode = new Map();
   for (const r of records) {
-    if (r?.typeCode && r?.model) nameToCode.set(squash(r.typeCode), String(r.model).toUpperCase());
+    if (!r?.typeCode || !r?.model) continue;
+    const model = String(r.model).toUpperCase();
+    nameToCode.set(squash(r.typeCode), model);
+    if (!nameToCode.has(squashBare(r.typeCode))) nameToCode.set(squashBare(r.typeCode), model);
   }
   return {
     regs: records.map((r) => ({
