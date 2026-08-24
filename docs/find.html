@@ -446,7 +446,7 @@ function detailHtml(r) {
     blocks.push(`<div class="detail-block" style="flex:1"><h3>Flights</h3>
       <table class="flights"><thead><tr>
         <th>Flight</th><th>STD</th><th>Days</th><th>#</th><th>Seen</th><th>Status</th>
-      </tr></thead><tbody>${rows}${more}</tbody></table></div>`;
+      </tr></thead><tbody>${rows}${more}</tbody></table></div>`);
   }
 
   return `<tr class="detailrow"><td colspan="6"><div class="detail-grid">${blocks.join('')}</div></td></tr>`;
