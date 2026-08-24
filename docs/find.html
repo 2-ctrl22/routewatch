@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteWatch — Vluchten zoeken</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #1c2129;
+    --line: #2b323c;
+    --text: #e6edf3;
+    --dim: #8b949e;
+    --accent: #4a9eff;
+    --own: #3fb950;
+    --warn: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: baseline;
+  }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header nav a { color: var(--dim); text-decoration: none; margin-right: 14px; font-size: 14px; }
+  header nav a:hover { color: var(--accent); }
+  .meta { color: var(--dim); font-size: 12px; margin-left: auto; }
+  main { display: grid; grid-template-columns: 300px 1fr; gap: 22px; padding: 22px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  aside { position: sticky; top: 22px; max-height: calc(100vh - 44px); overflow-y: auto; }
+  fieldset { border: 0; padding: 0; margin: 0 0 20px; }
+  legend { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin-bottom: 8px; padding: 0; }
+  label.opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 6px; border-radius: 6px; cursor: pointer; font-size: 14px;
+  }
+  label.opt:hover { background: var(--panel-2); }
+  label.opt.zero { opacity: .38; }
+  label.opt .count { margin-left: auto; color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+  label.opt .hint { color: var(--dim); font-size: 12px; }
+  input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; }
+  select, input[type=search] {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--text); border-radius: 6px; padding: 8px 9px; font-size: 14px;
+  }
+  .actions { display: flex; gap: 8px; margin-top: 4px; }
+  button {
+    font: inherit; border-radius: 6px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--text);
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #06131f; font-weight: 600; flex: 1; }
+  button:hover { filter: brightness(1.12); }
+  .bucket-group { margin-bottom: 26px; }
+  .bucket-head {
+    display: flex; align-items: baseline; gap: 10px;
+    border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;
+  }
+  .bucket-head h2 { font-size: 15px; margin: 0; }
+  .bucket-head .hint { color: var(--dim); font-size: 12px; }
+  .bucket-head .n { margin-left: auto; color: var(--dim); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 8px; }
+  td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dest { font-weight: 600; }
+  .dest small { display: block; font-weight: 400; color: var(--dim); font-size: 12px; }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--dim); white-space: nowrap;
+  }
+  .tag.own { color: var(--own); border-color: #23502f; }
+  .tag.est { color: var(--warn); border-color: #4a3a12; }
+  .ops { color: var(--dim); font-size: 13px; }
+  .empty { padding: 26px; text-align: center; color: var(--dim); }
+  .empty b { color: var(--text); }
+  .empty ul { list-style: none; padding: 0; margin: 12px 0 0; }
+  .empty li { margin: 5px 0; }
+  .empty a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .disclaimer { color: var(--dim); font-size: 12px; margin-top: 22px; border-top: 1px solid var(--line); padding-top: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RouteWatch · Vluchten zoeken</h1>
+  <nav>
+    <a href="index.html">Overzicht</a>
+    <a href="map.html">Kaart</a>
+    <a href="editor.html">Editor</a>
+  </nav>
+  <span class="meta" id="meta">laden…</span>
+</header>
+
+<main>
+  <aside class="panel">
+    <fieldset>
+      <legend>Vertrek</legend>
+      <select id="from"></select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Bestemming <span class="hint">(leeg = verras me)</span></legend>
+      <input type="search" id="toFilter" placeholder="ICAO of stad, optioneel">
+    </fieldset>
+
+    <fieldset>
+      <legend>Vliegtuig</legend>
+      <div id="acOpts"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Vliegtijd</legend>
+      <div id="bucketOpts"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Scenery</legend>
+      <label class="opt"><input type="checkbox" id="ownOnly"> Alleen airports die ik bezit</label>
+      <label class="opt"><input type="checkbox" id="opsOnly"> Alleen routes met waargenomen verkeer</label>
+    </fieldset>
+
+    <div class="actions">
+      <button class="primary" id="search">Zoeken</button>
+      <button id="reset">Wis</button>
+    </div>
+  </aside>
+
+  <section>
+    <div id="results"></div>
+    <p class="disclaimer" id="disclaimer"></p>
+  </section>
+</main>
+
+<script>
+'use strict';
+
+const state = { data: null, from: null, to: '', ac: new Set(), buckets: new Set(), ownOnly: false, opsOnly: false };
+const el = (id) => document.getElementById(id);
+
+const FREQ_LABEL = {
+  several_daily: 'meerdere keren per dag',
+  daily: 'zo goed als dagelijks',
+  weekly: 'wekelijks',
+  seen: 'incidenteel gezien',
+};
+
+function fmtDuration(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h ? `${h}u ${String(m).padStart(2, '0')}m` : `${m}m`;
+}
+
+/* ---------- filtering ---------- */
+
+function matches(route, skip) {
+  if (route.from !== state.from) return false;
+  if (skip !== 'ac' && state.ac.size && !state.ac.has(route.ac)) return false;
+  if (skip !== 'bucket' && state.buckets.size && !state.buckets.has(route.bucket)) return false;
+  if (state.ownOnly && !(route.own_from && route.own_to)) return false;
+  if (state.opsOnly && !route.operators.length) return false;
+  if (state.to) {
+    const ap = state.data.airports[route.to] || {};
+    const hay = `${route.to} ${ap.name || ''} ${ap.city || ''} ${ap.country || ''}`.toLowerCase();
+    if (!hay.includes(state.to)) return false;
+  }
+  return true;
+}
+
+// Counts on a facet ignore that facet's own selection, so the numbers show
+// what you would get by ticking the box rather than what you have now.
+function facetCounts(field, skip) {
+  const counts = new Map();
+  const seen = new Set();
+  for (const r of state.data.routes) {
+    if (!matches(r, skip)) continue;
+    const dedupe = `${r[field]}|${r.to}`;
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    counts.set(r[field], (counts.get(r[field]) || 0) + 1);
+  }
+  return counts;
+}
+
+/* ---------- rendering ---------- */
+
+function renderFacets() {
+  const acCounts = facetCounts('ac', 'ac');
+  const bucketCounts = facetCounts('bucket', 'bucket');
+
+  el('acOpts').innerHTML = Object.entries(state.data.aircraft)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([code, meta]) => {
+      const n = acCounts.get(code) || 0;
+      return `<label class="opt ${n ? '' : 'zero'}">
+        <input type="checkbox" data-ac="${code}" ${state.ac.has(code) ? 'checked' : ''}>
+        <span>${code}</span><span class="hint">${meta.narrowbody ? 'narrowbody' : 'widebody'}</span>
+        <span class="count">${n}</span></label>`;
+    }).join('');
+
+  el('bucketOpts').innerHTML = state.data.buckets.map((b) => {
+    const n = bucketCounts.get(b.id) || 0;
+    return `<label class="opt ${n ? '' : 'zero'}">
+      <input type="checkbox" data-bucket="${b.id}" ${state.buckets.has(b.id) ? 'checked' : ''}>
+      <span>${b.label}</span><span class="hint">${b.hint}</span>
+      <span class="count">${n}</span></label>`;
+  }).join('');
+
+  el('acOpts').querySelectorAll('input').forEach((input) => {
+    input.addEventListener('change', () => {
+      const code = input.dataset.ac;
+      if (input.checked) state.ac.add(code); else state.ac.delete(code);
+      update();
+    });
+  });
+  el('bucketOpts').querySelectorAll('input').forEach((input) => {
+    input.addEventListener('change', () => {
+      const id = input.dataset.bucket;
+      if (input.checked) state.buckets.add(id); else state.buckets.delete(id);
+      update();
+    });
+  });
+}
+
+function renderResults() {
+  const hits = state.data.routes.filter((r) => matches(r));
+
+  if (!hits.length) {
+    el('results').innerHTML = `<div class="panel empty"><b>Geen treffers.</b>${relaxHints()}</div>`;
+    el('results').querySelectorAll('a[data-relax]').forEach((a) => {
+      a.addEventListener('click', () => {
+        const kind = a.dataset.relax;
+        if (kind === 'ac') state.ac.clear();
+        if (kind === 'bucket') state.buckets.clear();
+        if (kind === 'own') { state.ownOnly = false; el('ownOnly').checked = false; }
+        if (kind === 'ops') { state.opsOnly = false; el('opsOnly').checked = false; }
+        if (kind === 'to') { state.to = ''; el('toFilter').value = ''; }
+        update();
+      });
+    });
+    return;
+  }
+
+  // One row per destination: the shortest block time wins, every other type
+  // that also qualifies is listed alongside it so the list stays readable.
+  const byDest = new Map();
+  for (const r of hits) {
+    const cur = byDest.get(r.to);
+    if (!cur) {
+      byDest.set(r.to, { ...r, alts: new Set([r.ac]) });
+      continue;
+    }
+    cur.alts.add(r.ac);
+    if (r.block_min < cur.block_min) byDest.set(r.to, { ...r, alts: cur.alts });
+  }
+
+  const rows = [...byDest.values()];
+  el('results').innerHTML = state.data.buckets.map((b) => {
+    const group = rows.filter((r) => r.bucket === b.id).sort((x, y) => x.block_min - y.block_min);
+    if (!group.length) return '';
+    return `<div class="bucket-group">
+      <div class="bucket-head"><h2>${b.label}</h2><span class="hint">${b.hint}</span>
+        <span class="n">${group.length} bestemming${group.length === 1 ? '' : 'en'}</span></div>
+      <table><thead><tr>
+        <th>Bestemming</th><th>Vliegtuig</th><th class="num">Afstand</th><th class="num">Blok</th><th>Scenery</th><th>Maatschappijen</th>
+      </tr></thead><tbody>
+      ${group.map(rowHtml).join('')}
+      </tbody></table></div>`;
+  }).join('');
+}
+
+function rowHtml(r) {
+  const ap = state.data.airports[r.to] || {};
+  const alts = [...r.alts].sort();
+  const ops = r.operators.length ? r.operators.join(', ') : '<span class="hint">geen operator vastgelegd</span>';
+  const freq = r.freq_band ? ` <span class="tag">${FREQ_LABEL[r.freq_band]}</span>` : '';
+  const scenery = r.own_to
+    ? '<span class="tag own">in bezit</span>'
+    : '<span class="tag">niet in bezit</span>';
+  const detail = r.detail === 'observed' ? '' : ' <span class="tag est">geschat</span>';
+  return `<tr>
+    <td class="dest">${r.to}<small>${ap.city || ap.name || ''}${ap.country ? ' · ' + ap.country : ''}</small></td>
+    <td>${alts.join(' / ')}</td>
+    <td class="num">${r.dist_nm.toLocaleString('nl-NL')} nm</td>
+    <td class="num">${fmtDuration(r.block_min)}${detail}</td>
+    <td>${scenery}</td>
+    <td class="ops">${ops}${freq}</td>
+  </tr>`;
+}
+
+// For an empty result set, report how many options each single relaxation
+// would bring back, so the user gets a way out instead of a dead end.
+function relaxHints() {
+  const snapshot = { ac: state.ac, buckets: state.buckets, ownOnly: state.ownOnly, opsOnly: state.opsOnly, to: state.to };
+  const count = (mutate) => {
+    mutate();
+    const n = state.data.routes.filter((r) => matches(r)).length;
+    Object.assign(state, snapshot);
+    return n;
+  };
+  const tries = [];
+  if (state.ac.size) tries.push(['ac', 'zonder het typefilter', count(() => { state.ac = new Set(); })]);
+  if (state.buckets.size) tries.push(['bucket', 'zonder het vliegtijdfilter', count(() => { state.buckets = new Set(); })]);
+  if (state.ownOnly) tries.push(['own', 'als je ook niet-bezeten scenery toelaat', count(() => { state.ownOnly = false; })]);
+  if (state.opsOnly) tries.push(['ops', 'zonder de eis van waargenomen verkeer', count(() => { state.opsOnly = false; })]);
+  if (state.to) tries.push(['to', 'zonder het bestemmingsfilter', count(() => { state.to = ''; })]);
+  Object.assign(state, snapshot);
+  const useful = tries.filter((t) => t[2] > 0);
+  if (!useful.length) return '<p>Probeer een ander vertrekpunt.</p>';
+  return `<ul>${useful.map(([k, text, n]) => `<li><a data-relax="${k}">${text}</a> zijn er ${n} opties.</li>`).join('')}</ul>`;
+}
+
+/* ---------- URL state ---------- */
+
+function toUrl() {
+  const p = new URLSearchParams();
+  if (state.from) p.set('from', state.from);
+  if (state.to) p.set('to', state.to);
+  if (state.ac.size) p.set('ac', [...state.ac].join(','));
+  if (state.buckets.size) p.set('dur', [...state.buckets].join(','));
+  if (state.ownOnly) p.set('own', '1');
+  if (state.opsOnly) p.set('ops', '1');
+  history.replaceState(null, '', `${location.pathname}?${p}`);
+}
+
+function fromUrl() {
+  const p = new URLSearchParams(location.search);
+  state.from = (p.get('from') || '').toUpperCase() || null;
+  state.to = (p.get('to') || '').toLowerCase();
+  state.ac = new Set((p.get('ac') || '').split(',').filter(Boolean).map((s) => s.toUpperCase()));
+  state.buckets = new Set((p.get('dur') || '').split(',').filter(Boolean));
+  state.ownOnly = p.get('own') === '1';
+  state.opsOnly = p.get('ops') === '1';
+}
+
+function update() {
+  renderFacets();
+  renderResults();
+  toUrl();
+}
+
+/* ---------- boot ---------- */
+
+async function boot() {
+  let data;
+  try {
+    const res = await fetch('find.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  } catch (err) {
+    el('meta').textContent = 'find.json niet geladen';
+    el('results').innerHTML = `<div class="panel empty"><b>find.json kon niet geladen worden.</b>
+      <p>Draai <code>node scripts/publish-find.mjs</code> en commit <code>docs/find.json</code>.</p>
+      <p class="hint">${err.message}</p></div>`;
+    return;
+  }
+  state.data = data;
+
+  const origins = [...new Set(data.routes.map((r) => r.from))].sort();
+  fromUrl();
+  if (!state.from || !origins.includes(state.from)) state.from = origins.includes('EHAM') ? 'EHAM' : origins[0];
+
+  el('from').innerHTML = origins.map((code) => {
+    const ap = data.airports[code] || {};
+    return `<option value="${code}" ${code === state.from ? 'selected' : ''}>${code} — ${ap.city || ap.name || ''}</option>`;
+  }).join('');
+  el('toFilter').value = state.to;
+  el('ownOnly').checked = state.ownOnly;
+  el('opsOnly').checked = state.opsOnly;
+
+  el('from').addEventListener('change', (e) => { state.from = e.target.value; update(); });
+  el('toFilter').addEventListener('input', (e) => { state.to = e.target.value.trim().toLowerCase(); update(); });
+  el('ownOnly').addEventListener('change', (e) => { state.ownOnly = e.target.checked; update(); });
+  el('opsOnly').addEventListener('change', (e) => { state.opsOnly = e.target.checked; update(); });
+  el('search').addEventListener('click', update);
+  el('reset').addEventListener('click', () => {
+    state.ac.clear();
+    state.buckets.clear();
+    state.to = '';
+    el('toFilter').value = '';
+    state.ownOnly = false; el('ownOnly').checked = false;
+    state.opsOnly = false; el('opsOnly').checked = false;
+    update();
+  });
+
+  el('meta').textContent = `${Object.keys(data.airports).length} airports · ${data.routes.length.toLocaleString('nl-NL')} combinaties · bijgewerkt ${data.generated_on}`;
+  el('disclaimer').textContent = data.detail_level === 'estimated'
+    ? 'Bloktijden zijn schattingen uit grootcirkelafstand en gepubliceerde kruissnelheid, geen waargenomen tijden. Frequenties zijn grove banden. Zodra er afspraken met Aero liggen, kan deze pagina waargenomen tijden tonen.'
+    : 'Rijen met "geschat" komen uit de afstandsschatter; de rest is waargenomen.';
+
+  update();
+}
+
+boot();
+</script>
+</body>
+</html>
