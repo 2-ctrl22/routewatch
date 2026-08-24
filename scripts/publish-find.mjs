@@ -11,16 +11,20 @@
  * WHERE THE FACTS COME FROM
  * -------------------------
  *   config/collection.json   airports (46) AND fleet.owned, the only source of
- *                            range_nm, role and cruise speed
+ *                            range_nm, role and cruise speed. Body width comes
+ *                            from the ICAO type codes, not from role, because
+ *                            role is the mission: "pax" or "cargo".
  *   data/airports-meta.json  enrichment for names, cities, countries
  *   data/ledger.json         observed traffic, keyed "EHAM-LEMG|HV|HV6115"
- *   data/aircraft-meta.json  registration cache only. It has no range and no
- *                            narrowbody flag, so it must never drive filtering.
+ *   data/aircraft-meta.json  registration cache. No range and no body width, so
+ *                            it must never drive filtering, but its
+ *                            typeCode -> model mapping bridges the ledger's
+ *                            display names onto ICAO codes.
  *
- * That last line used to be wrong and it cost the 2026-08-24 dry run its entire
- * range filter: readAircraft() read tails as types, range_nm came back undefined,
- * and `if (ac.range_nm && ...)` skipped the guard instead of failing it. All
- * 46 x 45 x 20 = 41400 pairings survived. The readers now live in
+ * That aircraft-meta line used to be wrong and it cost the 2026-08-24 dry run its
+ * entire range filter: readAircraft() read tails as types, range_nm came back
+ * undefined, and `if (ac.range_nm && ...)` skipped the guard instead of failing
+ * it. All 46 x 45 x 20 = 41400 pairings survived. The readers now live in
  * scripts/find-sources.mjs and refuse what they cannot verify.
  *
  * DETAIL LEVEL — Article 5.5 (see issue #1)
@@ -54,7 +58,6 @@ import {
   readAircraftRegs,
   pairingAllowed,
   estimateBlockMin,
-  trackFactorFor,
 } from './find-sources.mjs';
 
 const ROOT = process.cwd();
@@ -70,13 +73,13 @@ const PATHS = {
 };
 
 const BUCKETS = [
-  { id: 'lt1', label: 'Onder 1 uur', hint: 'quick hop', min: 0, max: 60 },
-  { id: '1-2', label: '1–2 uur', hint: 'korte lijndienst', min: 60, max: 120 },
-  { id: '2-4', label: '2–4 uur', hint: 'Europees / Med', min: 120, max: 240 },
-  { id: '4-6', label: '4–6 uur', hint: 'lange narrowbody', min: 240, max: 360 },
-  { id: '6-9', label: '6–9 uur', hint: 'instap-longhaul', min: 360, max: 540 },
-  { id: '9-12', label: '9–12 uur', hint: 'longhaul', min: 540, max: 720 },
-  { id: 'gt12', label: '12 uur en meer', hint: 'ultralong', min: 720, max: Infinity },
+  { id: 'lt1', label: 'Under 1 hour', hint: 'quick hop', min: 0, max: 60 },
+  { id: '1-2', label: '1–2 hours', hint: 'short scheduled leg', min: 60, max: 120 },
+  { id: '2-4', label: '2–4 hours', hint: 'Europe / Med', min: 120, max: 240 },
+  { id: '4-6', label: '4–6 hours', hint: 'long narrowbody', min: 240, max: 360 },
+  { id: '6-9', label: '6–9 hours', hint: 'entry-level long haul', min: 360, max: 540 },
+  { id: '9-12', label: '9–12 hours', hint: 'long haul', min: 540, max: 720 },
+  { id: 'gt12', label: '12 hours and more', hint: 'ultra long', min: 720, max: Infinity },
 ];
 
 const notes = [];
@@ -274,6 +277,7 @@ async function main() {
           if (Number.isFinite(override.days_seen)) record.days_seen = override.days_seen;
           if (Number.isFinite(override.observed_nm)) record.observed_nm = override.observed_nm;
           if (override.simmable) record.simmable = true;
+          if (override.cargo_seen) record.cargo_seen = true;
           if (DETAIL_MODE === 'full') {
             if (Array.isArray(override.flights) && override.flights.length) record.flights = override.flights;
             if (Array.isArray(override.regs) && override.regs.length) record.regs = override.regs;
@@ -288,6 +292,7 @@ async function main() {
   }
 
   const observedRows = routes.filter((r) => r.detail === 'observed').length;
+  const cargoRows = routes.filter((r) => r.cargo_seen).length;
   const detailLevel = observedRows === 0
     ? 'estimated'
     : observedRows === routes.length ? 'observed' : 'mixed';
@@ -309,6 +314,8 @@ async function main() {
       fleet_types: aircraft.size,
       tails_known: tails.regs.length,
       observed_pairings: observed.size,
+      observed_rows: observedRows,
+      cargo_rows: cargoRows,
       rejected: skipped,
     },
     buckets: BUCKETS.map(({ id, label, hint, min, max }) => ({
@@ -336,10 +343,12 @@ async function main() {
         {
           name: ac.label,
           role: ac.role,
+          cargo: Boolean(ac.cargo),
           narrowbody: ac.narrowbody,
           cruise_kts: ac.cruise_kt,
           range_nm: ac.range_nm,
           usable_range_nm: Math.round(ac.range_nm * EST.maxRangeUtilisation),
+          icao_types: ac.icao_types ?? [],
         },
       ]),
     ),
@@ -354,7 +363,7 @@ async function main() {
     `${skipped['out-of-range']} out of range, ` +
     `${skipped['narrowbody-blocked']} narrowbody-blocked, ` +
     `${skipped['no-range-data']} without range data)`);
-  console.log(`[find] ${observed.size} observed pairings from the ledger, ${observedRows} matched onto a pairing`);
+  console.log(`[find] ${observed.size} observed pairings from the ledger, ${observedRows} matched onto a pairing, ${cargoRows} with cargo traffic`);
   console.log(`[find] operators resolved for ${routes.filter((r) => r.operators.length).length} pairings`);
   console.log(`[find] payload ${sizeKb} kB, detail_level=${detailLevel}, detail_mode=${DETAIL_MODE}`);
   if (skipped['no-range-data']) {

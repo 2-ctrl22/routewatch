@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RouteWatch — Vluchten zoeken</title>
+<title>RouteWatch — Find a flight</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -115,46 +115,47 @@
 </head>
 <body>
 <header>
-  <h1>RouteWatch · Vluchten zoeken</h1>
+  <h1>RouteWatch · Find a flight</h1>
   <nav>
-    <a href="index.html">Overzicht</a>
-    <a href="map.html">Kaart</a>
+    <a href="index.html">Dashboard</a>
+    <a href="map.html">Map</a>
     <a href="editor.html">Editor</a>
   </nav>
-  <span class="meta" id="meta">laden…</span>
+  <span class="meta" id="meta">loading…</span>
 </header>
 
 <main>
   <aside class="panel">
     <fieldset>
-      <legend>Vertrek</legend>
+      <legend>Departure</legend>
       <select id="from"></select>
     </fieldset>
 
     <fieldset>
-      <legend>Bestemming <span class="hint">(leeg = verras me)</span></legend>
-      <input type="search" id="toFilter" placeholder="ICAO of stad, optioneel">
+      <legend>Destination <span class="hint">(empty = surprise me)</span></legend>
+      <input type="search" id="toFilter" placeholder="ICAO or city, optional">
     </fieldset>
 
     <fieldset>
-      <legend>Vliegtuig</legend>
+      <legend>Aircraft</legend>
       <div id="acOpts"></div>
     </fieldset>
 
     <fieldset>
-      <legend>Vliegtijd</legend>
+      <legend>Flight time</legend>
       <div id="bucketOpts"></div>
     </fieldset>
 
     <fieldset>
-      <legend>Scenery</legend>
-      <label class="opt"><input type="checkbox" id="ownOnly"> Alleen airports die ik bezit</label>
-      <label class="opt"><input type="checkbox" id="opsOnly"> Alleen routes met waargenomen verkeer</label>
+      <legend>Filters</legend>
+      <label class="opt"><input type="checkbox" id="ownOnly"> Only airports I own</label>
+      <label class="opt"><input type="checkbox" id="opsOnly"> Only routes with observed traffic</label>
+      <label class="opt"><input type="checkbox" id="cargoOnly"> Freighters on cargo routes only</label>
     </fieldset>
 
     <div class="actions">
-      <button class="primary" id="search">Zoeken</button>
-      <button id="reset">Wis</button>
+      <button class="primary" id="search">Search</button>
+      <button id="reset">Clear</button>
     </div>
   </aside>
 
@@ -167,19 +168,22 @@
 <script>
 'use strict';
 
-const state = { data: null, from: null, to: '', ac: new Set(), buckets: new Set(), ownOnly: false, opsOnly: false, open: new Set() };
+const state = {
+  data: null, from: null, to: '', ac: new Set(), buckets: new Set(),
+  ownOnly: false, opsOnly: false, cargoOnly: false, open: new Set(),
+};
 const el = (id) => document.getElementById(id);
 
 const FREQ_LABEL = {
-  several_daily: 'meerdere keren per dag',
-  daily: 'zo goed als dagelijks',
-  weekly: 'wekelijks',
-  seen: 'incidenteel gezien',
+  several_daily: 'several times a day',
+  daily: 'practically daily',
+  weekly: 'weekly',
+  seen: 'seen occasionally',
 };
 
 // The ledger's dow array uses 1 = Monday: an entry first seen on 2026-08-13,
 // a Thursday, is stored as 4.
-const DOW = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const dowLabel = (d) => DOW[Number(d) - 1] || String(d);
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -187,8 +191,10 @@ const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '
 function fmtDuration(min) {
   const h = Math.floor(min / 60);
   const m = min % 60;
-  return h ? `${h}u ${String(m).padStart(2, '0')}m` : `${m}m`;
+  return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
 }
+
+const isFreighter = (code) => Boolean(state.data.aircraft[code] && state.data.aircraft[code].cargo);
 
 /* ---------- filtering ---------- */
 
@@ -198,6 +204,8 @@ function matches(route, skip) {
   if (skip !== 'bucket' && state.buckets.size && !state.buckets.has(route.bucket)) return false;
   if (state.ownOnly && !(route.own_from && route.own_to)) return false;
   if (state.opsOnly && route.detail !== 'observed') return false;
+  // A freighter is only realistic where cargo traffic was actually observed.
+  if (state.cargoOnly && isFreighter(route.ac) && !route.cargo_seen) return false;
   if (state.to) {
     const ap = state.data.airports[route.to] || {};
     const hay = `${route.to} ${ap.name || ''} ${ap.city || ''} ${ap.country || ''}`.toLowerCase();
@@ -231,8 +239,8 @@ function renderFacets() {
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([code, meta]) => {
       const n = acCounts.get(code) || 0;
-      const hint = meta.narrowbody ? 'narrowbody' : 'widebody';
-      return `<label class="opt ${n ? '' : 'zero'}" title="${esc(meta.name || code)} · bereik ${meta.range_nm ?? '?'} nm, bruikbaar ${meta.usable_range_nm ?? '?'} nm">
+      const hint = `${meta.narrowbody ? 'narrowbody' : 'widebody'}${meta.cargo ? ' freighter' : ''}`;
+      return `<label class="opt ${n ? '' : 'zero'}" title="${esc(meta.name || code)} · range ${meta.range_nm ?? '?'} nm, usable ${meta.usable_range_nm ?? '?'} nm">
         <input type="checkbox" data-ac="${esc(code)}" ${state.ac.has(code) ? 'checked' : ''}>
         <span>${esc(code)}</span><span class="hint">${hint}</span>
         <span class="count">${n}</span></label>`;
@@ -242,7 +250,7 @@ function renderFacets() {
     const n = bucketCounts.get(b.id) || 0;
     return `<label class="opt ${n ? '' : 'zero'}">
       <input type="checkbox" data-bucket="${b.id}" ${state.buckets.has(b.id) ? 'checked' : ''}>
-      <span>${b.label}</span><span class="hint">${b.hint}</span>
+      <span>${esc(b.label)}</span><span class="hint">${esc(b.hint)}</span>
       <span class="count">${n}</span></label>`;
   }).join('');
 
@@ -266,7 +274,7 @@ function renderResults() {
   const hits = state.data.routes.filter((r) => matches(r));
 
   if (!hits.length) {
-    el('results').innerHTML = `<div class="panel empty"><b>Geen treffers.</b>${relaxHints()}</div>`;
+    el('results').innerHTML = `<div class="panel empty"><b>No matches.</b>${relaxHints()}</div>`;
     el('results').querySelectorAll('a[data-relax]').forEach((a) => {
       a.addEventListener('click', () => {
         const kind = a.dataset.relax;
@@ -274,6 +282,7 @@ function renderResults() {
         if (kind === 'bucket') state.buckets.clear();
         if (kind === 'own') { state.ownOnly = false; el('ownOnly').checked = false; }
         if (kind === 'ops') { state.opsOnly = false; el('opsOnly').checked = false; }
+        if (kind === 'cargo') { state.cargoOnly = false; el('cargoOnly').checked = false; }
         if (kind === 'to') { state.to = ''; el('toFilter').value = ''; }
         update();
       });
@@ -304,10 +313,10 @@ function renderResults() {
     const group = rows.filter((r) => r.bucket === b.id).sort((x, y) => x.block_min - y.block_min);
     if (!group.length) return '';
     return `<div class="bucket-group">
-      <div class="bucket-head"><h2>${b.label}</h2><span class="hint">${b.hint}</span>
-        <span class="n">${group.length} bestemming${group.length === 1 ? '' : 'en'}</span></div>
+      <div class="bucket-head"><h2>${esc(b.label)}</h2><span class="hint">${esc(b.hint)}</span>
+        <span class="n">${group.length} destination${group.length === 1 ? '' : 's'}</span></div>
       <table><thead><tr>
-        <th>Bestemming</th><th>Vliegtuig</th><th class="num">Afstand</th><th class="num">Blok</th><th>Scenery</th><th>Maatschappijen</th>
+        <th>Destination</th><th>Aircraft</th><th class="num">Distance</th><th class="num">Block</th><th>Scenery</th><th>Airlines</th>
       </tr></thead><tbody>
       ${group.map(rowHtml).join('')}
       </tbody></table></div>`;
@@ -325,8 +334,9 @@ function renderResults() {
 // Merge the observed fields of one route record into an accumulator.
 function collectObserved(acc, r) {
   if (r.detail !== 'observed') return acc;
-  const out = acc || { flights: [], regs: new Set(), time_bands: new Set(), dow: new Set(), seasons: {}, days_seen: 0, freq_band: null, types: new Set() };
+  const out = acc || { flights: [], regs: new Set(), time_bands: new Set(), dow: new Set(), seasons: {}, days_seen: 0, freq_band: null, types: new Set(), cargo: false };
   out.types.add(r.ac);
+  if (r.cargo_seen) out.cargo = true;
   for (const f of r.flights || []) {
     const key = `${f.airline}|${f.flight}|${f.std}`;
     if (!out.flights.some((x) => `${x.airline}|${x.flight}|${x.std}` === key)) out.flights.push(f);
@@ -351,27 +361,28 @@ function rowHtml(r) {
   const alts = [...r.alts].sort();
   const ops = r.operators && r.operators.length
     ? esc(r.operators.join(', '))
-    : '<span class="hint">geen operator vastgelegd</span>';
+    : '<span class="hint">no operator recorded</span>';
   const freq = r.freq_band ? ` <span class="tag">${FREQ_LABEL[r.freq_band] || r.freq_band}</span>` : '';
+  const cargo = r.cargo_seen ? ' <span class="tag">cargo seen</span>' : '';
   const scenery = r.own_to
-    ? '<span class="tag own">in bezit</span>'
-    : '<span class="tag">niet in bezit</span>';
+    ? '<span class="tag own">owned</span>'
+    : '<span class="tag">not owned</span>';
 
   // Honest per field, not per row: a record can be observed while its block time
   // is still an estimate, because the ledger has no arrival time.
-  let blockTag = ' <span class="tag est">geschat</span>';
+  let blockTag = ' <span class="tag est">estimated</span>';
   if (r.detail === 'observed') {
-    blockTag = r.block_source === 'observed' ? '' : ' <span class="tag est">blok geschat</span>';
+    blockTag = r.block_source === 'observed' ? '' : ' <span class="tag est">block estimated</span>';
   }
 
   const dist = r.routed_nm && r.routed_nm !== r.dist_nm
-    ? `${r.dist_nm.toLocaleString('nl-NL')} nm<small class="hint"> · ${r.routed_nm.toLocaleString('nl-NL')} routed</small>`
-    : `${r.dist_nm.toLocaleString('nl-NL')} nm`;
+    ? `${r.dist_nm.toLocaleString('en-GB')} nm<small class="hint"> · ${r.routed_nm.toLocaleString('en-GB')} routed</small>`
+    : `${r.dist_nm.toLocaleString('en-GB')} nm`;
 
   const key = `${r.from}-${r.to}`;
   const isOpen = state.open.has(key);
   const toggle = r.obs
-    ? `<button class="toggle" data-open="${key}">${isOpen ? '−' : '+'} waargenomen verkeer</button>`
+    ? `<button class="toggle" data-open="${key}">${isOpen ? '−' : '+'} observed traffic</button>`
     : '';
 
   const main = `<tr>
@@ -380,7 +391,7 @@ function rowHtml(r) {
     <td class="num">${dist}</td>
     <td class="num">${fmtDuration(r.block_min)}${blockTag}</td>
     <td>${scenery}</td>
-    <td class="ops">${ops}${freq}</td>
+    <td class="ops">${ops}${freq}${cargo}</td>
   </tr>`;
 
   return isOpen && r.obs ? main + detailHtml(r) : main;
@@ -396,8 +407,9 @@ function detailHtml(r) {
     const days = [...o.dow].sort((a, b) => a - b).map(dowLabel);
     when.push(`<div class="chips">${days.map((d) => `<span class="chip">${esc(d)}</span>`).join('')}</div>`);
   }
-  if (o.days_seen) when.push(`<div class="chips"><span class="chip">${o.days_seen} waarnemingsdagen</span></div>`);
-  if (when.length) blocks.push(`<div class="detail-block"><h3>Wanneer</h3>${when.join('')}</div>`);
+  if (o.days_seen) when.push(`<div class="chips"><span class="chip">${o.days_seen} days observed</span></div>`);
+  if (o.cargo) when.push('<div class="chips"><span class="chip">cargo traffic</span></div>');
+  if (when.length) blocks.push(`<div class="detail-block"><h3>When</h3>${when.join('')}</div>`);
 
   const seasonKeys = Object.keys(o.seasons).sort();
   if (seasonKeys.length) {
@@ -406,17 +418,17 @@ function detailHtml(r) {
       const span = v.first && v.last ? `${esc(v.first)} → ${esc(v.last)}` : '';
       return `<span class="chip">${esc(s)}: ${v.days ?? 0} d ${span}</span>`;
     }).join('');
-    blocks.push(`<div class="detail-block"><h3>Seizoenen</h3><div class="chips">${rows}</div></div>`);
+    blocks.push(`<div class="detail-block"><h3>Seasons</h3><div class="chips">${rows}</div></div>`);
   }
 
   if (o.regs.size) {
-    blocks.push(`<div class="detail-block"><h3>Registraties</h3><div class="chips">${
+    blocks.push(`<div class="detail-block"><h3>Registrations</h3><div class="chips">${
       [...o.regs].sort().map((g) => `<span class="chip">${esc(g)}</span>`).join('')
     }</div></div>`);
   }
 
   if (o.types.size) {
-    blocks.push(`<div class="detail-block"><h3>Waargenomen op</h3><div class="chips">${
+    blocks.push(`<div class="detail-block"><h3>Observed on</h3><div class="chips">${
       [...o.types].sort().map((t) => `<span class="chip">${esc(t)}</span>`).join('')
     }</div></div>`);
   }
@@ -430,11 +442,11 @@ function detailHtml(r) {
       <td class="mono">${esc(f.first_seen || '')} → ${esc(f.last_seen || '')}</td>
       <td>${esc(f.status || '')}</td>
     </tr>`).join('');
-    const more = o.flights.length > 40 ? `<tr><td colspan="6" class="hint">… en ${o.flights.length - 40} meer</td></tr>` : '';
-    blocks.push(`<div class="detail-block" style="flex:1"><h3>Vluchten</h3>
+    const more = o.flights.length > 40 ? `<tr><td colspan="6" class="hint">… and ${o.flights.length - 40} more</td></tr>` : '';
+    blocks.push(`<div class="detail-block" style="flex:1"><h3>Flights</h3>
       <table class="flights"><thead><tr>
-        <th>Vlucht</th><th>STD</th><th>Dagen</th><th>#</th><th>Gezien</th><th>Status</th>
-      </tr></thead><tbody>${rows}${more}</tbody></table></div>`);
+        <th>Flight</th><th>STD</th><th>Days</th><th>#</th><th>Seen</th><th>Status</th>
+      </tr></thead><tbody>${rows}${more}</tbody></table></div>`;
   }
 
   return `<tr class="detailrow"><td colspan="6"><div class="detail-grid">${blocks.join('')}</div></td></tr>`;
@@ -443,7 +455,7 @@ function detailHtml(r) {
 // For an empty result set, report how many options each single relaxation
 // would bring back, so the user gets a way out instead of a dead end.
 function relaxHints() {
-  const snapshot = { ac: state.ac, buckets: state.buckets, ownOnly: state.ownOnly, opsOnly: state.opsOnly, to: state.to };
+  const snapshot = { ac: state.ac, buckets: state.buckets, ownOnly: state.ownOnly, opsOnly: state.opsOnly, cargoOnly: state.cargoOnly, to: state.to };
   const count = (mutate) => {
     mutate();
     const n = state.data.routes.filter((r) => matches(r)).length;
@@ -451,15 +463,16 @@ function relaxHints() {
     return n;
   };
   const tries = [];
-  if (state.ac.size) tries.push(['ac', 'zonder het typefilter', count(() => { state.ac = new Set(); })]);
-  if (state.buckets.size) tries.push(['bucket', 'zonder het vliegtijdfilter', count(() => { state.buckets = new Set(); })]);
-  if (state.ownOnly) tries.push(['own', 'als je ook niet-bezeten scenery toelaat', count(() => { state.ownOnly = false; })]);
-  if (state.opsOnly) tries.push(['ops', 'zonder de eis van waargenomen verkeer', count(() => { state.opsOnly = false; })]);
-  if (state.to) tries.push(['to', 'zonder het bestemmingsfilter', count(() => { state.to = ''; })]);
+  if (state.ac.size) tries.push(['ac', 'without the aircraft filter', count(() => { state.ac = new Set(); })]);
+  if (state.buckets.size) tries.push(['bucket', 'without the flight-time filter', count(() => { state.buckets = new Set(); })]);
+  if (state.ownOnly) tries.push(['own', 'if scenery you do not own is allowed', count(() => { state.ownOnly = false; })]);
+  if (state.opsOnly) tries.push(['ops', 'without requiring observed traffic', count(() => { state.opsOnly = false; })]);
+  if (state.cargoOnly) tries.push(['cargo', 'if freighters may fly non-cargo routes', count(() => { state.cargoOnly = false; })]);
+  if (state.to) tries.push(['to', 'without the destination filter', count(() => { state.to = ''; })]);
   Object.assign(state, snapshot);
   const useful = tries.filter((t) => t[2] > 0);
-  if (!useful.length) return '<p>Probeer een ander vertrekpunt.</p>';
-  return `<ul>${useful.map(([k, text, n]) => `<li><a data-relax="${k}">${text}</a> zijn er ${n} opties.</li>`).join('')}</ul>`;
+  if (!useful.length) return '<p>Try another departure airport.</p>';
+  return `<ul>${useful.map(([k, text, n]) => `<li><a data-relax="${k}">${text}</a> there are ${n} options.</li>`).join('')}</ul>`;
 }
 
 /* ---------- URL state ---------- */
@@ -472,6 +485,7 @@ function toUrl() {
   if (state.buckets.size) p.set('dur', [...state.buckets].join(','));
   if (state.ownOnly) p.set('own', '1');
   if (state.opsOnly) p.set('ops', '1');
+  if (state.cargoOnly) p.set('frt', '1');
   history.replaceState(null, '', `${location.pathname}?${p}`);
 }
 
@@ -483,6 +497,7 @@ function fromUrl() {
   state.buckets = new Set((p.get('dur') || '').split(',').filter(Boolean));
   state.ownOnly = p.get('own') === '1';
   state.opsOnly = p.get('ops') === '1';
+  state.cargoOnly = p.get('frt') === '1';
 }
 
 function update() {
@@ -494,14 +509,14 @@ function update() {
 /* ---------- boot ---------- */
 
 function disclaimerText(data) {
-  const base = 'Bloktijden komen uit grootcirkelafstand, een afstandsafhankelijke trackfactor en de kruissnelheid uit fleet.owned.';
+  const base = 'Block times come from great-circle distance, a distance-dependent track factor and the cruise speed published in fleet.owned.';
   if (data.detail_level === 'estimated') {
-    return `${base} Er is nog geen waargenomen laag gekoppeld: frequenties en operators blijven leeg tot publish-find.mjs de ledger kan lezen.`;
+    return `${base} No observed layer is attached yet: frequencies and operators stay empty until publish-find.mjs can read the ledger.`;
   }
   const extra = data.detail_mode === 'full'
-    ? 'Rijen met waargenomen verkeer tonen de echte vluchtnummers, tijdvakken, weekdagen en registraties uit de ledger.'
-    : 'Rijen met waargenomen verkeer tonen alleen afgeleide feiten: frequentieband, tijdvakken en operatornamen.';
-  return `${base} De ledger legt geen aankomsttijd vast, dus een bloktijd blijft een schatting; dat staat per rij als "blok geschat". ${extra}`;
+    ? 'Rows with observed traffic show the real flight numbers, time bands, weekdays and registrations from the ledger.'
+    : 'Rows with observed traffic show derived facts only: frequency band, time bands and operator names.';
+  return `${base} The ledger records no arrival time, so a block time stays an estimate; rows say "block estimated" where that applies. ${extra}`;
 }
 
 async function boot() {
@@ -511,9 +526,9 @@ async function boot() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
   } catch (err) {
-    el('meta').textContent = 'find.json niet geladen';
-    el('results').innerHTML = `<div class="panel empty"><b>find.json kon niet geladen worden.</b>
-      <p>Draai <code>node scripts/publish-find.mjs</code> en commit <code>docs/find.json</code>.</p>
+    el('meta').textContent = 'find.json not loaded';
+    el('results').innerHTML = `<div class="panel empty"><b>Could not load find.json.</b>
+      <p>Run <code>node scripts/publish-find.mjs</code> and commit <code>docs/find.json</code>.</p>
       <p class="hint">${esc(err.message)}</p></div>`;
     return;
   }
@@ -530,11 +545,13 @@ async function boot() {
   el('toFilter').value = state.to;
   el('ownOnly').checked = state.ownOnly;
   el('opsOnly').checked = state.opsOnly;
+  el('cargoOnly').checked = state.cargoOnly;
 
   el('from').addEventListener('change', (e) => { state.from = e.target.value; state.open.clear(); update(); });
   el('toFilter').addEventListener('input', (e) => { state.to = e.target.value.trim().toLowerCase(); update(); });
   el('ownOnly').addEventListener('change', (e) => { state.ownOnly = e.target.checked; update(); });
   el('opsOnly').addEventListener('change', (e) => { state.opsOnly = e.target.checked; update(); });
+  el('cargoOnly').addEventListener('change', (e) => { state.cargoOnly = e.target.checked; update(); });
   el('search').addEventListener('click', update);
   el('reset').addEventListener('click', () => {
     state.ac.clear();
@@ -543,6 +560,7 @@ async function boot() {
     el('toFilter').value = '';
     state.ownOnly = false; el('ownOnly').checked = false;
     state.opsOnly = false; el('opsOnly').checked = false;
+    state.cargoOnly = false; el('cargoOnly').checked = false;
     state.open.clear();
     update();
   });
@@ -551,9 +569,9 @@ async function boot() {
   const parts = [
     `${Object.keys(data.airports).length} airports`,
     c.fleet_types ? `${c.fleet_types} types` : null,
-    `${data.routes.length.toLocaleString('nl-NL')} combinaties`,
-    c.observed_pairings ? `${c.observed_pairings.toLocaleString('nl-NL')} waargenomen` : null,
-    `bijgewerkt ${data.generated_on}`,
+    `${data.routes.length.toLocaleString('en-GB')} combinations`,
+    c.observed_rows ? `${c.observed_rows.toLocaleString('en-GB')} observed` : null,
+    `updated ${data.generated_on}`,
   ].filter(Boolean);
   el('meta').textContent = parts.join(' · ');
   el('disclaimer').textContent = disclaimerText(data);
