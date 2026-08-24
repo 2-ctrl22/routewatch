@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RouteWatch — Find a flight</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #1c2129;
+    --line: #2b323c;
+    --text: #e6edf3;
+    --dim: #8b949e;
+    --accent: #4a9eff;
+    --own: #3fb950;
+    --warn: #d29922;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: baseline;
+  }
+  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
+  header nav a { color: var(--dim); text-decoration: none; margin-right: 14px; font-size: 14px; }
+  header nav a:hover { color: var(--accent); }
+  .meta { color: var(--dim); font-size: 12px; margin-left: auto; }
+  main { display: grid; grid-template-columns: 300px 1fr; gap: 22px; padding: 22px; align-items: start; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  aside { position: sticky; top: 22px; max-height: calc(100vh - 44px); overflow-y: auto; }
+  fieldset { border: 0; padding: 0; margin: 0 0 20px; }
+  legend { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin-bottom: 8px; padding: 0; }
+  label.opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 6px; border-radius: 6px; cursor: pointer; font-size: 14px;
+  }
+  label.opt:hover { background: var(--panel-2); }
+  label.opt.zero { opacity: .38; }
+  label.opt .count { margin-left: auto; color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
+  label.opt .hint { color: var(--dim); font-size: 12px; }
+  input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; }
+  select, input[type=search] {
+    width: 100%; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--text); border-radius: 6px; padding: 8px 9px; font-size: 14px;
+  }
+  .actions { display: flex; gap: 8px; margin-top: 4px; }
+  button {
+    font: inherit; border-radius: 6px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--text);
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #06131f; font-weight: 600; flex: 1; }
+  button:hover { filter: brightness(1.12); }
+  .bucket-group { margin-bottom: 26px; }
+  .bucket-head {
+    display: flex; align-items: baseline; gap: 10px;
+    border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;
+  }
+  .bucket-head h2 { font-size: 15px; margin: 0; }
+  .bucket-head .hint { color: var(--dim); font-size: 12px; }
+  .bucket-head .n { margin-left: auto; color: var(--dim); font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 8px; }
+  td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .dest { font-weight: 600; }
+  .dest small { display: block; font-weight: 400; color: var(--dim); font-size: 12px; }
+  .tag {
+    display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid var(--line); color: var(--dim); white-space: nowrap;
+  }
+  .tag.own { color: var(--own); border-color: #23502f; }
+  .tag.est { color: var(--warn); border-color: #4a3a12; }
+  .tag.obs { color: var(--own); border-color: #23502f; }
+  .ops { color: var(--dim); font-size: 13px; }
+  .empty { padding: 26px; text-align: center; color: var(--dim); }
+  .empty b { color: var(--text); }
+  .empty ul { list-style: none; padding: 0; margin: 12px 0 0; }
+  .empty li { margin: 5px 0; }
+  .empty a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .disclaimer { color: var(--dim); font-size: 12px; margin-top: 22px; border-top: 1px solid var(--line); padding-top: 12px; }
+  /* Observed detail panel */
+  .toggle {
+    background: none; border: 0; color: var(--accent); cursor: pointer;
+    font: inherit; font-size: 12px; padding: 0; margin-top: 4px;
+  }
+  tr.detailrow > td { background: var(--panel-2); border-top: 0; padding: 0 8px 12px; }
+  .detail-grid { display: flex; flex-wrap: wrap; gap: 18px; padding: 10px 2px 2px; }
+  .detail-block { min-width: 180px; }
+  .detail-block h3 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
+    color: var(--dim); margin: 0 0 6px; font-weight: 600;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip {
+    font-size: 11px; padding: 1px 7px; border-radius: 4px;
+    border: 1px solid var(--line); color: var(--text); background: var(--panel);
+    font-variant-numeric: tabular-nums;
+  }
+  table.flights { width: auto; min-width: 420px; font-size: 13px; }
+  table.flights th { padding: 2px 10px 2px 0; }
+  table.flights td { padding: 3px 10px 3px 0; border-top: 1px solid var(--line); }
+  table.flights td.mono { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<header>
+  <h1>RouteWatch · Find a flight</h1>
+  <nav>
+    <a href="index.html">Dashboard</a>
+    <a href="map.html">Map</a>
+    <a href="editor.html">Editor</a>
+  </nav>
+  <span class="meta" id="meta">loading…</span>
+</header>
+
+<main>
+  <aside class="panel">
+    <fieldset>
+      <legend>Departure</legend>
+      <select id="from"></select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Destination <span class="hint">(empty = surprise me)</span></legend>
+      <input type="search" id="toFilter" placeholder="ICAO or city, optional">
+    </fieldset>
+
+    <fieldset>
+      <legend>Aircraft</legend>
+      <div id="acOpts"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Flight time</legend>
+      <div id="bucketOpts"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Filters</legend>
+      <label class="opt"><input type="checkbox" id="ownOnly"> Only airports I own</label>
+      <label class="opt"><input type="checkbox" id="opsOnly"> Only routes with observed traffic</label>
+      <label class="opt"><input type="checkbox" id="cargoOnly"> Freighters on cargo routes only</label>
+    </fieldset>
+
+    <div class="actions">
+      <button class="primary" id="search">Search</button>
+      <button id="reset">Clear</button>
+    </div>
+  </aside>
+
+  <section>
+    <div id="results"></div>
+    <p class="disclaimer" id="disclaimer"></p>
+  </section>
+</main>
+
+<script>
+'use strict';
+
+const state = {
+  data: null, from: null, to: '', ac: new Set(), buckets: new Set(),
+  ownOnly: false, opsOnly: false, cargoOnly: false, open: new Set(),
+};
+const el = (id) => document.getElementById(id);
+
+const FREQ_LABEL = {
+  several_daily: 'several times a day',
+  daily: 'practically daily',
+  weekly: 'weekly',
+  seen: 'seen occasionally',
+};
+
+// The ledger's dow array uses 1 = Monday: an entry first seen on 2026-08-13,
+// a Thursday, is stored as 4.
+const DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const dowLabel = (d) => DOW[Number(d) - 1] || String(d);
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function fmtDuration(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`;
+}
+
+const isFreighter = (code) => Boolean(state.data.aircraft[code] && state.data.aircraft[code].cargo);
+
+/* ---------- filtering ---------- */
+
+function matches(route, skip) {
+  if (route.from !== state.from) return false;
+  if (skip !== 'ac' && state.ac.size && !state.ac.has(route.ac)) return false;
+  if (skip !== 'bucket' && state.buckets.size && !state.buckets.has(route.bucket)) return false;
+  if (state.ownOnly && !(route.own_from && route.own_to)) return false;
+  if (state.opsOnly && route.detail !== 'observed') return false;
+  // A freighter is only realistic where cargo traffic was actually observed.
+  if (state.cargoOnly && isFreighter(route.ac) && !route.cargo_seen) return false;
+  if (state.to) {
+    const ap = state.data.airports[route.to] || {};
+    const hay = `${route.to} ${ap.name || ''} ${ap.city || ''} ${ap.country || ''}`.toLowerCase();
+    if (!hay.includes(state.to)) return false;
+  }
+  return true;
+}
+
+// Counts on a facet ignore that facet's own selection, so the numbers show
+// what you would get by ticking the box rather than what you have now.
+function facetCounts(field, skip) {
+  const counts = new Map();
+  const seen = new Set();
+  for (const r of state.data.routes) {
+    if (!matches(r, skip)) continue;
+    const dedupe = `${r[field]}|${r.to}`;
+    if (seen.has(dedupe)) continue;
+    seen.add(dedupe);
+    counts.set(r[field], (counts.get(r[field]) || 0) + 1);
+  }
+  return counts;
+}
+
+/* ---------- rendering ---------- */
+
+function renderFacets() {
+  const acCounts = facetCounts('ac', 'ac');
+  const bucketCounts = facetCounts('bucket', 'bucket');
+
+  el('acOpts').innerHTML = Object.entries(state.data.aircraft)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([code, meta]) => {
+      const n = acCounts.get(code) || 0;
+      const hint = `${meta.narrowbody ? 'narrowbody' : 'widebody'}${meta.cargo ? ' freighter' : ''}`;
+      return `<label class="opt ${n ? '' : 'zero'}" title="${esc(meta.name || code)} · range ${meta.range_nm ?? '?'} nm, usable ${meta.usable_range_nm ?? '?'} nm">
+        <input type="checkbox" data-ac="${esc(code)}" ${state.ac.has(code) ? 'checked' : ''}>
+        <span>${esc(code)}</span><span class="hint">${hint}</span>
+        <span class="count">${n}</span></label>`;
+    }).join('');
+
+  el('bucketOpts').innerHTML = state.data.buckets.map((b) => {
+    const n = bucketCounts.get(b.id) || 0;
+    return `<label class="opt ${n ? '' : 'zero'}">
+      <input type="checkbox" data-bucket="${b.id}" ${state.buckets.has(b.id) ? 'checked' : ''}>
+      <span>${esc(b.label)}</span><span class="hint">${esc(b.hint)}</span>
+      <span class="count">${n}</span></label>`;
+  }).join('');
+
+  el('acOpts').querySelectorAll('input').forEach((input) => {
+    input.addEventListener('change', () => {
+      const code = input.dataset.ac;
+      if (input.checked) state.ac.add(code); else state.ac.delete(code);
+      update();
+    });
+  });
+  el('bucketOpts').querySelectorAll('input').forEach((input) => {
+    input.addEventListener('change', () => {
+      const id = input.dataset.bucket;
+      if (input.checked) state.buckets.add(id); else state.buckets.delete(id);
+      update();
+    });
+  });
+}
+
+function renderResults() {
+  const hits = state.data.routes.filter((r) => matches(r));
+
+  if (!hits.length) {
+    el('results').innerHTML = `<div class="panel empty"><b>No matches.</b>${relaxHints()}</div>`;
+    el('results').querySelectorAll('a[data-relax]').forEach((a) => {
+      a.addEventListener('click', () => {
+        const kind = a.dataset.relax;
+        if (kind === 'ac') state.ac.clear();
+        if (kind === 'bucket') state.buckets.clear();
+        if (kind === 'own') { state.ownOnly = false; el('ownOnly').checked = false; }
+        if (kind === 'ops') { state.opsOnly = false; el('opsOnly').checked = false; }
+        if (kind === 'cargo') { state.cargoOnly = false; el('cargoOnly').checked = false; }
+        if (kind === 'to') { state.to = ''; el('toFilter').value = ''; }
+        update();
+      });
+    });
+    return;
+  }
+
+  // One row per destination: the shortest block time wins, every other type
+  // that also qualifies is listed alongside it. Observed detail is merged from
+  // every type on that destination, because the traffic is a property of the
+  // route, not of the aircraft you happen to pick.
+  const byDest = new Map();
+  for (const r of hits) {
+    const cur = byDest.get(r.to);
+    if (!cur) {
+      byDest.set(r.to, { ...r, alts: new Set([r.ac]), obs: collectObserved(null, r) });
+      continue;
+    }
+    cur.alts.add(r.ac);
+    cur.obs = collectObserved(cur.obs, r);
+    if (r.block_min < cur.block_min) {
+      byDest.set(r.to, { ...r, alts: cur.alts, obs: cur.obs });
+    }
+  }
+
+  const rows = [...byDest.values()];
+  el('results').innerHTML = state.data.buckets.map((b) => {
+    const group = rows.filter((r) => r.bucket === b.id).sort((x, y) => x.block_min - y.block_min);
+    if (!group.length) return '';
+    return `<div class="bucket-group">
+      <div class="bucket-head"><h2>${esc(b.label)}</h2><span class="hint">${esc(b.hint)}</span>
+        <span class="n">${group.length} destination${group.length === 1 ? '' : 's'}</span></div>
+      <table><thead><tr>
+        <th>Destination</th><th>Aircraft</th><th class="num">Distance</th><th class="num">Block</th><th>Scenery</th><th>Airlines</th>
+      </tr></thead><tbody>
+      ${group.map(rowHtml).join('')}
+      </tbody></table></div>`;
+  }).join('');
+
+  el('results').querySelectorAll('button[data-open]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.open;
+      if (state.open.has(key)) state.open.delete(key); else state.open.add(key);
+      renderResults();
+    });
+  });
+}
+
+// Merge the observed fields of one route record into an accumulator.
+function collectObserved(acc, r) {
+  if (r.detail !== 'observed') return acc;
+  const out = acc || { flights: [], regs: new Set(), time_bands: new Set(), dow: new Set(), seasons: {}, days_seen: 0, freq_band: null, types: new Set(), cargo: false };
+  out.types.add(r.ac);
+  if (r.cargo_seen) out.cargo = true;
+  for (const f of r.flights || []) {
+    const key = `${f.airline}|${f.flight}|${f.std}`;
+    if (!out.flights.some((x) => `${x.airline}|${x.flight}|${x.std}` === key)) out.flights.push(f);
+  }
+  for (const g of r.regs || []) out.regs.add(g);
+  for (const t of r.time_bands || []) out.time_bands.add(t);
+  for (const d of r.dow || []) out.dow.add(d);
+  for (const [s, v] of Object.entries(r.seasons || {})) {
+    const prev = out.seasons[s];
+    out.seasons[s] = prev && prev.days >= (v.days || 0) ? prev : v;
+  }
+  out.days_seen = Math.max(out.days_seen, r.days_seen || 0);
+  const order = ['several_daily', 'daily', 'weekly', 'seen'];
+  if (r.freq_band && (!out.freq_band || order.indexOf(r.freq_band) < order.indexOf(out.freq_band))) {
+    out.freq_band = r.freq_band;
+  }
+  return out;
+}
+
+function rowHtml(r) {
+  const ap = state.data.airports[r.to] || {};
+  const alts = [...r.alts].sort();
+  const ops = r.operators && r.operators.length
+    ? esc(r.operators.join(', '))
+    : '<span class="hint">no operator recorded</span>';
+  const freq = r.freq_band ? ` <span class="tag">${FREQ_LABEL[r.freq_band] || r.freq_band}</span>` : '';
+  const cargo = r.cargo_seen ? ' <span class="tag">cargo seen</span>' : '';
+  const scenery = r.own_to
+    ? '<span class="tag own">owned</span>'
+    : '<span class="tag">not owned</span>';
+
+  // Honest per field, not per row: a record can be observed while its block time
+  // is still an estimate, because the ledger has no arrival time.
+  let blockTag = ' <span class="tag est">estimated</span>';
+  if (r.detail === 'observed') {
+    blockTag = r.block_source === 'observed' ? '' : ' <span class="tag est">block estimated</span>';
+  }
+
+  const dist = r.routed_nm && r.routed_nm !== r.dist_nm
+    ? `${r.dist_nm.toLocaleString('en-GB')} nm<small class="hint"> · ${r.routed_nm.toLocaleString('en-GB')} routed</small>`
+    : `${r.dist_nm.toLocaleString('en-GB')} nm`;
+
+  const key = `${r.from}-${r.to}`;
+  const isOpen = state.open.has(key);
+  const toggle = r.obs
+    ? `<button class="toggle" data-open="${key}">${isOpen ? '−' : '+'} observed traffic</button>`
+    : '';
+
+  const main = `<tr>
+    <td class="dest">${esc(r.to)}<small>${esc(ap.city || ap.name || '')}${ap.country ? ' · ' + esc(ap.country) : ''}</small>${toggle}</td>
+    <td>${alts.map(esc).join(' / ')}</td>
+    <td class="num">${dist}</td>
+    <td class="num">${fmtDuration(r.block_min)}${blockTag}</td>
+    <td>${scenery}</td>
+    <td class="ops">${ops}${freq}${cargo}</td>
+  </tr>`;
+
+  return isOpen && r.obs ? main + detailHtml(r) : main;
+}
+
+function detailHtml(r) {
+  const o = r.obs;
+  const blocks = [];
+
+  const when = [];
+  if (o.time_bands.size) when.push(`<div class="chips">${[...o.time_bands].map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>`);
+  if (o.dow.size) {
+    const days = [...o.dow].sort((a, b) => a - b).map(dowLabel);
+    when.push(`<div class="chips">${days.map((d) => `<span class="chip">${esc(d)}</span>`).join('')}</div>`);
+  }
+  if (o.days_seen) when.push(`<div class="chips"><span class="chip">${o.days_seen} days observed</span></div>`);
+  if (o.cargo) when.push('<div class="chips"><span class="chip">cargo traffic</span></div>');
+  if (when.length) blocks.push(`<div class="detail-block"><h3>When</h3>${when.join('')}</div>`);
+
+  const seasonKeys = Object.keys(o.seasons).sort();
+  if (seasonKeys.length) {
+    const rows = seasonKeys.map((s) => {
+      const v = o.seasons[s] || {};
+      const span = v.first && v.last ? `${esc(v.first)} → ${esc(v.last)}` : '';
+      return `<span class="chip">${esc(s)}: ${v.days ?? 0} d ${span}</span>`;
+    }).join('');
+    blocks.push(`<div class="detail-block"><h3>Seasons</h3><div class="chips">${rows}</div></div>`);
+  }
+
+  if (o.regs.size) {
+    blocks.push(`<div class="detail-block"><h3>Registrations</h3><div class="chips">${
+      [...o.regs].sort().map((g) => `<span class="chip">${esc(g)}</span>`).join('')
+    }</div></div>`);
+  }
+
+  if (o.types.size) {
+    blocks.push(`<div class="detail-block"><h3>Observed on</h3><div class="chips">${
+      [...o.types].sort().map((t) => `<span class="chip">${esc(t)}</span>`).join('')
+    }</div></div>`);
+  }
+
+  if (o.flights.length) {
+    const rows = o.flights.slice(0, 40).map((f) => `<tr>
+      <td>${esc(f.airline || '')} ${esc(f.flight || '')}</td>
+      <td class="mono">${esc(f.std || '')}</td>
+      <td>${(f.dow || []).map(dowLabel).map(esc).join(' ')}</td>
+      <td class="mono">${f.days ?? ''}</td>
+      <td class="mono">${esc(f.first_seen || '')} → ${esc(f.last_seen || '')}</td>
+      <td>${esc(f.status || '')}</td>
+    </tr>`).join('');
+    const more = o.flights.length > 40 ? `<tr><td colspan="6" class="hint">… and ${o.flights.length - 40} more</td></tr>` : '';
+    blocks.push(`<div class="detail-block" style="flex:1"><h3>Flights</h3>
+      <table class="flights"><thead><tr>
+        <th>Flight</th><th>STD</th><th>Days</th><th>#</th><th>Seen</th><th>Status</th>
+      </tr></thead><tbody>${rows}${more}</tbody></table></div>`);
+  }
+
+  return `<tr class="detailrow"><td colspan="6"><div class="detail-grid">${blocks.join('')}</div></td></tr>`;
+}
+
+// For an empty result set, report how many options each single relaxation
+// would bring back, so the user gets a way out instead of a dead end.
+function relaxHints() {
+  const snapshot = { ac: state.ac, buckets: state.buckets, ownOnly: state.ownOnly, opsOnly: state.opsOnly, cargoOnly: state.cargoOnly, to: state.to };
+  const count = (mutate) => {
+    mutate();
+    const n = state.data.routes.filter((r) => matches(r)).length;
+    Object.assign(state, snapshot);
+    return n;
+  };
+  const tries = [];
+  if (state.ac.size) tries.push(['ac', 'without the aircraft filter', count(() => { state.ac = new Set(); })]);
+  if (state.buckets.size) tries.push(['bucket', 'without the flight-time filter', count(() => { state.buckets = new Set(); })]);
+  if (state.ownOnly) tries.push(['own', 'if scenery you do not own is allowed', count(() => { state.ownOnly = false; })]);
+  if (state.opsOnly) tries.push(['ops', 'without requiring observed traffic', count(() => { state.opsOnly = false; })]);
+  if (state.cargoOnly) tries.push(['cargo', 'if freighters may fly non-cargo routes', count(() => { state.cargoOnly = false; })]);
+  if (state.to) tries.push(['to', 'without the destination filter', count(() => { state.to = ''; })]);
+  Object.assign(state, snapshot);
+  const useful = tries.filter((t) => t[2] > 0);
+  if (!useful.length) return '<p>Try another departure airport.</p>';
+  return `<ul>${useful.map(([k, text, n]) => `<li><a data-relax="${k}">${text}</a> there are ${n} options.</li>`).join('')}</ul>`;
+}
+
+/* ---------- URL state ---------- */
+
+function toUrl() {
+  const p = new URLSearchParams();
+  if (state.from) p.set('from', state.from);
+  if (state.to) p.set('to', state.to);
+  if (state.ac.size) p.set('ac', [...state.ac].join(','));
+  if (state.buckets.size) p.set('dur', [...state.buckets].join(','));
+  if (state.ownOnly) p.set('own', '1');
+  if (state.opsOnly) p.set('ops', '1');
+  if (state.cargoOnly) p.set('frt', '1');
+  history.replaceState(null, '', `${location.pathname}?${p}`);
+}
+
+function fromUrl() {
+  const p = new URLSearchParams(location.search);
+  state.from = (p.get('from') || '').toUpperCase() || null;
+  state.to = (p.get('to') || '').toLowerCase();
+  state.ac = new Set((p.get('ac') || '').split(',').filter(Boolean).map((s) => s.toUpperCase()));
+  state.buckets = new Set((p.get('dur') || '').split(',').filter(Boolean));
+  state.ownOnly = p.get('own') === '1';
+  state.opsOnly = p.get('ops') === '1';
+  state.cargoOnly = p.get('frt') === '1';
+}
+
+function update() {
+  renderFacets();
+  renderResults();
+  toUrl();
+}
+
+/* ---------- boot ---------- */
+
+function disclaimerText(data) {
+  const base = 'Block times come from great-circle distance, a distance-dependent track factor and the cruise speed published in fleet.owned.';
+  if (data.detail_level === 'estimated') {
+    return `${base} No observed layer is attached yet: frequencies and operators stay empty until publish-find.mjs can read the ledger.`;
+  }
+  const extra = data.detail_mode === 'full'
+    ? 'Rows with observed traffic show the real flight numbers, time bands, weekdays and registrations from the ledger.'
+    : 'Rows with observed traffic show derived facts only: frequency band, time bands and operator names.';
+  return `${base} The ledger records no arrival time, so a block time stays an estimate; rows say "block estimated" where that applies. ${extra}`;
+}
+
+async function boot() {
+  let data;
+  try {
+    const res = await fetch('find.json', { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  } catch (err) {
+    el('meta').textContent = 'find.json not loaded';
+    el('results').innerHTML = `<div class="panel empty"><b>Could not load find.json.</b>
+      <p>Run <code>node scripts/publish-find.mjs</code> and commit <code>docs/find.json</code>.</p>
+      <p class="hint">${esc(err.message)}</p></div>`;
+    return;
+  }
+  state.data = data;
+
+  const origins = [...new Set(data.routes.map((r) => r.from))].sort();
+  fromUrl();
+  if (!state.from || !origins.includes(state.from)) state.from = origins.includes('EHAM') ? 'EHAM' : origins[0];
+
+  el('from').innerHTML = origins.map((code) => {
+    const ap = data.airports[code] || {};
+    return `<option value="${esc(code)}" ${code === state.from ? 'selected' : ''}>${esc(code)} — ${esc(ap.city || ap.name || '')}</option>`;
+  }).join('');
+  el('toFilter').value = state.to;
+  el('ownOnly').checked = state.ownOnly;
+  el('opsOnly').checked = state.opsOnly;
+  el('cargoOnly').checked = state.cargoOnly;
+
+  el('from').addEventListener('change', (e) => { state.from = e.target.value; state.open.clear(); update(); });
+  el('toFilter').addEventListener('input', (e) => { state.to = e.target.value.trim().toLowerCase(); update(); });
+  el('ownOnly').addEventListener('change', (e) => { state.ownOnly = e.target.checked; update(); });
+  el('opsOnly').addEventListener('change', (e) => { state.opsOnly = e.target.checked; update(); });
+  el('cargoOnly').addEventListener('change', (e) => { state.cargoOnly = e.target.checked; update(); });
+  el('search').addEventListener('click', update);
+  el('reset').addEventListener('click', () => {
+    state.ac.clear();
+    state.buckets.clear();
+    state.to = '';
+    el('toFilter').value = '';
+    state.ownOnly = false; el('ownOnly').checked = false;
+    state.opsOnly = false; el('opsOnly').checked = false;
+    state.cargoOnly = false; el('cargoOnly').checked = false;
+    state.open.clear();
+    update();
+  });
+
+  const c = data.counts || {};
+  const parts = [
+    `${Object.keys(data.airports).length} airports`,
+    c.fleet_types ? `${c.fleet_types} types` : null,
+    `${data.routes.length.toLocaleString('en-GB')} combinations`,
+    c.observed_rows ? `${c.observed_rows.toLocaleString('en-GB')} observed` : null,
+    `updated ${data.generated_on}`,
+  ].filter(Boolean);
+  el('meta').textContent = parts.join(' · ');
+  el('disclaimer').textContent = disclaimerText(data);
+
+  update();
+}
+
+boot();
+</script>
+</body>
+</html>

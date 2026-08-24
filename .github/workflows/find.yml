@@ -1,0 +1,55 @@
+name: RouteWatch find index
+
+# Deliberately a separate workflow from routewatch.yml: the finder only needs
+# committed config and metadata, never the Aero API, so it must not consume a
+# single unit from the budget in data/unit-budget.json.
+
+on:
+  schedule:
+    # 08:30 UTC, shortly after the main collection run has pushed its commit.
+    - cron: '30 8 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/collection.json'
+      - 'data/aircraft-meta.json'
+      - 'data/airports-meta.json'
+      - 'scripts/publish-find.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: routewatch-find
+  cancel-in-progress: false
+
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Report what the finder would publish
+        run: node scripts/publish-find.mjs --dry-run --verbose
+
+      - name: Build docs/find.json
+        run: node scripts/publish-find.mjs
+
+      - name: Commit docs/find.json when it changed
+        run: |
+          if git diff --quiet -- docs/find.json; then
+            echo "[find] docs/find.json unchanged, nothing to commit"
+            exit 0
+          fi
+          git config user.name "routewatch-bot"
+          git config user.email "routewatch-bot@users.noreply.github.com"
+          git add docs/find.json
+          git commit -m "RouteWatch find index $(date -u +%Y-%m-%d)"
+          git push
