@@ -630,5 +630,69 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-08-19"
+ },
+ "EGSS": {
+  "icao": "EGSS",
+  "iata": "STN",
+  "name": "London Stansted",
+  "country": "United Kingdom",
+  "tz": "Europe/London",
+  "elevation_ft": 348,
+  "runway_count": 2,
+  "longest_runway_ft": 10020,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-24"
+ },
+ "EDDP": {
+  "icao": "EDDP",
+  "iata": "LEJ",
+  "name": "Leipzig Halle",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 465,
+  "runway_count": 4,
+  "longest_runway_ft": 11785,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-24"
+ },
+ "OMDB": {
+  "icao": "OMDB",
+  "iata": "DXB",
+  "name": "Dubai",
+  "country": "United Arab Emirates",
+  "tz": "Asia/Dubai",
+  "elevation_ft": 62,
+  "runway_count": 4,
+  "longest_runway_ft": 14600,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-24"
+ },
+ "VHHH": {
+  "icao": "VHHH",
+  "iata": "HKG",
+  "name": "Hong Kong Chek Lap Kok",
+  "country": "Hong Kong",
+  "tz": "Asia/Shanghai",
+  "elevation_ft": 28,
+  "runway_count": 4,
+  "longest_runway_ft": 12467,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-08-24"
  }
 }

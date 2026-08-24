@@ -1,1 +1,42 @@
-{}
+{
+ "3V5TR": {
+  "2026-08-17_2026-08-23": {
+   "pair": "EDDF-EDDS",
+   "prio": 0,
+   "legs": 10,
+   "per_day": {
+    "2026-08-16": {
+     "type": "Boeing 737-800",
+     "reg": "OO-IWD"
+    },
+    "2026-08-18": {
+     "type": "Boeing 737-800",
+     "reg": "OE-IXW"
+    },
+    "2026-08-19": {
+     "type": "Boeing 737-800",
+     "reg": "OE-IXW"
+    },
+    "2026-08-20": {
+     "type": "Boeing 737-800",
+     "reg": "OE-IXW"
+    },
+    "2026-08-21": {
+     "type": "Boeing 737-400",
+     "reg": "OE-IBI"
+    },
+    "2026-08-23": {
+     "type": "Boeing 737-800",
+     "reg": "OE-IXA"
+    }
+   },
+   "type_count": {
+    "Boeing 737-800": 8,
+    "Boeing 737-400": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-08-24"
+  }
+ },
+ "A0461M": {}
+}

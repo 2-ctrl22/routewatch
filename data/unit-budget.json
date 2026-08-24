@@ -5,7 +5,13 @@
  "period_days": 31,
  "seeded_units": 260,
  "seeded_calls": 169,
- "runs": [],
+ "runs": [
+  {
+   "at": "2026-08-24",
+   "calls": 76,
+   "units": 122
+  }
+ ],
  "unit_limit": 600,
  "request_limit": 2400
 }

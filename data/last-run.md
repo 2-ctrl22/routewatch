@@ -1,58 +1,58 @@
-## RouteWatch 2026-08-19T10:34
+## RouteWatch 2026-08-24T08:05
 
 - season **S26** (2026-03-29 through 2026-10-24)
-- pairs with a connection: **233** of 465
-- with MATCH: **49** &middot; simmable: **191**
+- pairs with a connection: **255** of 666
+- with MATCH: **54** &middot; simmable: **209**
 - registrations known: **1165**
-- airlines named: **86** (86 new, 1 renamed, still unnamed: 5H 5O AAB ABR AM AP AR AWH DK EY FH GA)
-- new changes: **7936**
+- airlines named: **86** (0 new, 0 renamed, still unnamed: 5H 5O AAB ABR AM AP AR AWH DK EY FH GA)
+- new changes: **3021**
 
 ### Buy advice by network gain
 
-- **LIMC Milan Malpensa** (pax+cargo): +22 pairs, +5 with MATCH
-- **EGSS London Stansted** (cargo): +16 pairs, +5 with MATCH
-- **EGKK London Gatwick** (pax): +22 pairs, +4 with MATCH
-- **EDDM Munich** (pax): +25 pairs, +2 with MATCH
-- **EDDF Frankfurt** (pax): +23 pairs, +1 with MATCH
-- **EKCH Copenhagen Kastrup** (pax): +22 pairs, +1 with MATCH
+- **EGSS London Stansted** (cargo): +17 pairs, +5 with MATCH
+- **EGKK London Gatwick** (pax): +23 pairs, +4 with MATCH
+- **EDDM Munich** (pax): +26 pairs, +2 with MATCH
+- **EDDF Frankfurt** (pax): +24 pairs, +1 with MATCH
+- **EKCH Copenhagen Kastrup** (pax): +23 pairs, +1 with MATCH
+- **LEMD Madrid Barajas** (pax): +23 pairs, +1 with MATCH
 
-- `AIRLINE_RENAMED`  4Y  - {"from":"Flight Alaska","to":"Eurowings Discover"}
-- `ROUTE_NEW` EHAM-LGIR HV HV6875 - {"nm":1340,"types":["AIRBUS A321"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-LEBL KL KL1497 - {"from":[4],"to":[4,5]}
-- `ROUTE_NEW` EHAM-LPPR HV HV6003 - {"nm":861,"types":["BOEING 737"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-EKCH SK SK550 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LEMG HV HV6115 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LSGG KL KL1929 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LSZH LX LX737 - {"from":[4],"to":[4,5]}
-- `ROUTE_NEW` EHAM-LEZL U2 U27809 - {"nm":1000,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","candidate":false}
-- `MATCH_CHANGED` EHAM-ESSA KL KL1215 - {"from":"MATCH","to":"MATCH+NO-MATCH","types":["B738","AIRBUS A321 NEO"]}
-- `TYPE_NEW` EHAM-ESSA KL KL1215 - {"added":["AIRBUS A321 NEO"],"previously":["B738"]}
-- `TYPE_MIX_SHIFT` EHAM-ESSA KL KL1215 - {"type":"B738","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EHAM-ESSA KL KL1215 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LEMD KL KL1501 - {"from":[4],"to":[4,5]}
-- `TYPE_NEW` EHAM-ENGM KL KL1197 - {"added":["EMBRAER 190"],"previously":["E195"]}
-- `TYPE_MIX_SHIFT` EHAM-ENGM KL KL1197 - {"type":"E195","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EHAM-ENGM KL KL1197 - {"from":[4],"to":[4,5]}
-- `ROUTE_NEW` EHAM-LGKR U2 U27913 - {"nm":987,"types":["AIRBUS A320 NEO"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-LEBL VY VY8308 - {"from":[4],"to":[4,5]}
-- `ROUTE_NEW` EHAM-LGIR CD CD5257 - {"nm":1340,"types":["BOEING 737 MAX 9"],"status":"NO-MATCH","candidate":false}
-- `ROUTE_NEW` EHAM-LGIR HV HV5723 - {"nm":1340,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-EKCH KL KL1267 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LSZH KL KL1917 - {"from":[4],"to":[4,5]}
-- `MATCH_CHANGED` EGLL-EHAM BA BA445 - {"from":"MATCH","to":"MATCH+NO-MATCH","types":["A320","AIRBUS A320 (SHARKLETS)"]}
-- `TYPE_NEW` EGLL-EHAM BA BA445 - {"added":["AIRBUS A320 (SHARKLETS)"],"previously":["A320"]}
-- `TYPE_MIX_SHIFT` EGLL-EHAM BA BA445 - {"type":"A320","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EGLL-EHAM BA BA445 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LIRF KL KL1601 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EGLL-EHAM KL KL1001 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LFPG KL KL1403 - {"from":[4],"to":[4,5]}
-- `ROUTE_NEW` EHAM-LEZL HV HV6731 - {"nm":1000,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","candidate":false}
-- `TYPE_NEW` EHAM-LEMD IB IB740 - {"added":["AIRBUS A320 (SHARKLETS)"],"previously":["AIRBUS A320 NEO"]}
-- `TYPE_MIX_SHIFT` EHAM-LEMD IB IB740 - {"type":"AIRBUS A320 NEO","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EHAM-LEMD IB IB740 - {"from":[4],"to":[4,5]}
-- `TYPE_NEW` EHAM-LEMG U2 U27889 - {"added":["AIRBUS A321 (SHARKLETS)"],"previously":["AIRBUS A320 NEO"]}
-- `TYPE_MIX_SHIFT` EHAM-LEMG U2 U27889 - {"type":"AIRBUS A320 NEO","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EHAM-LEMG U2 U27889 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LFLL KL KL1427 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EDDS-EHAM KL KL1827 - {"from":[4],"to":[4,5]}
-- `DOW_PATTERN_CHANGE` EGPH-EHAM KL KL923 - {"from":[4],"to":[4,5]}
+- `SEASON_NEW` EHAM-LEMG HV HV6115 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LSZH LX LX737 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LSGG KL KL1929 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LFPG KL KL1401 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-ESSA KL KL1215 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-EKCH SK SK550 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EBBR-EHAM KL KL1701 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEBL KL KL1497 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LGIR HV HV6871 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-EKCH KL KL1267 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEMD KL KL1501 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGKK-EHAM U2 U28671 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-ENGM KL KL1197 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-EPWA LO LO270 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LSZH KL KL1917 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGLL-EHAM KL KL1001 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EDDM-EHAM KL KL1849 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEMG U2 U27889 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEMD IB IB740 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LFPG KL KL1403 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LIRF KL KL1601 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEMG HV HV6113 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LGKR OR OR1115 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LFLL KL KL1427 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LPPR HV HV6007 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EBBR-EHAM KL KL9857 - {"observed":"2026-08-13 through 2026-08-13","days":2,"counter_season":"W26/27"}
+- `SEASON_NEW` EDDS-EHAM KL KL1827 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EDDF-EHAM LH LH1003 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EDDM-EHAM LH LH2311 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGPH-EHAM KL KL923 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGBB-EHAM KL KL1041 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LEBL KL KL1511 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LFPG KL KL1405 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EDDF-EHAM KL KL1815 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LGAV KL KL1953 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGLL-EHAM KL KL1003 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EGKK-EHAM U2 U28673 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EBBR-EHAM KL KL1703 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-LPPR KL KL1571 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
+- `SEASON_NEW` EHAM-EKCH KL KL1269 - {"observed":"2026-08-13 through 2026-08-14","days":3,"counter_season":"W26/27"}
