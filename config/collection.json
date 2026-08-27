@@ -22,70 +22,645 @@
   },
   "fleet": {
     "owned": [
-      {"key": "B738", "name": "Boeing 737-800 (NG, winglets)", "role": "pax", "range_nm": 2900, "types": ["B738", "B73H"]},
-      {"key": "B738F", "name": "Boeing 737-800BCF / -800SF", "role": "cargo", "range_nm": 1900, "types": ["B738F", "B73Y"]},
-      {"key": "A320", "name": "Airbus A320 / A320neo", "role": "pax", "range_nm": 3000, "types": ["A320", "A20N"]},
-      {"key": "A350", "name": "Airbus A350-900 / -1000", "role": "pax", "range_nm": 8500, "types": ["A359", "A35K"]},
-      {"key": "B77F", "name": "Boeing 777F", "role": "cargo", "range_nm": 8000, "types": ["B77L", "B77F"]}
+      {
+        "key": "B738",
+        "name": "Boeing 737-800 (NG, winglets)",
+        "role": "pax",
+        "range_nm": 2900,
+        "types": [
+          "B738",
+          "B73H"
+        ]
+      },
+      {
+        "key": "B738F",
+        "name": "Boeing 737-800BCF / -800SF",
+        "role": "cargo",
+        "range_nm": 1900,
+        "types": [
+          "B738F",
+          "B73Y"
+        ]
+      },
+      {
+        "key": "A320",
+        "name": "Airbus A320 / A320neo",
+        "role": "pax",
+        "range_nm": 3000,
+        "types": [
+          "A320",
+          "A20N"
+        ]
+      },
+      {
+        "key": "A350",
+        "name": "Airbus A350-900 / -1000",
+        "role": "pax",
+        "range_nm": 8500,
+        "types": [
+          "A359",
+          "A35K"
+        ]
+      },
+      {
+        "key": "B77F",
+        "name": "Boeing 777F",
+        "role": "cargo",
+        "range_nm": 8000,
+        "types": [
+          "B77L",
+          "B77F"
+        ]
+      }
     ],
     "near_match": {
-      "B38M": {"substitute": "B738", "concession": "737 MAX 8: LEAP engines, 197 vs 189 seats, about 8% more efficient"},
-      "B38X": {"substitute": "B738", "concession": "737 MAX 8-200 (Ryanair), 197 seats"},
-      "B737": {"substitute": "B738", "concession": "737-700: shorter and lighter, climbs faster"},
-      "A21N": {"substitute": "A320", "concession": "A321neo: 7 m longer, higher MTOW"},
-      "A319": {"substitute": "A320", "concession": "A319: 3.7 m shorter, negligible difference"},
-      "A321": {"substitute": "A320", "concession": "A321ceo: longer, heavier, older engines"},
-      "A332": {"substitute": "A350", "concession": "A330-200 instead of an A350"},
-      "A333": {"substitute": "A350", "concession": "A330-300 instead of an A350"},
-      "B734F": {"substitute": "B738F", "concession": "737-400F: one generation older, about 4 tonnes less payload"}
+      "B38M": {
+        "substitute": "B738",
+        "concession": "737 MAX 8: LEAP engines, 197 vs 189 seats, about 8% more efficient"
+      },
+      "B38X": {
+        "substitute": "B738",
+        "concession": "737 MAX 8-200 (Ryanair), 197 seats"
+      },
+      "B737": {
+        "substitute": "B738",
+        "concession": "737-700: shorter and lighter, climbs faster"
+      },
+      "A21N": {
+        "substitute": "A320",
+        "concession": "A321neo: 7 m longer, higher MTOW"
+      },
+      "A319": {
+        "substitute": "A320",
+        "concession": "A319: 3.7 m shorter, negligible difference"
+      },
+      "A321": {
+        "substitute": "A320",
+        "concession": "A321ceo: longer, heavier, older engines"
+      },
+      "A332": {
+        "substitute": "A350",
+        "concession": "A330-200 instead of an A350"
+      },
+      "A333": {
+        "substitute": "A350",
+        "concession": "A330-300 instead of an A350"
+      },
+      "B734F": {
+        "substitute": "B738F",
+        "concession": "737-400F: one generation older, about 4 tonnes less payload"
+      }
     }
   },
   "airports": [
-    {"icao": "EHAM", "iata": "AMS", "name": "Amsterdam Schiphol", "country": "NL", "lat": 52.3086, "lon": 4.7639, "night": "night slot required 23:00-07:00", "narrowbody_allowed": true},
-    {"icao": "EBBR", "iata": "BRU", "name": "Brussels Airport", "country": "BE", "lat": 50.9014, "lon": 4.4844, "night": "night 23:00-05:59; 16,000 night slots per year; quiet weekend nights", "narrowbody_allowed": true},
-    {"icao": "EDDS", "iata": "STR", "name": "Stuttgart", "country": "DE", "lat": 48.6899, "lon": 9.222, "narrowbody_allowed": true},
-    {"icao": "EDDK", "iata": "CGN", "name": "Cologne/Bonn", "country": "DE", "lat": 50.8659, "lon": 7.1427, "night": "24 hours; passenger ban 00:00-05:00, CARGO EXEMPT", "narrowbody_allowed": true},
-    {"icao": "EDLV", "iata": "NRN", "name": "Weeze", "country": "DE", "lat": 51.6024, "lon": 6.1422, "narrowbody_allowed": true},
-    {"icao": "LFLL", "iata": "LYS", "name": "Lyon-Saint Exupery", "country": "FR", "lat": 45.7256, "lon": 5.0811, "narrowbody_allowed": true},
-    {"icao": "LFRB", "iata": "BES", "name": "Brest Bretagne", "country": "FR", "lat": 48.4479, "lon": -4.4185, "narrowbody_allowed": true},
-    {"icao": "LFBD", "iata": "BOD", "name": "Bordeaux-Merignac", "country": "FR", "lat": 44.8283, "lon": -0.7156, "narrowbody_allowed": true},
-    {"icao": "LFBZ", "iata": "BIQ", "name": "Biarritz", "country": "FR", "lat": 43.4684, "lon": -1.5233, "narrowbody_allowed": true},
-    {"icao": "EGLL", "iata": "LHR", "name": "London Heathrow", "country": "GB", "lat": 51.4706, "lon": -0.4619, "night": "night quota - still to be verified", "narrowbody_allowed": true},
-    {"icao": "EGBB", "iata": "BHX", "name": "Birmingham", "country": "GB", "lat": 52.4539, "lon": -1.748, "narrowbody_allowed": true},
-    {"icao": "EGPH", "iata": "EDI", "name": "Edinburgh", "country": "GB", "lat": 55.95, "lon": -3.3725, "narrowbody_allowed": true},
-    {"icao": "LSZH", "iata": "ZRH", "name": "Zurich", "country": "CH", "lat": 47.4647, "lon": 8.5492, "night": "06:00-23:30; scheduled departures not after 23:00", "narrowbody_allowed": true},
-    {"icao": "LSGG", "iata": "GVA", "name": "Geneva", "country": "CH", "lat": 46.2381, "lon": 6.109, "narrowbody_allowed": true},
-    {"icao": "LOWI", "iata": "INN", "name": "Innsbruck", "country": "AT", "lat": 47.2602, "lon": 11.3439, "night": "06:30-20:00 local; jet departures after 20:00 in principle not allowed", "narrowbody_allowed": true},
-    {"icao": "LEBL", "iata": "BCN", "name": "Barcelona", "country": "ES", "lat": 41.2971, "lon": 2.0785, "narrowbody_allowed": true},
-    {"icao": "LEMG", "iata": "AGP", "name": "Malaga", "country": "ES", "lat": 36.6749, "lon": -4.4991, "narrowbody_allowed": true},
-    {"icao": "LEZL", "iata": "SVQ", "name": "Seville", "country": "ES", "lat": 37.418, "lon": -5.8931, "narrowbody_allowed": true},
-    {"icao": "LPPR", "iata": "OPO", "name": "Porto", "country": "PT", "lat": 41.2481, "lon": -8.6814, "narrowbody_allowed": true},
-    {"icao": "LIRF", "iata": "FCO", "name": "Rome Fiumicino", "country": "IT", "lat": 41.8003, "lon": 12.2389, "narrowbody_allowed": true},
-    {"icao": "LGAV", "iata": "ATH", "name": "Athens", "country": "GR", "lat": 37.9364, "lon": 23.9445, "narrowbody_allowed": true},
-    {"icao": "LGKR", "iata": "CFU", "name": "Corfu", "country": "GR", "lat": 39.6019, "lon": 19.9117, "narrowbody_allowed": true},
-    {"icao": "LGIR", "iata": "HER", "name": "Heraklion", "country": "GR", "lat": 35.3397, "lon": 25.1803, "narrowbody_allowed": true},
-    {"icao": "ENGM", "iata": "OSL", "name": "Oslo Gardermoen", "country": "NO", "lat": 60.1939, "lon": 11.1004, "narrowbody_allowed": true},
-    {"icao": "ESSA", "iata": "ARN", "name": "Stockholm Arlanda", "country": "SE", "lat": 59.6519, "lon": 17.9186, "narrowbody_allowed": true},
-    {"icao": "EFHK", "iata": "HEL", "name": "Helsinki-Vantaa", "country": "FI", "lat": 60.3172, "lon": 24.9633, "narrowbody_allowed": true},
-    {"icao": "EPWA", "iata": "WAW", "name": "Warsaw Chopin", "country": "PL", "lat": 52.1657, "lon": 20.9671, "narrowbody_allowed": true},
-    {"icao": "OTHH", "iata": "DOH", "name": "Doha Hamad", "country": "QA", "lat": 25.2731, "lon": 51.6081, "narrowbody_allowed": false},
-    {"icao": "FACT", "iata": "CPT", "name": "Cape Town", "country": "ZA", "lat": -33.9648, "lon": 18.6017, "narrowbody_allowed": false},
-    {"icao": "NZAA", "iata": "AKL", "name": "Auckland Intl", "country": "NZ", "lat": -37.0082, "lon": 174.785, "narrowbody_allowed": false},
-    {"icao": "KSFO", "iata": "SFO", "name": "San Francisco", "country": "US", "lat": 37.6189, "lon": -122.375, "narrowbody_allowed": false},
-    {"icao": "EKCH", "iata": "CPH", "name": "Copenhagen Kastrup", "country": "DK", "lat": 55.6181, "lon": 12.6561, "candidate": true, "focus": "pax", "why": "Busiest pair from ENGM, ESSA, EFHK and EPWA; plus SAS to KSFO and Qatar Airways to OTHH. Unlocks two long-haul islands in a single purchase.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CPH+Copenhagen", "simmarket": "https://secure.simmarket.com/?s=CPH", "contrail": "https://contrail.co.uk/?s=CPH", "orbx": "https://orbxdirect.com/search?q=CPH", "inibuilds": "https://www.inibuilds.com/search?q=CPH", "aerosoft": "https://www.aerosoft.com/en/search?q=CPH", "justflight": "https://www.justflight.com/searchresults?searchterm=CPH"}, "known_developers": ["SimNord - MSFS 2020 and 2024, released August 2025", "FlyTampa"]},
-    {"icao": "EDDF", "iata": "FRA", "name": "Frankfurt", "country": "DE", "lat": 50.0333, "lon": 8.5706, "candidate": true, "focus": "pax", "why": "Top-5 destination from all four Nordic airports; Lufthansa to KSFO and the new FRA-CPT flight; fills the gap next to EDDS, EDDK and EDLV.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=FRA+Frankfurt", "simmarket": "https://secure.simmarket.com/?s=FRA", "contrail": "https://contrail.co.uk/?s=FRA", "orbx": "https://orbxdirect.com/search?q=FRA", "inibuilds": "https://www.inibuilds.com/search?q=FRA", "aerosoft": "https://www.aerosoft.com/en/search?q=FRA", "justflight": "https://www.justflight.com/searchresults?searchterm=FRA"}},
-    {"icao": "EDDM", "iata": "MUC", "name": "Munich", "country": "DE", "lat": 48.3538, "lon": 11.7861, "candidate": true, "focus": "pax", "why": "Strong from the Nordics; Allegris A350 to Cape Town.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MUC+Munich", "simmarket": "https://secure.simmarket.com/?s=MUC", "contrail": "https://contrail.co.uk/?s=MUC", "orbx": "https://orbxdirect.com/search?q=MUC", "inibuilds": "https://www.inibuilds.com/search?q=MUC", "aerosoft": "https://www.aerosoft.com/en/search?q=MUC", "justflight": "https://www.justflight.com/searchresults?searchterm=MUC"}},
-    {"icao": "LEMD", "iata": "MAD", "name": "Madrid Barajas", "country": "ES", "lat": 40.4719, "lon": -3.5626, "candidate": true, "focus": "pax", "why": "Completes the Iberian cluster; Iberia to KSFO; Qatar Airways 18-21 weekly to OTHH; also a Qatar Airways Cargo station.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MAD+Madrid", "simmarket": "https://secure.simmarket.com/?s=MAD", "contrail": "https://contrail.co.uk/?s=MAD", "orbx": "https://orbxdirect.com/search?q=MAD", "inibuilds": "https://www.inibuilds.com/search?q=MAD", "aerosoft": "https://www.aerosoft.com/en/search?q=MAD", "justflight": "https://www.justflight.com/searchresults?searchterm=MAD"}},
-    {"icao": "LIMC", "iata": "MXP", "name": "Milan Malpensa", "country": "IT", "lat": 45.6306, "lon": 8.7281, "focus": "pax+cargo", "why": "Second Italian airport next to LIRF; Qatar Airways 18 weekly; Qatar Airways Cargo via STN-MXP; FedEx BOM-MXP-MEM.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MXP+Milan", "simmarket": "https://secure.simmarket.com/?s=MXP", "contrail": "https://contrail.co.uk/?s=MXP", "orbx": "https://orbxdirect.com/search?q=MXP", "inibuilds": "https://www.inibuilds.com/search?q=MXP", "aerosoft": "https://www.aerosoft.com/en/search?q=MXP", "justflight": "https://www.justflight.com/searchresults?searchterm=MXP"}},
-    {"icao": "EGKK", "iata": "LGW", "name": "London Gatwick", "country": "GB", "lat": 51.1481, "lon": -0.1903, "candidate": true, "focus": "pax", "why": "The missing London link for LFBD, LFBZ, LEZL, LPPR and LGKR: they do have London traffic, just not to EGLL.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGW+London", "simmarket": "https://secure.simmarket.com/?s=LGW", "contrail": "https://contrail.co.uk/?s=LGW", "orbx": "https://orbxdirect.com/search?q=LGW", "inibuilds": "https://www.inibuilds.com/search?q=LGW", "aerosoft": "https://www.aerosoft.com/en/search?q=LGW", "justflight": "https://www.justflight.com/searchresults?searchterm=LGW"}},
-    {"icao": "EBLG", "iata": "LGG", "name": "Liege", "country": "BE", "lat": 50.6374, "lon": 5.4432, "candidate": true, "focus": "cargo", "why": "CARGO number 1: home base of ASL Airlines Belgium with 24 Boeing 737-800BCFs, plus a Qatar Airways Cargo station. Unlocks your entire B7 block, which currently has zero pairs.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGG+Liege", "simmarket": "https://secure.simmarket.com/?s=LGG", "contrail": "https://contrail.co.uk/?s=LGG", "orbx": "https://orbxdirect.com/search?q=LGG", "inibuilds": "https://www.inibuilds.com/search?q=LGG", "aerosoft": "https://www.aerosoft.com/en/search?q=LGG", "justflight": "https://www.justflight.com/searchresults?searchterm=LGG"}, "night": "24-hour cargo hub"},
-    {"icao": "LFPG", "iata": "CDG", "name": "Paris Charles de Gaulle", "country": "FR", "lat": 49.0097, "lon": 2.5479, "candidate": true, "focus": "cargo", "why": "CARGO number 2: base of ASL Airlines France and West Atlantic, the largest FedEx hub in Europe, and a Qatar Airways Cargo station. Makes CDG-ATH and OPO-CDG flyable with the 737-800BCF.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CDG+Paris", "simmarket": "https://secure.simmarket.com/?s=CDG", "contrail": "https://contrail.co.uk/?s=CDG", "orbx": "https://orbxdirect.com/search?q=CDG", "inibuilds": "https://www.inibuilds.com/search?q=CDG", "aerosoft": "https://www.aerosoft.com/en/search?q=CDG", "justflight": "https://www.justflight.com/searchresults?searchterm=CDG"}},
-    {"icao": "EGSS", "iata": "STN", "name": "London Stansted", "country": "GB", "lat": 51.885, "lon": 0.235, "candidate": true, "focus": "cargo", "why": "CARGO: Qatar Airways Cargo 777F on STN-BRU and STN-MXP. Immediately adds two new 777F pairs with EBBR.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=STN+London", "simmarket": "https://secure.simmarket.com/?s=STN", "contrail": "https://contrail.co.uk/?s=STN", "orbx": "https://orbxdirect.com/search?q=STN", "inibuilds": "https://www.inibuilds.com/search?q=STN", "aerosoft": "https://www.aerosoft.com/en/search?q=STN", "justflight": "https://www.justflight.com/searchresults?searchterm=STN"}},
-    {"icao": "EDDP", "iata": "LEJ", "name": "Leipzig/Halle", "country": "DE", "lat": 51.4239, "lon": 12.2364, "candidate": true, "focus": "cargo", "why": "CARGO: DHL hub; EAT Leipzig and Star Air, which you already came across at LFBD.", "price_search": {"fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LEJ+Leipzig/Halle", "simmarket": "https://secure.simmarket.com/?s=LEJ", "contrail": "https://contrail.co.uk/?s=LEJ", "orbx": "https://orbxdirect.com/search?q=LEJ", "inibuilds": "https://www.inibuilds.com/search?q=LEJ", "aerosoft": "https://www.aerosoft.com/en/search?q=LEJ", "justflight": "https://www.justflight.com/searchresults?searchterm=LEJ"}},
-    {"icao": "OMDB", "iata": "DXB", "name": "Dubai International", "country": "AE", "lat": 25.2528, "lon": 55.3644, "narrowbody_allowed": true},
-    {"icao": "VHHH", "iata": "HKG", "name": "Hong Kong International", "country": "HK", "lat": 22.3089, "lon": 113.9146, "narrowbody_allowed": true},
-    {"icao": "VTBS", "iata": "BKK", "name": "Bangkok Suvarnabhumi", "country": "TH", "lat": 13.6811, "lon": 100.7477, "narrowbody_allowed": true},
-    {"icao": "ZSPD", "iata": "PVG", "name": "Shanghai Pudong", "country": "CN", "lat": 31.1434, "lon": 121.8052, "narrowbody_allowed": true},
-    {"icao": "WSSS", "iata": "SIN", "name": "Singapore Changi", "country": "SG", "lat": 1.3502, "lon": 103.9944, "narrowbody_allowed": true}
+    {
+      "icao": "EHAM",
+      "iata": "AMS",
+      "name": "Amsterdam Schiphol",
+      "country": "NL",
+      "lat": 52.3086,
+      "lon": 4.7639,
+      "night": "night slot required 23:00-07:00",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EBBR",
+      "iata": "BRU",
+      "name": "Brussels Airport",
+      "country": "BE",
+      "lat": 50.9014,
+      "lon": 4.4844,
+      "night": "night 23:00-05:59; 16,000 night slots per year; quiet weekend nights",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EDDS",
+      "iata": "STR",
+      "name": "Stuttgart",
+      "country": "DE",
+      "lat": 48.6899,
+      "lon": 9.222,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EDDK",
+      "iata": "CGN",
+      "name": "Cologne/Bonn",
+      "country": "DE",
+      "lat": 50.8659,
+      "lon": 7.1427,
+      "night": "24 hours; passenger ban 00:00-05:00, CARGO EXEMPT",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EDLV",
+      "iata": "NRN",
+      "name": "Weeze",
+      "country": "DE",
+      "lat": 51.6024,
+      "lon": 6.1422,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LFLL",
+      "iata": "LYS",
+      "name": "Lyon-Saint Exupery",
+      "country": "FR",
+      "lat": 45.7256,
+      "lon": 5.0811,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LFRB",
+      "iata": "BES",
+      "name": "Brest Bretagne",
+      "country": "FR",
+      "lat": 48.4479,
+      "lon": -4.4185,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LFBD",
+      "iata": "BOD",
+      "name": "Bordeaux-Merignac",
+      "country": "FR",
+      "lat": 44.8283,
+      "lon": -0.7156,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LFBZ",
+      "iata": "BIQ",
+      "name": "Biarritz",
+      "country": "FR",
+      "lat": 43.4684,
+      "lon": -1.5233,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EGLL",
+      "iata": "LHR",
+      "name": "London Heathrow",
+      "country": "GB",
+      "lat": 51.4706,
+      "lon": -0.4619,
+      "night": "night quota - still to be verified",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EGBB",
+      "iata": "BHX",
+      "name": "Birmingham",
+      "country": "GB",
+      "lat": 52.4539,
+      "lon": -1.748,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EGPH",
+      "iata": "EDI",
+      "name": "Edinburgh",
+      "country": "GB",
+      "lat": 55.95,
+      "lon": -3.3725,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LSZH",
+      "iata": "ZRH",
+      "name": "Zurich",
+      "country": "CH",
+      "lat": 47.4647,
+      "lon": 8.5492,
+      "night": "06:00-23:30; scheduled departures not after 23:00",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LSGG",
+      "iata": "GVA",
+      "name": "Geneva",
+      "country": "CH",
+      "lat": 46.2381,
+      "lon": 6.109,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LOWI",
+      "iata": "INN",
+      "name": "Innsbruck",
+      "country": "AT",
+      "lat": 47.2602,
+      "lon": 11.3439,
+      "night": "06:30-20:00 local; jet departures after 20:00 in principle not allowed",
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LEBL",
+      "iata": "BCN",
+      "name": "Barcelona",
+      "country": "ES",
+      "lat": 41.2971,
+      "lon": 2.0785,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LEMG",
+      "iata": "AGP",
+      "name": "Malaga",
+      "country": "ES",
+      "lat": 36.6749,
+      "lon": -4.4991,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LEZL",
+      "iata": "SVQ",
+      "name": "Seville",
+      "country": "ES",
+      "lat": 37.418,
+      "lon": -5.8931,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LPPR",
+      "iata": "OPO",
+      "name": "Porto",
+      "country": "PT",
+      "lat": 41.2481,
+      "lon": -8.6814,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LIRF",
+      "iata": "FCO",
+      "name": "Rome Fiumicino",
+      "country": "IT",
+      "lat": 41.8003,
+      "lon": 12.2389,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGAV",
+      "iata": "ATH",
+      "name": "Athens",
+      "country": "GR",
+      "lat": 37.9364,
+      "lon": 23.9445,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGKR",
+      "iata": "CFU",
+      "name": "Corfu",
+      "country": "GR",
+      "lat": 39.6019,
+      "lon": 19.9117,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGIR",
+      "iata": "HER",
+      "name": "Heraklion",
+      "country": "GR",
+      "lat": 35.3397,
+      "lon": 25.1803,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "ENGM",
+      "iata": "OSL",
+      "name": "Oslo Gardermoen",
+      "country": "NO",
+      "lat": 60.1939,
+      "lon": 11.1004,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "ESSA",
+      "iata": "ARN",
+      "name": "Stockholm Arlanda",
+      "country": "SE",
+      "lat": 59.6519,
+      "lon": 17.9186,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EFHK",
+      "iata": "HEL",
+      "name": "Helsinki-Vantaa",
+      "country": "FI",
+      "lat": 60.3172,
+      "lon": 24.9633,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EPWA",
+      "iata": "WAW",
+      "name": "Warsaw Chopin",
+      "country": "PL",
+      "lat": 52.1657,
+      "lon": 20.9671,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "OTHH",
+      "iata": "DOH",
+      "name": "Doha Hamad",
+      "country": "QA",
+      "lat": 25.2731,
+      "lon": 51.6081,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "FACT",
+      "iata": "CPT",
+      "name": "Cape Town",
+      "country": "ZA",
+      "lat": -33.9648,
+      "lon": 18.6017,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "NZAA",
+      "iata": "AKL",
+      "name": "Auckland Intl",
+      "country": "NZ",
+      "lat": -37.0082,
+      "lon": 174.785,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "KSFO",
+      "iata": "SFO",
+      "name": "San Francisco",
+      "country": "US",
+      "lat": 37.6189,
+      "lon": -122.375,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "EKCH",
+      "iata": "CPH",
+      "name": "Copenhagen Kastrup",
+      "country": "DK",
+      "lat": 55.6181,
+      "lon": 12.6561,
+      "candidate": true,
+      "focus": "pax",
+      "why": "Busiest pair from ENGM, ESSA, EFHK and EPWA; plus SAS to KSFO and Qatar Airways to OTHH. Unlocks two long-haul islands in a single purchase.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CPH+Copenhagen",
+        "simmarket": "https://secure.simmarket.com/?s=CPH",
+        "contrail": "https://contrail.co.uk/?s=CPH",
+        "orbx": "https://orbxdirect.com/search?q=CPH",
+        "inibuilds": "https://www.inibuilds.com/search?q=CPH",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=CPH",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=CPH"
+      },
+      "known_developers": [
+        "SimNord - MSFS 2020 and 2024, released August 2025",
+        "FlyTampa"
+      ]
+    },
+    {
+      "icao": "EDDF",
+      "iata": "FRA",
+      "name": "Frankfurt",
+      "country": "DE",
+      "lat": 50.0333,
+      "lon": 8.5706,
+      "candidate": false,
+      "focus": "pax",
+      "why": "Top-5 destination from all four Nordic airports; Lufthansa to KSFO and the new FRA-CPT flight; fills the gap next to EDDS, EDDK and EDLV.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=FRA+Frankfurt",
+        "simmarket": "https://secure.simmarket.com/?s=FRA",
+        "contrail": "https://contrail.co.uk/?s=FRA",
+        "orbx": "https://orbxdirect.com/search?q=FRA",
+        "inibuilds": "https://www.inibuilds.com/search?q=FRA",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=FRA",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=FRA"
+      }
+    },
+    {
+      "icao": "EDDM",
+      "iata": "MUC",
+      "name": "Munich",
+      "country": "DE",
+      "lat": 48.3538,
+      "lon": 11.7861,
+      "candidate": true,
+      "focus": "pax",
+      "why": "Strong from the Nordics; Allegris A350 to Cape Town.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MUC+Munich",
+        "simmarket": "https://secure.simmarket.com/?s=MUC",
+        "contrail": "https://contrail.co.uk/?s=MUC",
+        "orbx": "https://orbxdirect.com/search?q=MUC",
+        "inibuilds": "https://www.inibuilds.com/search?q=MUC",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=MUC",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=MUC"
+      }
+    },
+    {
+      "icao": "LEMD",
+      "iata": "MAD",
+      "name": "Madrid Barajas",
+      "country": "ES",
+      "lat": 40.4719,
+      "lon": -3.5626,
+      "candidate": true,
+      "focus": "pax",
+      "why": "Completes the Iberian cluster; Iberia to KSFO; Qatar Airways 18-21 weekly to OTHH; also a Qatar Airways Cargo station.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MAD+Madrid",
+        "simmarket": "https://secure.simmarket.com/?s=MAD",
+        "contrail": "https://contrail.co.uk/?s=MAD",
+        "orbx": "https://orbxdirect.com/search?q=MAD",
+        "inibuilds": "https://www.inibuilds.com/search?q=MAD",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=MAD",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=MAD"
+      }
+    },
+    {
+      "icao": "LIMC",
+      "iata": "MXP",
+      "name": "Milan Malpensa",
+      "country": "IT",
+      "lat": 45.6306,
+      "lon": 8.7281,
+      "focus": "pax+cargo",
+      "why": "Second Italian airport next to LIRF; Qatar Airways 18 weekly; Qatar Airways Cargo via STN-MXP; FedEx BOM-MXP-MEM.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MXP+Milan",
+        "simmarket": "https://secure.simmarket.com/?s=MXP",
+        "contrail": "https://contrail.co.uk/?s=MXP",
+        "orbx": "https://orbxdirect.com/search?q=MXP",
+        "inibuilds": "https://www.inibuilds.com/search?q=MXP",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=MXP",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=MXP"
+      }
+    },
+    {
+      "icao": "EGKK",
+      "iata": "LGW",
+      "name": "London Gatwick",
+      "country": "GB",
+      "lat": 51.1481,
+      "lon": -0.1903,
+      "candidate": true,
+      "focus": "pax",
+      "why": "The missing London link for LFBD, LFBZ, LEZL, LPPR and LGKR: they do have London traffic, just not to EGLL.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGW+London",
+        "simmarket": "https://secure.simmarket.com/?s=LGW",
+        "contrail": "https://contrail.co.uk/?s=LGW",
+        "orbx": "https://orbxdirect.com/search?q=LGW",
+        "inibuilds": "https://www.inibuilds.com/search?q=LGW",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=LGW",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=LGW"
+      }
+    },
+    {
+      "icao": "EBLG",
+      "iata": "LGG",
+      "name": "Liege",
+      "country": "BE",
+      "lat": 50.6374,
+      "lon": 5.4432,
+      "candidate": true,
+      "focus": "cargo",
+      "why": "CARGO number 1: home base of ASL Airlines Belgium with 24 Boeing 737-800BCFs, plus a Qatar Airways Cargo station. Unlocks your entire B7 block, which currently has zero pairs.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LGG+Liege",
+        "simmarket": "https://secure.simmarket.com/?s=LGG",
+        "contrail": "https://contrail.co.uk/?s=LGG",
+        "orbx": "https://orbxdirect.com/search?q=LGG",
+        "inibuilds": "https://www.inibuilds.com/search?q=LGG",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=LGG",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=LGG"
+      },
+      "night": "24-hour cargo hub"
+    },
+    {
+      "icao": "LFPG",
+      "iata": "CDG",
+      "name": "Paris Charles de Gaulle",
+      "country": "FR",
+      "lat": 49.0097,
+      "lon": 2.5479,
+      "candidate": true,
+      "focus": "cargo",
+      "why": "CARGO number 2: base of ASL Airlines France and West Atlantic, the largest FedEx hub in Europe, and a Qatar Airways Cargo station. Makes CDG-ATH and OPO-CDG flyable with the 737-800BCF.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CDG+Paris",
+        "simmarket": "https://secure.simmarket.com/?s=CDG",
+        "contrail": "https://contrail.co.uk/?s=CDG",
+        "orbx": "https://orbxdirect.com/search?q=CDG",
+        "inibuilds": "https://www.inibuilds.com/search?q=CDG",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=CDG",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=CDG"
+      }
+    },
+    {
+      "icao": "EGSS",
+      "iata": "STN",
+      "name": "London Stansted",
+      "country": "GB",
+      "lat": 51.885,
+      "lon": 0.235,
+      "candidate": true,
+      "focus": "cargo",
+      "why": "CARGO: Qatar Airways Cargo 777F on STN-BRU and STN-MXP. Immediately adds two new 777F pairs with EBBR.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=STN+London",
+        "simmarket": "https://secure.simmarket.com/?s=STN",
+        "contrail": "https://contrail.co.uk/?s=STN",
+        "orbx": "https://orbxdirect.com/search?q=STN",
+        "inibuilds": "https://www.inibuilds.com/search?q=STN",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=STN",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=STN"
+      }
+    },
+    {
+      "icao": "EDDP",
+      "iata": "LEJ",
+      "name": "Leipzig/Halle",
+      "country": "DE",
+      "lat": 51.4239,
+      "lon": 12.2364,
+      "candidate": true,
+      "focus": "cargo",
+      "why": "CARGO: DHL hub; EAT Leipzig and Star Air, which you already came across at LFBD.",
+      "price_search": {
+        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=LEJ+Leipzig/Halle",
+        "simmarket": "https://secure.simmarket.com/?s=LEJ",
+        "contrail": "https://contrail.co.uk/?s=LEJ",
+        "orbx": "https://orbxdirect.com/search?q=LEJ",
+        "inibuilds": "https://www.inibuilds.com/search?q=LEJ",
+        "aerosoft": "https://www.aerosoft.com/en/search?q=LEJ",
+        "justflight": "https://www.justflight.com/searchresults?searchterm=LEJ"
+      }
+    },
+    {
+      "icao": "OMDB",
+      "iata": "DXB",
+      "name": "Dubai International",
+      "country": "AE",
+      "lat": 25.2528,
+      "lon": 55.3644,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "VHHH",
+      "iata": "HKG",
+      "name": "Hong Kong International",
+      "country": "HK",
+      "lat": 22.3089,
+      "lon": 113.9146,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "VTBS",
+      "iata": "BKK",
+      "name": "Bangkok Suvarnabhumi",
+      "country": "TH",
+      "lat": 13.6811,
+      "lon": 100.7477,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "ZSPD",
+      "iata": "PVG",
+      "name": "Shanghai Pudong",
+      "country": "CN",
+      "lat": 31.1434,
+      "lon": 121.8052,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "WSSS",
+      "iata": "SIN",
+      "name": "Singapore Changi",
+      "country": "SG",
+      "lat": 1.3502,
+      "lon": 103.9944,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "",
+      "iata": "",
+      "name": "",
+      "country": "",
+      "lat": 0,
+      "lon": 0,
+      "night": "",
+      "narrowbody_allowed": false,
+      "candidate": false,
+      "focus": "",
+      "why": "",
+      "price_search": "",
+      "known_developers": []
+    }
   ]
 }
