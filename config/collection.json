@@ -648,19 +648,19 @@
       "narrowbody_allowed": true
     },
     {
-      "icao": "",
-      "iata": "",
-      "name": "",
-      "country": "",
-      "lat": 0,
-      "lon": 0,
+      "icao": "WMKK",
+      "iata": "KUL",
+      "name": "Kuala Lumpur International",
+      "country": "MY",
+      "lon": 101.698056,
       "night": "",
-      "narrowbody_allowed": false,
+      "narrowbody_allowed": true,
       "candidate": false,
-      "focus": "",
+      "focus": "pax+cargo",
       "why": "",
       "price_search": "",
-      "known_developers": []
+      "known_developers": [],
+      "lat": 2.743333
     }
   ]
 }
