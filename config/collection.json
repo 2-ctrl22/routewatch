@@ -661,6 +661,51 @@
       "price_search": "",
       "known_developers": [],
       "lat": 2.743333
+    },
+    {
+      "icao": "ELLX",
+      "iata": "LUX",
+      "name": "Luxemborg",
+      "country": "LU",
+      "lat": 49.6233,
+      "lon": 6.2044,
+      "night": "23:00–06:00",
+      "narrowbody_allowed": true,
+      "candidate": false,
+      "focus": "pax+cargo",
+      "why": "",
+      "price_search": "",
+      "known_developers": []
+    },
+    {
+      "icao": "HECA",
+      "iata": "CAI",
+      "name": "Cairo International",
+      "country": "EG",
+      "lat": 30.1219,
+      "lon": 31.4056,
+      "night": "24 hours",
+      "narrowbody_allowed": true,
+      "candidate": false,
+      "focus": "pax+cargo",
+      "why": "",
+      "price_search": "",
+      "known_developers": []
+    },
+    {
+      "icao": "LPMA",
+      "iata": "FNC",
+      "name": "Madeira (Cristiano Ronaldo)",
+      "country": "PT",
+      "lat": 32.6979,
+      "lon": -16.7745,
+      "night": "00:00–06:00 verbod",
+      "narrowbody_allowed": true,
+      "candidate": false,
+      "why": "",
+      "price_search": "",
+      "known_developers": [],
+      "focus": "pax"
     }
   ]
 }
