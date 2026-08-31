@@ -1,11 +1,12 @@
 {
  "EGSS": {
   "gain": {
-   "new_pairs": 17,
+   "new_pairs": 19,
    "match_pairs": 5,
-   "simmable_pairs": 15,
-   "cargo_pairs": 1,
+   "simmable_pairs": 16,
+   "cargo_pairs": 2,
    "connects": [
+    "EDDF",
     "EDDK",
     "EFHK",
     "EGPH",
@@ -22,18 +23,20 @@
     "LGKR",
     "LIMC",
     "LIRF",
-    "LPPR"
+    "LPPR",
+    "OMDB"
    ]
   },
   "prices": null
  },
  "EGKK": {
   "gain": {
-   "new_pairs": 23,
+   "new_pairs": 27,
    "match_pairs": 4,
-   "simmable_pairs": 21,
+   "simmable_pairs": 24,
    "cargo_pairs": 0,
    "connects": [
+    "EDDF",
     "EDDK",
     "EDDS",
     "EFHK",
@@ -56,19 +59,23 @@
     "LPPR",
     "LSGG",
     "LSZH",
-    "OTHH"
+    "OMDB",
+    "OTHH",
+    "WSSS",
+    "ZSPD"
    ]
   },
   "prices": null
  },
  "EDDM": {
   "gain": {
-   "new_pairs": 26,
+   "new_pairs": 31,
    "match_pairs": 2,
-   "simmable_pairs": 20,
+   "simmable_pairs": 22,
    "cargo_pairs": 0,
    "connects": [
     "EBBR",
+    "EDDF",
     "EDDK",
     "EDDS",
     "EFHK",
@@ -93,54 +100,24 @@
     "LPPR",
     "LSGG",
     "LSZH",
-    "OTHH"
-   ]
-  },
-  "prices": null
- },
- "EDDF": {
-  "gain": {
-   "new_pairs": 24,
-   "match_pairs": 1,
-   "simmable_pairs": 18,
-   "cargo_pairs": 2,
-   "connects": [
-    "EBBR",
-    "EDDS",
-    "EFHK",
-    "EGBB",
-    "EGLL",
-    "EGPH",
-    "EHAM",
-    "ENGM",
-    "EPWA",
-    "ESSA",
-    "KSFO",
-    "LEBL",
-    "LEMG",
-    "LEZL",
-    "LFLL",
-    "LGAV",
-    "LGIR",
-    "LGKR",
-    "LIMC",
-    "LIRF",
-    "LPPR",
-    "LSGG",
-    "LSZH",
-    "OTHH"
+    "OMDB",
+    "OTHH",
+    "VHHH",
+    "VTBS",
+    "WSSS"
    ]
   },
   "prices": null
  },
  "EKCH": {
   "gain": {
-   "new_pairs": 23,
-   "match_pairs": 1,
-   "simmable_pairs": 17,
+   "new_pairs": 27,
+   "match_pairs": 2,
+   "simmable_pairs": 19,
    "cargo_pairs": 1,
    "connects": [
     "EBBR",
+    "EDDF",
     "EDDS",
     "EFHK",
     "EGBB",
@@ -162,19 +139,24 @@
     "LPPR",
     "LSGG",
     "LSZH",
-    "OTHH"
+    "OMDB",
+    "OTHH",
+    "VTBS",
+    "WSSS"
    ]
   },
   "prices": null
  },
  "LEMD": {
   "gain": {
-   "new_pairs": 23,
-   "match_pairs": 1,
-   "simmable_pairs": 17,
-   "cargo_pairs": 1,
+   "new_pairs": 27,
+   "match_pairs": 2,
+   "simmable_pairs": 21,
+   "cargo_pairs": 3,
    "connects": [
     "EBBR",
+    "EDDF",
+    "EDDK",
     "EFHK",
     "EGBB",
     "EGLL",
@@ -196,32 +178,22 @@
     "LPPR",
     "LSGG",
     "LSZH",
-    "OTHH"
-   ]
-  },
-  "prices": null
- },
- "EBLG": {
-  "gain": {
-   "new_pairs": 2,
-   "match_pairs": 1,
-   "simmable_pairs": 1,
-   "cargo_pairs": 1,
-   "connects": [
-    "ENGM",
-    "LIMC"
+    "OMDB",
+    "OTHH",
+    "ZSPD"
    ]
   },
   "prices": null
  },
  "LFPG": {
   "gain": {
-   "new_pairs": 27,
-   "match_pairs": 0,
-   "simmable_pairs": 20,
+   "new_pairs": 34,
+   "match_pairs": 1,
+   "simmable_pairs": 24,
    "cargo_pairs": 2,
    "connects": [
     "EBBR",
+    "EDDF",
     "EDDK",
     "EFHK",
     "EGBB",
@@ -247,24 +219,60 @@
     "LPPR",
     "LSGG",
     "LSZH",
-    "OTHH"
+    "OMDB",
+    "OTHH",
+    "VHHH",
+    "VTBS",
+    "WMKK",
+    "WSSS",
+    "ZSPD"
    ]
   },
   "prices": null
  },
  "EDDP": {
   "gain": {
-   "new_pairs": 6,
-   "match_pairs": 0,
-   "simmable_pairs": 1,
-   "cargo_pairs": 2,
+   "new_pairs": 20,
+   "match_pairs": 1,
+   "simmable_pairs": 5,
+   "cargo_pairs": 9,
    "connects": [
     "EBBR",
+    "EDDF",
+    "EDDK",
     "EDDS",
+    "EFHK",
+    "EGPH",
+    "ENGM",
+    "EPWA",
+    "ESSA",
     "LEBL",
+    "LFLL",
+    "LGAV",
     "LGIR",
     "LGKR",
-    "LSGG"
+    "LPPR",
+    "LSGG",
+    "VHHH",
+    "VTBS",
+    "WSSS",
+    "ZSPD"
+   ]
+  },
+  "prices": null
+ },
+ "EBLG": {
+  "gain": {
+   "new_pairs": 5,
+   "match_pairs": 0,
+   "simmable_pairs": 1,
+   "cargo_pairs": 4,
+   "connects": [
+    "ENGM",
+    "ESSA",
+    "LIMC",
+    "VHHH",
+    "ZSPD"
    ]
   },
   "prices": null
