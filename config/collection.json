@@ -706,6 +706,36 @@
       "price_search": "",
       "known_developers": [],
       "focus": "pax"
+    },
+    {
+      "icao": "YMML",
+      "iata": "MEL",
+      "name": "Melbourne",
+      "country": "AU",
+      "lat": -37.6733,
+      "lon": 144.8433,
+      "night": "24 hours",
+      "narrowbody_allowed": true,
+      "candidate": false,
+      "focus": "",
+      "why": "",
+      "price_search": "",
+      "known_developers": []
+    },
+    {
+      "icao": "YPPH",
+      "iata": "PER",
+      "name": "Perth International",
+      "country": "AU",
+      "lat": -31.9403,
+      "lon": 115.9669,
+      "night": "24 hours",
+      "narrowbody_allowed": false,
+      "candidate": false,
+      "focus": "",
+      "why": "",
+      "price_search": "",
+      "known_developers": []
     }
   ]
 }
