@@ -730,7 +730,7 @@
       "lat": -31.9403,
       "lon": 115.9669,
       "night": "24 hours",
-      "narrowbody_allowed": false,
+      "narrowbody_allowed": true,
       "candidate": false,
       "focus": "",
       "why": "",
