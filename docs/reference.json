@@ -2,10 +2,10 @@
  "_what_this_is": "RouteWatch community reference set. Reference data only: airline names, type aliases, airport coordinates and fleet definitions. Contains no flights, no flight numbers, no departure times and no schedule data of any kind.",
  "_why_it_is_shareable": "These are either public facts or user-authored configuration, not API Contents. That is why this file is independent of the AeroDataBox permission question tracked in issue #1.",
  "_how_to_contribute": "Open a pull request against docs/reference.json. Maintainers can preview a contribution with: node scripts/export-reference.mjs --merge <file>, which reports what it would add and flags any disagreement instead of applying it.",
- "generated": "2026-08-31T05:09:24.225Z",
+ "generated": "2026-09-07T05:15:47.039Z",
  "counts": {
   "airlines": 132,
-  "airports": 47,
+  "airports": 52,
   "fleet": 5,
   "near_match": 9
  },
@@ -1399,6 +1399,41 @@
    "iata": "KUL",
    "lat": 2.743333,
    "lon": 101.698056,
+   "narrowbody_allowed": true
+  },
+  "ELLX": {
+   "name": "Luxemborg",
+   "iata": "LUX",
+   "lat": 49.6233,
+   "lon": 6.2044,
+   "narrowbody_allowed": true
+  },
+  "HECA": {
+   "name": "Cairo International",
+   "iata": "CAI",
+   "lat": 30.1219,
+   "lon": 31.4056,
+   "narrowbody_allowed": true
+  },
+  "LPMA": {
+   "name": "Madeira (Cristiano Ronaldo)",
+   "iata": "FNC",
+   "lat": 32.6979,
+   "lon": -16.7745,
+   "narrowbody_allowed": true
+  },
+  "YMML": {
+   "name": "Melbourne",
+   "iata": "MEL",
+   "lat": -37.6733,
+   "lon": 144.8433,
+   "narrowbody_allowed": true
+  },
+  "YPPH": {
+   "name": "Perth International",
+   "iata": "PER",
+   "lat": -31.9403,
+   "lon": 115.9669,
    "narrowbody_allowed": true
   }
  },
