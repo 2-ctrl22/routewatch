@@ -2,7 +2,7 @@
  "_what_this_is": "RouteWatch community reference set. Reference data only: airline names, type aliases, airport coordinates and fleet definitions. Contains no flights, no flight numbers, no departure times and no schedule data of any kind.",
  "_why_it_is_shareable": "These are either public facts or user-authored configuration, not API Contents. That is why this file is independent of the AeroDataBox permission question tracked in issue #1.",
  "_how_to_contribute": "Open a pull request against docs/reference.json. Maintainers can preview a contribution with: node scripts/export-reference.mjs --merge <file>, which reports what it would add and flags any disagreement instead of applying it.",
- "generated": "2026-09-07T05:15:47.039Z",
+ "generated": "2026-09-21T05:16:17.507Z",
  "counts": {
   "airlines": 132,
   "airports": 52,

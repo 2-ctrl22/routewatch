@@ -38,5 +38,675 @@
    "fetched": "2026-08-24"
   }
  },
- "A0461M": {}
+ "A0461M": {},
+ "A088UA": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EGKK-LEMG",
+   "prio": 0,
+   "legs": 3,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321",
+     "reg": "G-EUXK"
+    },
+    "2026-09-18": {
+     "type": "Airbus A320 (Sharklets)",
+     "reg": "G-EUYW"
+    },
+    "2026-09-19": {
+     "type": "Airbus A320 (Sharklets)",
+     "reg": "G-EUYV"
+    }
+   },
+   "type_count": {
+    "Airbus A321": 1,
+    "Airbus A320 (Sharklets)": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A09UQ": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EGKK-LGKR",
+   "prio": 0,
+   "legs": 6,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": "G-EUUW"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321",
+     "reg": "G-EUXJ"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321",
+     "reg": "G-EUXK"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321",
+     "reg": "G-EUXJ"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321",
+     "reg": "G-EUXJ"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321",
+     "reg": "G-EUXK"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 1,
+    "Airbus A321": 5
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3304": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LGIR",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-16": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-17": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-18": {
+     "type": "Airbus A321",
+     "reg": null
+    },
+    "2026-09-19": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-20": {
+     "type": "Airbus A320",
+     "reg": null
+    }
+   },
+   "type_count": {
+    "Airbus A320": 6,
+    "Airbus A321": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3305": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LGIR",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": "SX-DGE"
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": "SX-DGB"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320",
+     "reg": "SX-DVV"
+    },
+    "2026-09-17": {
+     "type": "Airbus A320",
+     "reg": "SX-DVT"
+    },
+    "2026-09-18": {
+     "type": "Airbus A320",
+     "reg": "SX-DGB"
+    },
+    "2026-09-19": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NES"
+    },
+    "2026-09-20": {
+     "type": "Airbus A320",
+     "reg": "SX-DVM"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 6,
+    "Airbus A320 NEO": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3306": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LGIR",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAV"
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": "SX-NAW"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAU"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAR"
+    },
+    "2026-09-18": {
+     "type": "Airbus A320",
+     "reg": "SX-NAZ"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAX"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAA"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 5,
+    "Airbus A320": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3307": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LGIR",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAV"
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": "SX-NAW"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAU"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAR"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAZ"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAX"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAA"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 6,
+    "Airbus A320": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3600": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EGLL-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAE"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAH"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAK"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAQ"
+    },
+    "2026-09-19": {
+     "type": "Airbus A320",
+     "reg": "SX-NAB"
+    },
+    "2026-09-20": {
+     "type": "Airbus A320",
+     "reg": "SX-NAC"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 5,
+    "Airbus A320": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3610": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LFPG-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": "SX-NAJ"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAF"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAO"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAZ"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAC"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 1,
+    "Airbus A321 NEO": 6
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3611": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LFPG-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": "SX-NAJ"
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": "SX-NAF"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAO"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAZ"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAC"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 2,
+    "Airbus A321 NEO": 5
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3616": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LFPG-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAH"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAO"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NER"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAS"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAH"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAK"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 6,
+    "Airbus A320 NEO": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3620": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EBBR-LGAV",
+   "prio": 0,
+   "legs": 8,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NET"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAB"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NAQ"
+    },
+    "2026-09-17": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NET"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    }
+   },
+   "type_count": {
+    "Airbus A320 NEO": 4,
+    "Airbus A321 NEO": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3621": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EBBR-LGAV",
+   "prio": 0,
+   "legs": 8,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NET"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAB"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAQ"
+    },
+    "2026-09-17": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    }
+   },
+   "type_count": {
+    "Airbus A320 NEO": 2,
+    "Airbus A321 NEO": 5,
+    "Airbus A320": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3624": {
+  "2026-09-14_2026-09-20": {
+   "pair": "EHAM-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAB"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAE"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320",
+     "reg": "SX-NAD"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAM"
+    },
+    "2026-09-18": {
+     "type": "Airbus A320",
+     "reg": "SX-NAW"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAQ"
+    },
+    "2026-09-20": {
+     "type": "Airbus A320",
+     "reg": "SX-NAL"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 4,
+    "Airbus A320": 3
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3650": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LIRF",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAA"
+    },
+    "2026-09-15": {
+     "type": "Airbus A320",
+     "reg": "SX-NAU"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320",
+     "reg": "SX-NAJ"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAO"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAJ"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAE"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAH"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 5,
+    "Airbus A320": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3660": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LGAV-LIMC",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAD"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAQ"
+    },
+    "2026-09-16": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NAB"
+    },
+    "2026-09-17": {
+     "type": "Airbus A320 NEO",
+     "reg": "SX-NEO"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAX"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAA"
+    },
+    "2026-09-20": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAR"
+    }
+   },
+   "type_count": {
+    "Airbus A321 NEO": 5,
+    "Airbus A320 NEO": 2
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3700": {
+  "2026-09-14_2026-09-20": {
+   "pair": "LEMD-LGAV",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-09-14": {
+     "type": "Airbus A320",
+     "reg": "SX-NAR"
+    },
+    "2026-09-15": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAS"
+    },
+    "2026-09-16": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAV"
+    },
+    "2026-09-17": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAK"
+    },
+    "2026-09-18": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAE"
+    },
+    "2026-09-19": {
+     "type": "Airbus A321 NEO",
+     "reg": "SX-NAV"
+    },
+    "2026-09-20": {
+     "type": "Airbus A320",
+     "reg": "SX-NAE"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 2,
+    "Airbus A321 NEO": 5
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-09-21"
+  }
+ },
+ "A3710": {}
 }

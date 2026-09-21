@@ -694,5 +694,70 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-08-24"
+ },
+ "VTBS": {
+  "icao": "VTBS",
+  "iata": "BKK",
+  "name": "Bangkok Suvarnabhumi",
+  "country": "Thailand",
+  "tz": "Asia/Bangkok",
+  "elevation_ft": 5,
+  "runway_count": 4,
+  "longest_runway_ft": 13189,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-21"
+ },
+ "ZSPD": {
+  "icao": "ZSPD",
+  "iata": "PVG",
+  "name": "Shanghai Pudong",
+  "country": "China",
+  "tz": "Asia/Shanghai",
+  "elevation_ft": 13,
+  "runway_count": 8,
+  "longest_runway_ft": 13166,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-21"
+ },
+ "WSSS": {
+  "icao": "WSSS",
+  "iata": "SIN",
+  "name": "Singapore Changi",
+  "country": "Singapore",
+  "tz": "Asia/Singapore",
+  "elevation_ft": 22,
+  "runway_count": 6,
+  "longest_runway_ft": 13629,
+  "surfaces": [
+   "Asphalt",
+   "Unknown"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-21"
+ },
+ "WMKK": {
+  "icao": "WMKK",
+  "iata": "KUL",
+  "name": "Kuala Lumpur",
+  "country": "Malaysia",
+  "tz": "Asia/Kuala_Lumpur",
+  "elevation_ft": 69,
+  "runway_count": 6,
+  "longest_runway_ft": 13245,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-21"
  }
 }
