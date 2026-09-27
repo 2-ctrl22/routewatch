@@ -79,12 +79,14 @@ const counter = l => l.startsWith("S") ? "W"+yy(2000+ +l.slice(1))+"/"+yy(2001+ 
 const OWNED={}, BYKEY={};
 for(const f of CFG.fleet.owned){BYKEY[f.key]=f; for(const t of f.types) OWNED[t]=f;}
 const NEAR = CFG.fleet.near_match ?? {};
-const WIDE = new Set(["A350","B77F"]);
+const WIDE = new Set(["A350","B772","B77F"]);
 const ALIAS={"BOEING 737-800":"B738","737-800":"B738","73H":"B738","738":"B738","BOEING 737 MAX 8":"B38M",
  "737 MAX 8":"B38M","7M8":"B38M","AIRBUS A320":"A320","A320NEO":"A20N","32N":"A20N","AIRBUS A321NEO":"A21N",
  "A321NEO":"A21N","AIRBUS A319":"A319","AIRBUS A350-900":"A359","A350-900":"A359","AIRBUS A350-1000":"A35K",
  "A350-1000":"A35K","BOEING 777F":"B77L","777F":"B77L","EMBRAER 195-E2":"E295","EMBRAER 195":"E195",
- "EMBRAER 175":"E175","AIRBUS A220-300":"BCS3","ATR 72-600":"AT76","BOEING 787-9":"B789","BOEING 777-300ER":"B77W"};
+ "EMBRAER 175":"E175","AIRBUS A220-300":"BCS3","ATR 72-600":"AT76","BOEING 787-9":"B789","BOEING 777-300ER":"B77W",
+ "AIRBUS A220-100":"BCS1","A220-300":"BCS3","A220-100":"BCS1","BOEING 777-200":"B772","BOEING 777-200ER":"B772",
+ "777-200ER":"B772","BOEING 777-300":"B773","BOEING 777-300ER PASSENGER":"B77W"};
 const normType = r => r ? (ALIAS[String(r).trim().toUpperCase()] ?? String(r).trim().toUpperCase()) : null;
 const gcNm=(a,b)=>{
  if(!a||!b||!coordOk(a.lat)||!coordOk(a.lon)||!coordOk(b.lat)||!coordOk(b.lon)) return null;
@@ -93,7 +95,7 @@ const gcNm=(a,b)=>{
 const pk=(a,b)=>[a,b].sort().join("-");
 
 function matchStatus(types){const t=new Set();
- for(const x of types) if(x) t.add(OWNED[x]?"MATCH":NEAR[x]?"NEAR-MATCH":"NO-MATCH");
+ for(const r of types){const x=normType(r); if(x) t.add(OWNED[x]?"MATCH":NEAR[x]?"NEAR-MATCH":"NO-MATCH");}
  if(!t.size) return "UNKNOWN";
  if(t.size===1) return [...t][0];
  if(t.has("MATCH")) return "MATCH+"+[...t].filter(x=>x!=="MATCH").sort().join("+");
@@ -103,7 +105,7 @@ function simmable(pair,types,nm,cargo){const [a,b]=pair.split("-"); /* null or N
  if(!Number.isFinite(nm)) return false;
  const nbOk = ALL[a]?.narrowbody_allowed!==false && ALL[b]?.narrowbody_allowed!==false;
  const need = cargo?"cargo":"pax";
- for(const t of types){const spec=OWNED[t] ?? (NEAR[t]?BYKEY[NEAR[t].substitute]:null);
+ for(const r of types){const t=normType(r); const spec=OWNED[t] ?? (NEAR[t]?BYKEY[NEAR[t].substitute]:null);
   if(!spec||spec.role!==need||nm>spec.range_nm) continue;
   if(!WIDE.has(spec.key)&&!nbOk) continue;
   return true;} return false;}
