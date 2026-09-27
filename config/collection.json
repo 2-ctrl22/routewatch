@@ -63,6 +63,24 @@
         ]
       },
       {
+        "key": "BCS3",
+        "name": "Airbus A220-300",
+        "role": "pax",
+        "range_nm": 3400,
+        "types": [
+          "BCS3"
+        ]
+      },
+      {
+        "key": "B772",
+        "name": "Boeing 777-200ER",
+        "role": "pax",
+        "range_nm": 7000,
+        "types": [
+          "B772"
+        ]
+      },
+      {
         "key": "B77F",
         "name": "Boeing 777F",
         "role": "cargo",
@@ -109,6 +127,18 @@
       "B734F": {
         "substitute": "B738F",
         "concession": "737-400F: one generation older, about 4 tonnes less payload"
+      },
+      "BCS1": {
+        "substitute": "BCS3",
+        "concession": "A220-100: 3.7 m shorter, about 20 fewer seats"
+      },
+      "B773": {
+        "substitute": "B772",
+        "concession": "777-300: 10 m longer, same generation"
+      },
+      "B77W": {
+        "substitute": "B772",
+        "concession": "777-300ER: 10 m longer, GE90-115B, higher MTOW"
       }
     }
   },
@@ -140,16 +170,6 @@
       "country": "DE",
       "lat": 48.6899,
       "lon": 9.222,
-      "narrowbody_allowed": true
-    },
-    {
-      "icao": "EDDK",
-      "iata": "CGN",
-      "name": "Cologne/Bonn",
-      "country": "DE",
-      "lat": 50.8659,
-      "lon": 7.1427,
-      "night": "24 hours; passenger ban 00:00-05:00, CARGO EXEMPT",
       "narrowbody_allowed": true
     },
     {
@@ -405,22 +425,7 @@
       "country": "DK",
       "lat": 55.6181,
       "lon": 12.6561,
-      "candidate": true,
-      "focus": "pax",
-      "why": "Busiest pair from ENGM, ESSA, EFHK and EPWA; plus SAS to KSFO and Qatar Airways to OTHH. Unlocks two long-haul islands in a single purchase.",
-      "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=CPH+Copenhagen",
-        "simmarket": "https://secure.simmarket.com/?s=CPH",
-        "contrail": "https://contrail.co.uk/?s=CPH",
-        "orbx": "https://orbxdirect.com/search?q=CPH",
-        "inibuilds": "https://www.inibuilds.com/search?q=CPH",
-        "aerosoft": "https://www.aerosoft.com/en/search?q=CPH",
-        "justflight": "https://www.justflight.com/searchresults?searchterm=CPH"
-      },
-      "known_developers": [
-        "SimNord - MSFS 2020 and 2024, released August 2025",
-        "FlyTampa"
-      ]
+      "focus": "pax"
     },
     {
       "icao": "EDDF",
@@ -449,18 +454,7 @@
       "country": "DE",
       "lat": 48.3538,
       "lon": 11.7861,
-      "candidate": true,
-      "focus": "pax",
-      "why": "Strong from the Nordics; Allegris A350 to Cape Town.",
-      "price_search": {
-        "fsaddoncompare": "https://www.fsaddoncompare.com/search?q=MUC+Munich",
-        "simmarket": "https://secure.simmarket.com/?s=MUC",
-        "contrail": "https://contrail.co.uk/?s=MUC",
-        "orbx": "https://orbxdirect.com/search?q=MUC",
-        "inibuilds": "https://www.inibuilds.com/search?q=MUC",
-        "aerosoft": "https://www.aerosoft.com/en/search?q=MUC",
-        "justflight": "https://www.justflight.com/searchresults?searchterm=MUC"
-      }
+      "focus": "pax"
     },
     {
       "icao": "LEMD",
@@ -603,15 +597,6 @@
       }
     },
     {
-      "icao": "OMDB",
-      "iata": "DXB",
-      "name": "Dubai International",
-      "country": "AE",
-      "lat": 25.2528,
-      "lon": 55.3644,
-      "narrowbody_allowed": true
-    },
-    {
       "icao": "VHHH",
       "iata": "HKG",
       "name": "Hong Kong International",
@@ -627,15 +612,6 @@
       "country": "TH",
       "lat": 13.6811,
       "lon": 100.7477,
-      "narrowbody_allowed": true
-    },
-    {
-      "icao": "ZSPD",
-      "iata": "PVG",
-      "name": "Shanghai Pudong",
-      "country": "CN",
-      "lat": 31.1434,
-      "lon": 121.8052,
       "narrowbody_allowed": true
     },
     {
@@ -670,21 +646,6 @@
       "lat": 49.6233,
       "lon": 6.2044,
       "night": "23:00–06:00",
-      "narrowbody_allowed": true,
-      "candidate": false,
-      "focus": "pax+cargo",
-      "why": "",
-      "price_search": "",
-      "known_developers": []
-    },
-    {
-      "icao": "HECA",
-      "iata": "CAI",
-      "name": "Cairo International",
-      "country": "EG",
-      "lat": 30.1219,
-      "lon": 31.4056,
-      "night": "24 hours",
       "narrowbody_allowed": true,
       "candidate": false,
       "focus": "pax+cargo",
@@ -736,6 +697,186 @@
       "why": "",
       "price_search": "",
       "known_developers": []
+    },
+    {
+      "icao": "EDLP",
+      "iata": "PAD",
+      "name": "Paderborn/Lippstadt",
+      "country": "DE",
+      "lat": 51.6153,
+      "lon": 8.6172,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EETN",
+      "iata": "TLL",
+      "name": "Tallinn Lennart Meri",
+      "country": "EE",
+      "lat": 59.4133,
+      "lon": 24.8325,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LEPA",
+      "iata": "PMI",
+      "name": "Palma de Mallorca",
+      "country": "ES",
+      "lat": 39.5517,
+      "lon": 2.7389,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "GCHI",
+      "iata": "VDE",
+      "name": "El Hierro",
+      "country": "ES",
+      "lat": 27.8147,
+      "lon": -17.8869,
+      "narrowbody_allowed": false
+    },
+    {
+      "icao": "BIKF",
+      "iata": "KEF",
+      "name": "Keflavik",
+      "country": "IS",
+      "lat": 63.9802,
+      "lon": -22.6183,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EDDL",
+      "iata": "DUS",
+      "name": "Dusseldorf",
+      "country": "DE",
+      "lat": 51.2809,
+      "lon": 6.7573,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LROP",
+      "iata": "OTP",
+      "name": "Bucharest Henri Coanda",
+      "country": "RO",
+      "lat": 44.5717,
+      "lon": 26.0898,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGMK",
+      "iata": "JMK",
+      "name": "Mykonos",
+      "country": "GR",
+      "lat": 37.4342,
+      "lon": 25.3469,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGSA",
+      "iata": "CHQ",
+      "name": "Chania",
+      "country": "GR",
+      "lat": 35.5317,
+      "lon": 24.1497,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LGSR",
+      "iata": "JTR",
+      "name": "Santorini (Thira)",
+      "country": "GR",
+      "lat": 36.3992,
+      "lon": 25.4793,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "CYYZ",
+      "iata": "YYZ",
+      "name": "Toronto Pearson",
+      "country": "CA",
+      "lat": 43.6867,
+      "lon": -79.6312,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "ENSB",
+      "iata": "LYR",
+      "name": "Svalbard Longyearbyen",
+      "country": "NO",
+      "lat": 78.2464,
+      "lon": 15.461,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "KJFK",
+      "iata": "JFK",
+      "name": "New York JFK",
+      "country": "US",
+      "lat": 40.6414,
+      "lon": -73.7777,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "KLAX",
+      "iata": "LAX",
+      "name": "Los Angeles Intl",
+      "country": "US",
+      "lat": 33.9425,
+      "lon": -118.408,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LCLK",
+      "iata": "LCA",
+      "name": "Larnaca",
+      "country": "CY",
+      "lat": 34.8789,
+      "lon": 33.6303,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LEIB",
+      "iata": "IBZ",
+      "name": "Ibiza",
+      "country": "ES",
+      "lat": 38.8736,
+      "lon": 1.3731,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LMML",
+      "iata": "MLA",
+      "name": "Malta International",
+      "country": "MT",
+      "lat": 35.8457,
+      "lon": 14.4856,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "LFMN",
+      "iata": "NCE",
+      "name": "Nice Cote d'Azur",
+      "country": "FR",
+      "lat": 43.6605,
+      "lon": 7.2094,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "GCTS",
+      "iata": "TFS",
+      "name": "Tenerife South",
+      "country": "ES",
+      "lat": 28.0444,
+      "lon": -16.5725,
+      "narrowbody_allowed": true
+    },
+    {
+      "icao": "EKBI",
+      "iata": "BLL",
+      "name": "Billund",
+      "country": "DK",
+      "lat": 55.7403,
+      "lon": 9.1518,
+      "narrowbody_allowed": true
     }
   ]
 }
