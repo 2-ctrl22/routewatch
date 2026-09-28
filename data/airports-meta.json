@@ -759,5 +759,70 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-09-21"
+ },
+ "ELLX": {
+  "icao": "ELLX",
+  "iata": "LUX",
+  "name": "Luxembourg -Findel",
+  "country": "Luxembourg",
+  "tz": "Europe/Luxembourg",
+  "elevation_ft": 1234,
+  "runway_count": 2,
+  "longest_runway_ft": 13146,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-28"
+ },
+ "LPMA": {
+  "icao": "LPMA",
+  "iata": "FNC",
+  "name": "Funchal Madeira",
+  "country": "Portugal",
+  "tz": "Atlantic/Madeira",
+  "elevation_ft": 192,
+  "runway_count": 2,
+  "longest_runway_ft": 9137,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-28"
+ },
+ "YMML": {
+  "icao": "YMML",
+  "iata": "MEL",
+  "name": "Melbourne",
+  "country": "Australia",
+  "tz": "Australia/Melbourne",
+  "elevation_ft": 434,
+  "runway_count": 4,
+  "longest_runway_ft": 12031,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-28"
+ },
+ "YPPH": {
+  "icao": "YPPH",
+  "iata": "PER",
+  "name": "Perth International",
+  "country": "Australia",
+  "tz": "Australia/Perth",
+  "elevation_ft": 67,
+  "runway_count": 4,
+  "longest_runway_ft": 11325,
+  "surfaces": [
+   "Concrete",
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-09-28"
  }
 }
