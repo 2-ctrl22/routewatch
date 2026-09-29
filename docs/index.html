@@ -1,108 +1,28 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>RouteWatch</title>
-<style>
-:root{--bg:#0b0f14;--p:#121820;--p2:#182029;--l:#243040;--t:#e6edf3;--d:#8b98a8;
-  --m:#3fb950;--n:#d29922;--x:#f85149;--u:#58a6ff;--r:12px}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--t);
-  font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  -webkit-font-smoothing:antialiased}
-header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
-  border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:8}
-header>b{font-size:16px;letter-spacing:-.2px}
-#nav{display:flex;gap:18px;flex-wrap:wrap}
-#nav a{color:var(--d);cursor:pointer;text-decoration:none;padding:3px 0;
-  border-bottom:2px solid transparent;font-size:13.5px}
-#nav a:hover{color:var(--t)}
-#nav a.on{color:var(--t);border-bottom-color:var(--u)}
-a.ext{color:var(--u);text-decoration:none;font-size:13.5px;white-space:nowrap}
-a.ext:hover{text-decoration:underline}
-#meta{margin-left:auto}
-main{padding:22px;max-width:1500px}
-h2{font-size:13px;color:var(--d);margin:26px 0 10px;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
-h2:first-child{margin-top:0}
-h3{font-size:14px;margin:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
-.card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
-.card span{color:var(--d);font-size:11.5px;display:block;line-height:1.35;margin-top:2px}
-.lead{font-size:13.5px;color:var(--d);margin:0 0 14px;max-width:900px}
-.key{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:12.5px;color:var(--d)}
-.key span{display:inline-flex;align-items:center;gap:6px}
-.key i{width:9px;height:9px;border-radius:50%;display:inline-block}
-
-/* The panel is the scroll container for its own table, which is what keeps the
-   sticky head anchored to the top of the box instead of fighting the header. */
-.panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);
-  overflow:auto;max-height:74vh;position:relative}
-.panel::-webkit-scrollbar{width:10px;height:10px}
-.panel::-webkit-scrollbar-thumb{background:#2b3746;border-radius:8px}
-.panel::-webkit-scrollbar-track{background:transparent}
-
-table{border-collapse:separate;border-spacing:0;width:100%;font-size:13px}
-th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--l);vertical-align:top}
-thead th{color:var(--d);position:sticky;top:0;z-index:3;background:var(--p2);font-weight:500;
-  font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-  box-shadow:inset 0 -1px 0 var(--l);border-bottom:none;white-space:nowrap}
-thead th.s{cursor:pointer;user-select:none}
-thead th.s:hover{color:var(--t)}
-thead th.on{color:var(--u)}
-.arw{font-size:9px;opacity:.75;margin-left:3px}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover td{background:#151c25}
-code{background:#1c2430;padding:1px 5px;border-radius:4px;font-size:12px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
-.m{color:var(--m)}.n{color:var(--n)}.x{color:var(--x)}.u{color:var(--u)}
-.high{box-shadow:inset 3px 0 0 var(--x)}.medium{box-shadow:inset 3px 0 0 var(--n)}
-.low{box-shadow:inset 3px 0 0 #3d4759}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;align-items:center}
-.chip{background:var(--p);border:1px solid var(--l);border-radius:999px;padding:5px 13px;
-  cursor:pointer;font-size:12.5px;color:var(--d);user-select:none}
-.chip:hover{border-color:#31415a;color:var(--t)}
-.chip.on{border-color:var(--u);color:var(--u)}
-input{background:var(--p);border:1px solid var(--l);color:var(--t);padding:6px 11px;
-  border-radius:8px;min-width:230px;font:inherit;font-size:12.5px}
-input:focus{outline:none;border-color:var(--u)}
-.badge{background:var(--p2);border:1px solid var(--l);border-radius:9px;padding:6px 12px;
-  font-size:12px;color:var(--d)}
-.badge b{color:var(--t)}
-.muted{color:var(--d)}
-.small{font-size:12.5px}
-a{color:var(--u)}
-.tag{font-size:10.5px;border:1px solid var(--l);border-radius:999px;padding:2px 9px;color:var(--d);
-  white-space:nowrap}
-.tag.wish{border-color:#4d3f16;color:var(--n)}
-.rank{color:var(--u);font-weight:700;font-variant-numeric:tabular-nums}
-.gain b{font-size:15px;font-weight:650}
-.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-.op{border-bottom:1px dotted #3d4759;cursor:help}
-.op.unk{border-bottom-color:#4a3a3a;color:#9aa4b1}
-details{margin-top:6px}
-summary{cursor:pointer;color:var(--u);font-size:12.5px;outline:none}
-.stores{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
-.stores a{background:var(--p2);border:1px solid var(--l);border-radius:7px;padding:4px 10px;
-  font-size:11.5px;text-decoration:none;color:var(--d)}
-.stores a:hover{color:var(--t);border-color:#31415a}
-.more{display:block;width:100%;background:var(--p2);border:none;border-top:1px solid var(--l);
-  color:var(--u);padding:10px;cursor:pointer;font:inherit;font-size:12.5px;position:sticky;bottom:0}
-.more:hover{background:#1d2733}
-.nowrap{white-space:nowrap}
-</style></head><body>
-<header><b>RouteWatch</b>
-<nav id="nav"><a data-v="ov" class="on">Overview</a><a data-v="pr">Pair matrix</a><a data-v="bu">Buy advice</a><a data-v="ev">Changes</a><a data-v="se">Seasons</a><a data-v="fl">Fleet</a></nav>
-<a class="ext" href="map.html">Map</a>
-<a class="ext" href="editor.html">Editor</a><a class="ext" href="find.html">Find</a>
-<span id="meta" class="badge">loading...</span></header>
-<main id="app">loading...</main>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RouteWatch</title>
+<meta name="description" content="Real flights between the airports you own in the sim, and which airport to buy next.">
+<meta name="theme-color" content="#0a0f16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RouteWatch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/rw.css?v=3">
+</head>
+<body data-page="overview">
+<script src="assets/rw-shell.js?v=3"></script>
+<main class="rw-main" id="app"><div class="loading"><div class="spin"></div>Loading RouteWatch&hellip;</div></main>
 <script>
-let D=null, filter='all', prPage=1;
-const PAGE=200;
-const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+let D=null;
 const app=document.getElementById('app');
-const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="muted">+'+(a.length-n)+'</span>';};
-const nf=n=>Number(n).toLocaleString('en-GB');
-
+const esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const nf=n=>Number(n||0).toLocaleString('en-GB');
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+const cut=(arr,n)=>{const a=arr||[];return a.length<=n?esc(a.join(', ')):esc(a.slice(0,n).join(', '))+' <span class="faint">+'+(a.length-n)+'</span>';};
 /* Older runs wrote this sentinel in Dutch, newer runs write it in English. */
 const NOSVC=s=>{const v=String(s??'');return v==='GEEN VERBINDING'||v==='NO SERVICE';};
 
@@ -117,18 +37,6 @@ const EN=[[/GEEN VERBINDING/g,'NO SERVICE'],[/ONBEKEND/g,'UNKNOWN'],
           [/eerste_verbinding/g,'first_connection'],[/geen_actieve_vluchtregel/g,'no_active_flight_line'],
           [/hervat_op/g,'resumed_on'],[/aandeel_/g,'share_'],[/toelichting/g,'note']];
 const en=s=>{let o=String(s??'');for(const r of EN)o=o.replace(r[0],r[1]);return o;};
-
-const head=cells=>'<thead><tr>'+cells.map(c=>'<th>'+c+'</th>').join('')+'</tr></thead>';
-
-function sortHead(cells,st,fn){
-  return '<thead><tr>'+cells.map(c=>{
-    if(!Array.isArray(c)) return '<th>'+c+'</th>';
-    const on=st.key===c[1];
-    return '<th class="s'+(on?' on':'')+'" onclick="'+fn+'(\''+c[1]+'\')" '
-      +'title="Click to sort">'+c[0]
-      +'<span class="arw">'+(on?(st.dir>0?'&#9650;':'&#9660;'):'')+'</span></th>';
-  }).join('')+'</tr></thead>';
-}
 /* Sorting runs on raw values, never on the rendered text. */
 function sortRows(rows,keys,st){
   const get=keys[st.key];
@@ -140,7 +48,6 @@ function sortRows(rows,keys,st){
     return c*st.dir;
   });
 }
-
 /* ------------------------------------------------------- plain language --- */
 const TYPES={B733:'Boeing 737-300',B734:'Boeing 737-400',B735:'Boeing 737-500',
  B736:'Boeing 737-600',B737:'Boeing 737-700',B738:'Boeing 737-800',B739:'Boeing 737-900',
@@ -173,7 +80,6 @@ function prettyType(s){
   });
   return words.join(' ').replace(/ neo/g,'neo');
 }
-
 /* Airline names come from data.json, where routewatch.mjs collects them from the
  * sources themselves. So a new or renamed carrier needs no edit here. The small
  * table below is only a fallback for codes the data has not named yet, mostly
@@ -232,7 +138,6 @@ function opList(arr,n){
   }).join(' ');
   return out+(a.length>n?' <span class="muted">+'+(a.length-n)+'</span>':'');
 }
-
 const KINDS={ROUTE_NEW:'New route',ROUTE_GONE:'Route disappeared',ROUTE_BACK:'Route is back',
  PAIR_NEW:'First ever connection',PAIR_GONE:'No flights left on this pair',
  TYPE_NEW:'Different aircraft',TYPE_GONE:'Aircraft no longer used',
@@ -245,15 +150,6 @@ const KINDS={ROUTE_NEW:'New route',ROUTE_GONE:'Route disappeared',ROUTE_BACK:'Ro
  SUSPENDED:'Paused, not seen for a while',RESUMED:'Flying again'};
 const kindLabel=k=>KINDS[k]||String(k||'').replace(/_/g,' ').toLowerCase()
   .replace(/^./,c=>c.toUpperCase());
-
-function flyText(st){
-  const s=String(st||'');
-  if(NOSVC(s)) return '<span class="muted">no flights seen</span>';
-  if(s==='MATCH'||s.startsWith('MATCH')) return '<span class="m">Yes, you own this aircraft</span>';
-  if(s.startsWith('NEAR')) return '<span class="n">Almost, close substitute</span>';
-  if(s.startsWith('NO-')) return '<span class="x">No, not in your fleet</span>';
-  return '<span class="muted">Unknown</span>';
-}
 function flyRank(st){
   const s=String(st||'');
   if(NOSVC(s)) return 0;
@@ -262,7 +158,6 @@ function flyRank(st){
   if(s.startsWith('NO-')) return 2;
   return 1;
 }
-
 function sureText(c){
   const s=en(String(c||''));
   const d=s.match(/n=(\d+)\s*d/i), src=s.match(/sources=(\d+)/i);
@@ -272,7 +167,6 @@ function sureText(c){
   if(src) parts.push(src[1]+(src[1]==='1'?' source':' sources'));
   return '<span class="muted">'+parts.join(', ')+'</span>';
 }
-
 function fmtWhen(at){
   const s=String(at||'');
   const d=new Date(s);
@@ -297,150 +191,233 @@ function seasonOf(at){
   return 'W'+String(y).slice(2);
 }
 
+/* ================================================================ render === */
+const BACK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+const SEARCH='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>';
+let APMAP={};
+
+function flyText(st){
+  const s=String(st||'');
+  if(NOSVC(s)) return '<span class="st o">No flights seen</span>';
+  if(s.startsWith('MATCH')) return '<span class="st m" title="You own this aircraft">You own it</span>';
+  if(s.startsWith('NEAR')) return '<span class="st n" title="A close substitute is in your fleet">Substitute</span>';
+  if(s.startsWith('NO-')) return '<span class="st x" title="Not in your fleet">Not in fleet</span>';
+  return '<span class="st o">Unknown</span>';
+}
+const yesNo=b=>b?'<span class="st m">Yes</span>':'<span class="faint">No</span>';
+const typesShort=(t,n=3)=>{const a=(t||[]).map(prettyType);
+  const u=[...new Set(a)];
+  return u.length?esc(u.slice(0,n).join(', '))+(u.length>n?' <span class="faint">+'+(u.length-n)+'</span>':''):'<span class="faint">-</span>';};
+const dash='<span class="faint">-</span>';
+
+/* One table builder for every list. Desktop: a sortable table. Phone: the same
+ * rows as cards, each cell labelled from its column. */
+let SORTFN=null;
+app.addEventListener('click',e=>{
+  const th=e.target.closest('th[data-sort]');
+  if(th&&SORTFN) SORTFN(th.dataset.sort);
+});
+function table(cols,rows,opt){
+  opt=opt||{};
+  const st=opt.sort;
+  const th=cols.map(c=>{
+    const sortable=!!(c.k&&st), on=sortable&&st.key===c.k;
+    const cl=[(c.cls||'').split(' ').includes('r')?'r':'',sortable?'s':'',on?'on':''].filter(Boolean).join(' ');
+    return '<th'+(cl?' class="'+cl+'"':'')+(sortable?' data-sort="'+c.k+'" title="Sort"':'')+'>'+c.l
+      +(on?'<span class="arw">'+(st.dir>0?'&#9650;':'&#9660;')+'</span>':'')+'</th>';
+  }).join('');
+  const body=rows.length?rows.map(r=>'<tr'+(r.cls?' class="'+r.cls+'"':'')+(r.title?' title="'+esc(r.title)+'"':'')+'>'
+      +r.cells.map((h,i)=>{const c=cols[i];
+        const nil=(h===dash||h==='-'||h===''||h===undefined||h===null)&&!(c.cls||'').includes('tt');
+        const cl=((c.cls||'')+(nil?' nil':'')).trim();
+        return '<td'+(cl?' class="'+cl+'"':'')+' data-l="'+esc(c.ml||c.l)+'"><span class="v">'+(h??'')+'</span></td>';}).join('')
+      +'</tr>').join('')
+    :'<tr><td class="empty" colspan="'+cols.length+'">'+(opt.empty||'Nothing here yet.')+'</td></tr>';
+  return '<div class="panel"><div class="scroll"><table class="rt"><thead><tr>'+th+'</tr></thead><tbody>'
+    +body+'</tbody></table></div>'+(opt.after||'')+'</div>';
+}
+function sortSelect(id,opts,st){
+  return '<select class="mo-only sortsel" id="'+id+'" aria-label="Sort">'+opts.map(o=>
+    '<option value="'+o[0]+':'+o[1]+'"'+(st.key===o[0]&&st.dir===o[1]?' selected':'')+'>'+o[2]+'</option>').join('')
+    +'</select>';
+}
+const readSort=v=>{const [k,d]=String(v).split(':');return {key:k,dir:Number(d)};};
+function title(h,p,right){
+  return '<div class="page-title"><div><h1>'+h+'</h1>'+(p?'<p>'+p+'</p>':'')+'</div>'+(right||'')+'</div>';
+}
+
 /* ------------------------------------------------------------ changes ---- */
-function evTable(rows){
-  if(!rows||!rows.length) return '<p class="muted small">Nothing has changed yet.</p>';
-  return '<div class="panel"><table>'
-   +head(['When','What happened','Route','Flight','Season','Distance','Aircraft',
-          'Can you fly it?','How sure'])+'<tbody>'
-   +rows.map(e=>{
-     const d=e.detail||{}, ts=(d.types||[]).map(prettyType);
-     const seas=e.season||seasonOf(e.at);
-     const wish=d.candidate??d.kandidaat;
-     return '<tr class="'+esc(e.severity)+'" title="'+esc(en(JSON.stringify(d)))+'">'
-      +'<td class="nowrap">'+esc(fmtWhen(e.at))+'</td>'
-      +'<td class="nowrap">'+esc(kindLabel(e.kind))+'</td>'
-      +'<td class="nowrap">'+esc(e.pair||'-')
-        +(wish?' <span class="tag wish">wishlist</span>':'')+'</td>'
-      +'<td class="nowrap">'+(e.airline?opList([e.airline],1)+' '+esc(e.flight||''):esc(e.flight||'-'))+'</td>'
-      +'<td class="nowrap">'+(seas?esc(seas):'<span class="muted">-</span>')+'</td>'
-      +'<td class="num">'+(d.nm?nf(d.nm)+' NM':'<span class="muted">-</span>')+'</td>'
-      +'<td>'+(ts.length?esc(ts.join(', ')):'<span class="muted">-</span>')+'</td>'
-      +'<td class="nowrap">'+(d.status?flyText(d.status):'<span class="muted">-</span>')+'</td>'
-      +'<td class="small">'+sureText(e.confidence)+'</td></tr>';
-   }).join('')
-   +'</tbody></table></div>'
-   +'<p class="muted small">Hover a row to see the raw record behind it, or an airline code to see '
-   +'its name. Season is worked out from the date when the run did not store one.</p>';
+const EVCOLS=[{l:'What happened',cls:'tt'},{l:'When',cls:'nowrap'},{l:'Route',cls:'nowrap'},
+  {l:'Flight',cls:'nowrap'},{l:'Season',cls:'hm'},{l:'Distance',cls:'r num'},{l:'Aircraft'},
+  {l:'Can you fly it?',ml:'Your fleet',cls:'nowrap'},{l:'How sure',cls:'hm small'}];
+function evRows(list){
+  return list.map(e=>{
+    const d=e.detail||{}, ts=(d.types||[]).map(prettyType);
+    const seas=e.season||seasonOf(e.at);
+    const wish=d.candidate??d.kandidaat;
+    return {cls:'sev-'+esc(e.severity||'low'),title:en(JSON.stringify(d)),cells:[
+      esc(kindLabel(e.kind))+(wish?' <span class="tag wish">wishlist</span>':'')
+        +(typeof d.from==='string'&&typeof d.to==='string'?'<span class="sub">'+esc(d.from)+' &rarr; '+esc(d.to)+'</span>':''),
+      esc(fmtWhen(e.at)),
+      e.pair?'<a href="#route/'+esc(e.pair)+'">'+esc(e.pair)+'</a>':dash,
+      e.airline?opList([e.airline],1)+' '+esc(e.flight||''):(e.flight?esc(e.flight):dash),
+      seas?esc(seas):dash,
+      d.nm?nf(d.nm)+' NM':dash,
+      ts.length?esc([...new Set(ts)].join(', ')):dash,
+      d.status?flyText(d.status):dash,
+      sureText(e.confidence)
+    ]};
+  });
+}
+function evTable(list,opt){
+  return table(EVCOLS,evRows(list),Object.assign({empty:'Nothing has changed yet.'},opt||{}));
 }
 
 /* ----------------------------------------------------------- overview ---- */
 function ov(){
-  const s=D.summary;
-  const cards=[
-    [s.airports,'Airports you own'],
+  SORTFN=null;
+  const s=D.summary, served=D.pairs.filter(p=>!NOSVC(p.status));
+  const cM=served.filter(p=>String(p.status).startsWith('MATCH')).length;
+  const cN=served.filter(p=>String(p.status).startsWith('NEAR')).length;
+  const cX=served.length-cM-cN;
+  const tot=s.pairs_possible||D.pairs.length||1;
+  const seg=(n,c)=>n?'<i style="width:'+(n/tot*100).toFixed(2)+'%;background:'+c+'"></i>':'';
+  const stats=[
+    [s.airports,'Airports you own','acc'],
     [s.candidates,'Wishlist airports being measured'],
-    [s.pairs_possible,'Possible airport pairs'],
     [s.pairs_served,'Pairs with real flights'],
-    [s.pairs_unserved,'Pairs with no flights seen'],
-    [s.pairs_match,'Pairs you can fly with your fleet'],
     [s.pairs_simmable,'Pairs that fit a sim session'],
     [s.cargo_pairs,'Pairs flown by cargo aircraft'],
     [s.suspended,'Routes paused after repeated absence']];
-  if(s.airlines_known!==undefined) cards.push([s.airlines_known,'Airlines named automatically']);
-  if(s.registrations!==undefined) cards.push([s.registrations,'Aircraft registrations collected']);
-  app.innerHTML='<p class="lead">RouteWatch watches which flights really operate between the airports '
-   +'you own in the simulator, and tells you which add-on airport would open up the most new routes '
-   +'you can actually fly with the aircraft in your hangar.</p>'
-   +'<div class="cards">'
-   +cards.map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
-   +'<div class="key"><span><i style="background:var(--m)"></i>you own the aircraft</span>'
-   +'<span><i style="background:var(--n)"></i>close substitute in your fleet</span>'
-   +'<span><i style="background:var(--x)"></i>aircraft you do not own</span></div>'
-   +'<h2>What changed in the latest run ('+s.new_events+')</h2>'+evTable(D.events.slice(0,50))
-   +'<p class="muted small">Every run is compared against a stored history, not against yesterday. '
-   +'If a source returns nothing for a day, that is recorded as a miss rather than a change, and a route '
-   +'is only marked as paused after several misses in a row. That is why one quiet day never causes '
-   +'a false alarm.</p>';
+  if(s.airlines_known!==undefined) stats.push([s.airlines_known,'Airlines named automatically']);
+  if(s.registrations!==undefined) stats.push([s.registrations,'Aircraft registrations collected']);
+  app.innerHTML=title('Overview','Which flights really operate between the airports you own, and what you can fly with the aircraft in your hangar.')
+   +'<div class="hero">'
+   +'<div class="panel"><div class="lbl">Flyable today</div><div class="big" style="margin-top:8px">'+nf(s.pairs_match)+'</div>'
+   +'<div class="big-sub">routes you can fly with your own fleet</div>'
+   +'<div class="big-note">Out of '+nf(s.pairs_served)+' airport pairs with real flights. '
+   +'<a href="#routes" data-filter="match">Show them</a></div></div>'
+   +'<div class="panel"><div class="lbl">Network coverage</div>'
+   +'<div style="display:flex;align-items:baseline;gap:8px;margin-top:8px"><span class="val">'+pct(s.pairs_served,tot)+'%</span>'
+   +'<span class="muted small">of '+nf(tot)+' possible pairs have flights</span></div>'
+   +'<div class="meter">'+seg(cM,'var(--ok)')+seg(cN,'var(--warn)')+seg(cX,'#5b6b80')+'</div>'
+   +'<div class="legend"><span><i style="background:var(--ok)"></i>You own it '+nf(cM)+'</span>'
+   +'<span><i style="background:var(--warn)"></i>Substitute '+nf(cN)+'</span>'
+   +'<span><i style="background:#5b6b80"></i>Not in fleet '+nf(cX)+'</span>'
+   +'<span><i style="background:var(--s3)"></i>No flights '+nf(tot-served.length)+'</span></div></div>'
+   +'</div>'
+   +'<div class="stats s4">'+stats.map(x=>'<div class="stat '+(x[2]||'')+'"><b>'+nf(x[0])+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
+   +'<h2 class="sec">Latest changes <span class="count">'+nf(s.new_events)+' in the last run</span>'
+   +'<a href="#changes" style="margin-left:auto;text-transform:none;letter-spacing:0;font-size:12.5px">See all</a></h2>'
+   +evTable(D.events.slice(0,30))
+   +'<p class="note">Every run is compared against a stored history, not just yesterday. A day without data '
+   +'counts as a miss rather than a change, and a route is only marked as paused after several misses in a row, '
+   +'so one quiet day never raises a false alarm.</p>';
+  app.querySelector('a[data-filter]').addEventListener('click',()=>{prFilter='match';prPage=1;});
 }
 
-/* --------------------------------------------------------- pair matrix --- */
-/* Default order: the routes you can actually fly today, at the top. */
-let prSort={key:'status',dir:-1};
+/* ------------------------------------------------------------- routes ---- */
+let prSort={key:'status',dir:-1}, prFilter='all', prPage=1, prQ='';
+const PAGE=150;
 const PRKEYS={
   pair:p=>String(p.pair||''),
   airports:p=>String(p.from||''),
   nm:p=>Number(p.nm||0),
   operators:p=>(p.operators||[]).length,
   types:p=>(p.types||[]).length,
-  status:p=>flyRank(p.status),
+  status:p=>flyRank(p.status)*100000-Number(p.nm||0)/100,
   simmable:p=>p.simmable?1:0
 };
-window.prSortBy=k=>{
-  if(prSort.key===k) prSort={key:k,dir:-prSort.dir};
-  else prSort={key:k,dir:(k==='pair'||k==='airports')?1:-1};
-  prPage=1; pr();
-};
+const PRF=[['all','All'],['match','Flyable'],['served','With flights'],['simmable','Fits a session'],
+  ['cargo','Cargo'],['unserved','No flights']];
+const prIs=(p,f)=>f==='all'||(f==='served'&&!NOSVC(p.status))||(f==='unserved'&&NOSVC(p.status))
+  ||(f==='match'&&String(p.status).startsWith('MATCH'))||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo);
+const hay=p=>p._h||(p._h=[p.pair,p.from,p.to].concat(p.operators||[],(p.operators||[]).map(o=>airlineName(o)||''),
+  p.types||[],(p.types||[]).map(prettyType)).join(' ').toUpperCase());
+const PRCOLS=[{l:'Route',k:'pair',cls:'tt'},{l:'Airports',k:'airports',cls:'hm'},{l:'Distance',k:'nm',cls:'r num'},
+  {l:'Operators',k:'operators'},{l:'Aircraft',k:'types'},{l:'Can you fly it?',ml:'Your fleet',k:'status',cls:'nowrap'},
+  {l:'Fits a session',ml:'One session',k:'simmable'}];
 
 function pr(){
-  const f=filter;
-  const ps=D.pairs.filter(p=>f==='all'||(f==='served'&&!NOSVC(p.status))
-   ||(f==='unserved'&&NOSVC(p.status))||(f==='match'&&String(p.status).startsWith('MATCH'))
-   ||(f==='simmable'&&p.simmable)||(f==='cargo'&&p.cargo));
-  /* Sort the whole filtered set first, then page it. */
-  const shown=sortRows(ps,PRKEYS,prSort).slice(0,PAGE*prPage);
-  app.innerHTML='<div class="chips">'
-   +[['all','All'],['served','Served'],['unserved','Unserved'],['match','MATCH'],
-     ['simmable','Simmable'],['cargo','Cargo']]
-     .map(x=>'<span class="chip '+(x[0]===f?'on':'')+'" onclick="sf(\''+x[0]+'\')">'+x[1]+'</span>').join('')
-   +'<input id="q" placeholder="filter by ICAO, operator or type"><span id="qn" class="muted small"></span></div>'
-   +'<h2>Pair matrix &middot; '+ps.length+' rows</h2>'
-   +'<div class="panel"><table id="t">'
-   +sortHead([['Pair','pair'],['Airports','airports'],['Distance','nm'],['Operators','operators'],
-              ['Aircraft','types'],['Can you fly it?','status'],['Fits a session','simmable']],
-             prSort,'prSortBy')+'<tbody>'
-   +shown.map(p=>'<tr><td class="nowrap"><a onclick="pd(\''+p.pair+'\')">'+esc(p.pair)+'</a></td>'
-   +'<td>'+esc(p.from)+' &ndash; '+esc(p.to)+'</td><td class="num">'+nf(p.nm)+' NM</td>'
-   +'<td>'+opList(p.operators,6)+'</td>'
-   +'<td>'+((p.types||[]).length?esc((p.types||[]).slice(0,3).map(prettyType).join(', '))
-     +((p.types||[]).length>3?' <span class="muted">+'+((p.types||[]).length-3)+'</span>':''):'-')+'</td>'
-   +'<td class="nowrap">'+flyText(p.status)+'</td>'
-   +'<td>'+(p.simmable?'<span class="m">yes</span>':'<span class="muted">no</span>')+'</td></tr>').join('')
-   +'</tbody></table>'
-   +(shown.length<ps.length?'<button class="more" onclick="prMore()">Show '+Math.min(PAGE,ps.length-shown.length)
-     +' more ('+shown.length+' of '+ps.length+')</button>':'')
-   +'</div>'
-   +'<p class="muted small">Sorted by what you can fly, best first. Click a column heading to sort '
-   +'differently, click it again to reverse. Hover an operator code to see the airline name.</p>';
-  const q=document.getElementById('q'), qn=document.getElementById('qn');
-  q.oninput=e=>{const v=e.target.value.toUpperCase();let n=0;
-    document.querySelectorAll('#t tbody tr').forEach(tr=>{
-      const hit=tr.textContent.toUpperCase().indexOf(v)>=0;
-      tr.style.display=hit?'':'none'; if(hit)n++;});
-    qn.textContent=v?n+' matching':'';};
+  SORTFN=k=>{prSort=prSort.key===k?{key:k,dir:-prSort.dir}:{key:k,dir:(k==='pair'||k==='airports')?1:-1};
+    prPage=1;const sel=document.getElementById('prSortSel');if(sel)sel.value=prSort.key+':'+prSort.dir;renderPR();};
+  const counts=Object.fromEntries(PRF.map(f=>[f[0],D.pairs.filter(p=>prIs(p,f[0])).length]));
+  app.innerHTML=title('Routes','Every airport pair in your network. Tap a route for its flights, seasons and changes.')
+   +'<div class="toolbar"><div class="chips scrollx" id="prChips">'
+   +PRF.map(f=>'<span class="chip'+(f[0]===prFilter?' on':'')+'" data-f="'+f[0]+'">'+f[1]
+     +' <span class="n">'+nf(counts[f[0]])+'</span></span>').join('')+'</div>'
+   +'<div class="search">'+SEARCH+'<input id="q" type="search" placeholder="ICAO, city, airline or aircraft" '
+   +'autocomplete="off" value="'+esc(prQ)+'"></div>'
+   +sortSelect('prSortSel',[['status',-1,'Flyable first'],['nm',-1,'Longest first'],['nm',1,'Shortest first'],
+     ['operators',-1,'Most airlines'],['pair',1,'A to Z']],prSort)+'</div>'
+   +'<div id="prt"></div>'
+   +'<p class="note">Sorted by what you can fly, best first. On a computer, click a column heading to sort and '
+   +'click it again to reverse. Point at an airline code to see its name.</p>';
+  document.getElementById('prChips').addEventListener('click',e=>{
+    const c=e.target.closest('.chip'); if(!c) return;
+    prFilter=c.dataset.f; prPage=1;
+    document.querySelectorAll('#prChips .chip').forEach(x=>x.classList.toggle('on',x===c));
+    renderPR();
+  });
+  let t=null;
+  document.getElementById('q').addEventListener('input',e=>{clearTimeout(t);
+    t=setTimeout(()=>{prQ=e.target.value.trim();prPage=1;renderPR();},120);});
+  document.getElementById('prSortSel').addEventListener('change',e=>{prSort=readSort(e.target.value);prPage=1;renderPR();});
+  renderPR();
 }
-window.sf=x=>{filter=x;prPage=1;pr();};
-window.prMore=()=>{prPage++;pr();};
+function renderPR(){
+  let ps=D.pairs.filter(p=>prIs(p,prFilter));
+  if(prQ){const q=prQ.toUpperCase();ps=ps.filter(p=>hay(p).includes(q));}
+  const shown=sortRows(ps,PRKEYS,prSort).slice(0,PAGE*prPage);
+  const rows=shown.map(p=>({cells:[
+    '<a class="lnk" href="#route/'+esc(p.pair)+'">'+esc(p.pair)+'</a><span class="sub mo">'+esc(p.from)+' &ndash; '+esc(p.to)+'</span>',
+    esc(p.from)+' &ndash; '+esc(p.to),
+    nf(p.nm)+' NM',
+    opList(p.operators,6),
+    typesShort(p.types),
+    flyText(p.status),
+    yesNo(p.simmable)]}));
+  const more=shown.length<ps.length?'<button class="more-btn" id="prMore">Show '
+    +Math.min(PAGE,ps.length-shown.length)+' more &middot; '+nf(shown.length)+' of '+nf(ps.length)+'</button>':'';
+  document.getElementById('prt').innerHTML='<h2 class="sec">'+nf(ps.length)+' route'+(ps.length===1?'':'s')
+    +(prQ?' <span class="count">matching &ldquo;'+esc(prQ)+'&rdquo;</span>':'')+'</h2>'
+    +table(PRCOLS,rows,{sort:prSort,after:more,empty:'No routes match. Try another filter or search.'});
+  const mb=document.getElementById('prMore');
+  if(mb) mb.onclick=()=>{prPage++;renderPR();};
+}
 
-/* --------------------------------------------------------- pair detail --- */
-window.pd=p=>{
-  const o=D.pairs.find(x=>x.pair===p); if(!o) return;
-  const ap=Object.fromEntries(D.airports.map(a=>[a.icao,a])), q=p.split('-');
-  app.innerHTML='<h2>'+esc(p)+' &middot; '+nf(o.nm)+' NM</h2>'
-   +'<p class="small">'+esc(o.from)+' &ndash; '+esc(o.to)+' &middot; '+flyText(o.status)+'</p>'
-   +'<p class="muted small">Night restrictions &mdash; '+esc(q[0])+': '+esc(en((ap[q[0]]||{}).night||'not established'))
-   +' &middot; '+esc(q[1])+': '+esc(en((ap[q[1]]||{}).night||'not established'))+'</p>'
-   +'<h2>Flights on this route</h2><div class="panel"><table>'
-   +head(['Operator','Flight','Aircraft (times seen)','Can you fly it?','Days','Departure',
-          'Sources','First and last seen'])+'<tbody>'
-   +o.legs.map(l=>'<tr><td class="nowrap">'+opList([l.airline],1)+'</td>'
-   +'<td class="nowrap">'+esc(l.flight)+'</td>'
-   +'<td>'+esc(Object.entries(l.types).map(x=>prettyType(x[0])+' x'+x[1]).join(', '))+'</td>'
-   +'<td class="nowrap">'+flyText(l.status)+'</td><td class="num">'+l.days+'</td>'
-   +'<td class="nowrap">'+esc(l.std)+'</td><td class="small">'+esc((l.sources||[]).join(', '))+'</td>'
-   +'<td class="nowrap small">'+esc(l.first)+' &rarr; '+esc(l.last)+'</td></tr>').join('')
-   +'</tbody></table></div>'
-   +'<h2>Per season (as observed)</h2><div class="panel"><table>'
-   +head(['Season','Flight','From','To','Days','Aircraft','Departure'])+'<tbody>'
-   +o.legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>'<tr><td><b>'+esc(x[0])+'</b></td>'
-   +'<td class="nowrap">'+esc(l.flight)+'</td><td class="nowrap">'+esc(x[1].first)+'</td>'
-   +'<td class="nowrap">'+esc(x[1].last)+'</td><td class="num">'+x[1].days+'</td>'
-   +'<td>'+esc(Object.keys(x[1].types).map(prettyType).join(', '))+'</td>'
-   +'<td class="nowrap">'+esc(x[1].std)+'</td></tr>')).join('')
-   +'</tbody></table></div>'
-   +'<h2>Changes on this route</h2>'+evTable(D.events.filter(e=>e.pair===p))
-   +'<p><a onclick="V.pr()">&larr; back to the pair matrix</a></p>';
-};
+/* ------------------------------------------------------- route detail ---- */
+function pd(p){
+  SORTFN=null;
+  const o=D.pairs.find(x=>x.pair===p);
+  if(!o){app.innerHTML='<a class="back" href="#routes">'+BACK+'Routes</a><div class="panel empty-state"><b>Route not found</b>'
+    +esc(p)+' is not in the latest data.</div>';return;}
+  const q=p.split('-');
+  const night=c=>esc(en((APMAP[c]||{}).night||'not established'));
+  const legs=o.legs||[];
+  app.innerHTML='<a class="back" href="#routes">'+BACK+'Routes</a>'
+   +title(esc(q[0])+' &ndash; '+esc(q[1]),esc(o.from)+' &ndash; '+esc(o.to)+' &middot; '+nf(o.nm)+' NM',
+     '<div class="chips">'+flyText(o.status)+(o.simmable?'<span class="st m">Fits a session</span>':'')
+     +(o.cargo?'<span class="st c">Cargo</span>':'')+'</div>')
+   +'<div class="panel pad"><dl class="kv"><dt>Night rules '+esc(q[0])+'</dt><dd>'+night(q[0])+'</dd>'
+   +'<dt>Night rules '+esc(q[1])+'</dt><dd>'+night(q[1])+'</dd></dl></div>'
+   +'<h2 class="sec">Flights on this route <span class="count">'+legs.length+'</span></h2>'
+   +table([{l:'Flight',cls:'tt'},{l:'Aircraft (times seen)',ml:'Aircraft'},{l:'Can you fly it?',ml:'Your fleet',cls:'nowrap'},
+     {l:'Days',cls:'r num'},{l:'Departure',cls:'r num'},{l:'Sources',cls:'hm small'},{l:'First and last seen',ml:'Seen',cls:'nowrap small'}],
+     legs.map(l=>({cells:[
+       esc(l.flight)+' <span class="sub">'+(airlineName(l.airline)?esc(airlineName(l.airline)):opList([l.airline],1))+'</span>',
+       esc(Object.entries(l.types||{}).map(x=>prettyType(x[0])+' ×'+x[1]).join(', ')),
+       flyText(l.status),l.days,esc(l.std||'-'),esc((l.sources||[]).join(', ')),
+       esc(l.first)+' &rarr; '+esc(l.last)]})),{empty:'No flights recorded on this route.'})
+   +'<h2 class="sec">Per season</h2>'
+   +table([{l:'Season',cls:'tt'},{l:'Flight'},{l:'From',cls:'nowrap'},{l:'To',cls:'nowrap'},{l:'Days',cls:'r num'},
+     {l:'Aircraft'},{l:'Departure',cls:'r num'}],
+     legs.flatMap(l=>Object.entries(l.seasons||{}).map(x=>({cells:[
+       esc(x[0]),esc(l.flight),esc(x[1].first),esc(x[1].last),x[1].days,
+       esc(Object.keys(x[1].types||{}).map(prettyType).join(', ')),esc(x[1].std||'-')]}))),
+     {empty:'No season data yet.'})
+   +'<h2 class="sec">Changes on this route</h2>'+evTable(D.events.filter(e=>e.pair===p));
+}
 
 /* ---------------------------------------------------------- buy advice --- */
 const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
@@ -448,138 +425,195 @@ const TPL={fsaddoncompare:'https://www.fsaddoncompare.com/search?q=',
   orbx:'https://orbxdirect.com/search?q=',inibuilds:'https://www.inibuilds.com/search?q=',
   aerosoft:'https://www.aerosoft.com/en/search?q=',
   justflight:'https://www.justflight.com/searchresults?searchterm='};
+const STORE={fsaddoncompare:'FSAddonCompare',simmarket:'simMarket',contrail:'Contrail',orbx:'Orbx',
+  inibuilds:'iniBuilds',aerosoft:'Aerosoft',justflight:'Just Flight'};
 const cityOf=n=>String(n||'').split(/[\s\/-]+/)[0];
-
 const PRICES_NOTE='RouteWatch does not compare shop prices itself. FSAddonCompare already does that '
  +'across Aerosoft, Contrail, Flightsim.to, iniBuilds, Just Flight, Orbx, simMarket and the Marketplace, '
- +'with price history and sale alerts. Direct search links per candidate are below. To pull prices into '
- +'this dashboard anyway, set settings.price_scrape to true and fill price_urls per candidate with direct '
- +'product URLs; the app then reads the schema.org JSON-LD price field. Off by default, because scraping is '
- +'fragile and shops set their own terms.';
+ +'with price history and sale alerts. To pull prices into this dashboard anyway, set settings.price_scrape '
+ +'to true and fill price_urls per candidate with direct product URLs; the app then reads the schema.org '
+ +'JSON-LD price field. Off by default, because scraping is fragile and shops set their own terms.';
 
 let buSort={key:'match',dir:-1};
 const BUKEYS={
-  icao:c=>String(c.icao||''),
-  focus:c=>String(c.focus||''),
-  new:c=>Number(c.gain?.new_pairs||0),
-  match:c=>Number(c.gain?.match_pairs||0),
-  sim:c=>Number(c.gain?.simmable_pairs||0),
-  cargo:c=>Number(c.gain?.cargo_pairs||0)
-};
-window.buSortBy=k=>{
-  if(buSort.key===k) buSort={key:k,dir:-buSort.dir};
-  else buSort={key:k,dir:(k==='icao'||k==='focus')?1:-1};
-  bu();
-};
+  icao:c=>String(c.icao||''),focus:c=>String(c.focus||''),
+  new:c=>Number(c.gain?.new_pairs||0),match:c=>Number(c.gain?.match_pairs||0),
+  sim:c=>Number(c.gain?.simmable_pairs||0),cargo:c=>Number(c.gain?.cargo_pairs||0)};
 
 function bu(){
+  SORTFN=k=>{buSort=buSort.key===k?{key:k,dir:-buSort.dir}:{key:k,dir:(k==='icao'||k==='focus')?1:-1};renderBU();};
   const cs=D.candidates||[];
-  if(!cs.length){app.innerHTML='<h2>Buy advice</h2><p class="muted small">No candidates measured yet. '
-   +'Add an airport with <code>"candidate": true</code> in config/collection.json and run the workflow.</p>';return;}
-  const rows=sortRows(cs,BUKEYS,buSort);
-  app.innerHTML='<h2>Which airport is worth buying next</h2>'
-   +'<p class="lead">Each number below was counted, not guessed: these are routes where flights were '
-   +'really observed, between airports you already own and this candidate. The higher the count, the more '
-   +'new flying the purchase unlocks.</p>'
-   +'<div class="panel"><table>'
-   +sortHead(['#',['Airport','icao'],['Focus','focus'],['New routes','new'],
-              ['Flyable with your fleet','match'],['Fits a session','sim'],['Cargo','cargo'],
-              'Connects with'],buSort,'buSortBy')+'<tbody>'
-   +rows.map((c,i)=>'<tr><td class="rank">'+(i+1)+'</td>'
-    +'<td class="nowrap"><a onclick="cd(\''+esc(c.icao)+'\')"><code>'+esc(c.icao)+'</code></a> '+esc(c.name)+'</td>'
-    +'<td><span class="tag">'+esc(c.focus)+'</span></td>'
-    +'<td class="gain num"><b>'+c.gain.new_pairs+'</b></td>'
-    +'<td class="gain m num"><b>'+c.gain.match_pairs+'</b></td>'
-    +'<td class="num">'+c.gain.simmable_pairs+'</td><td class="num">'+c.gain.cargo_pairs+'</td>'
-    +'<td class="small">'+cut(c.gain.connects,10)+'</td></tr>').join('')
-   +'</tbody></table></div>'
-   +'<p class="muted small">Click a column heading to sort. The number in the first column is the rank '
-   +'in the current order. Click an ICAO code for the reasoning and shop links. '+PRICES_NOTE+'</p>';
+  if(!cs.length){app.innerHTML=title('Buy advice')+'<div class="panel empty-state"><b>No candidates measured yet</b>'
+   +'Add an airport with <code>"candidate": true</code> in config/collection.json and run the workflow.</div>';return;}
+  app.innerHTML=title('Buy advice','Every number is counted, not guessed: routes where flights were really seen between '
+   +'the airports you own and the candidate. The higher, the more new flying a purchase unlocks.')
+   +'<div class="toolbar">'+sortSelect('buSortSel',[['match',-1,'Most flyable routes'],['new',-1,'Most new routes'],
+     ['sim',-1,'Most session-length'],['cargo',-1,'Most cargo'],['icao',1,'A to Z']],buSort)+'</div>'
+   +'<div id="but"></div>'
+   +'<details class="fold"><summary>About prices</summary><p class="note">'+PRICES_NOTE+'</p></details>';
+  document.getElementById('buSortSel').addEventListener('change',e=>{buSort=readSort(e.target.value);renderBU();});
+  renderBU();
+}
+function renderBU(){
+  const rows=sortRows(D.candidates||[],BUKEYS,buSort);
+  document.getElementById('but').innerHTML=table(
+    [{l:'Airport',k:'icao',cls:'tt'},{l:'Focus',k:'focus',cls:'hm'},{l:'New routes',k:'new',cls:'r'},
+     {l:'Flyable with your fleet',ml:'Flyable',k:'match',cls:'r'},{l:'Fits a session',ml:'One session',k:'sim',cls:'r'},
+     {l:'Cargo',k:'cargo',cls:'r'},{l:'Connects with',cls:'hm small'}],
+    rows.map((c,i)=>({cells:[
+      '<span class="rank">#'+(i+1)+'</span><a class="lnk" href="#buy/'+esc(c.icao)+'">'+esc(c.icao)+'</a> '
+        +esc(c.name)+' <span class="tag mo-i">'+esc(c.focus)+'</span>',
+      '<span class="tag">'+esc(c.focus)+'</span>',
+      '<span class="big-num">'+nf(c.gain.new_pairs)+'</span>',
+      '<span class="big-num m">'+nf(c.gain.match_pairs)+'</span>',
+      nf(c.gain.simmable_pairs),nf(c.gain.cargo_pairs),cut(c.gain.connects,10)]})),{sort:buSort});
 }
 
-window.cd=icao=>{
-  const c=(D.candidates||[]).find(x=>x.icao===icao); if(!c) return;
+function cd(icao){
+  SORTFN=null;
+  const c=(D.candidates||[]).find(x=>x.icao===icao);
+  if(!c){app.innerHTML='<a class="back" href="#buy">'+BACK+'Buy advice</a><div class="panel empty-state"><b>Not found</b>'
+    +esc(icao)+' is not a candidate in the latest data.</div>';return;}
   const city=cityOf(c.name);
-  app.innerHTML='<h2>'+esc(c.icao)+' &middot; '+esc(c.name)+'</h2>'
-   +'<div class="cards">'+[[c.gain.new_pairs,'New routes this unlocks'],
-     [c.gain.match_pairs,'Of those, flyable with your fleet'],
+  app.innerHTML='<a class="back" href="#buy">'+BACK+'Buy advice</a>'
+   +title(esc(c.icao)+' &middot; '+esc(c.name),'',
+     '<span class="tag acc">'+esc(c.focus)+'</span>')
+   +'<div class="stats">'+[[c.gain.new_pairs,'New routes this unlocks','acc'],
+     [c.gain.match_pairs,'Of those, flyable with your fleet','ok'],
      [c.gain.simmable_pairs,'Short enough for one session'],
      [c.gain.cargo_pairs,'Flown by cargo aircraft']]
-     .map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
-   +'<h2>Why</h2><p class="small">'+esc(en(c.why||''))+'</p>'
-   +(c.known_developers?'<p class="muted small">Known developers: '+esc(c.known_developers.join(' | '))+'</p>':'')
-   +(c.gain.connects.length?'<h2>Connects with</h2><p><code>'+esc(c.gain.connects.join(' '))+'</code></p>':'')
-   +(c.prices&&c.prices.length?'<h2>Prices found</h2><div class="panel"><table>'
-     +head(['Store','Price'])+'<tbody>'
-     +c.prices.map(p=>'<tr><td><a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a></td>'
-     +'<td>'+p.price+' '+esc(p.currency||'')+'</td></tr>').join('')+'</tbody></table></div>':'')
-   +'<h2>Search by code</h2><div class="stores">'
+     .map(x=>'<div class="stat '+(x[2]||'')+'"><b>'+nf(x[0])+'</b><span>'+x[1]+'</span></div>').join('')+'</div>'
+   +'<h2 class="sec">Why</h2><div class="panel pad">'+esc(en(c.why||'No reasoning stored.'))
+   +(c.known_developers?'<p class="note">Known developers: '+esc(c.known_developers.join(' | '))+'</p>':'')+'</div>'
+   +((c.gain.connects||[]).length?'<h2 class="sec">Connects with <span class="count">'+c.gain.connects.length+'</span></h2>'
+     +'<div class="codes">'+c.gain.connects.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')
+   +(c.prices&&c.prices.length?'<h2 class="sec">Prices found</h2>'
+     +table([{l:'Store',cls:'tt'},{l:'Price',cls:'r'}],c.prices.map(p=>({cells:[
+       '<a href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.store)+'</a>',
+       esc(p.price)+' '+esc(p.currency||'')]}))):'')
+   +'<h2 class="sec">Search the shops by code</h2><div class="stores">'
    +Object.entries(c.price_search||{}).map(s=>'<a href="'+esc(s[1])+'" target="_blank" rel="noopener">'
-     +esc(s[0])+'</a>').join('')+'</div>'
-   +'<h2>Search by city name</h2><div class="stores">'
+     +esc(STORE[s[0]]||s[0])+'</a>').join('')+'</div>'
+   +'<h2 class="sec">Search by city name</h2><div class="stores">'
    +Object.entries(TPL).map(s=>'<a href="'+s[1]+encodeURIComponent(city)+'" target="_blank" rel="noopener">'
-     +s[0]+'</a>').join('')+'</div>'
-   +'<p class="muted small">Searching a bare IATA code returns noise in most shops, so the second row '
-   +'searches on "'+esc(city)+'" instead. Direct product URLs are not possible without a catalogue feed '
-   +'from each store.</p>'
-   +'<p><a onclick="V.bu()">&larr; back to buy advice</a></p>';
-};
+     +esc(STORE[s[0]]||s[0])+'</a>').join('')+'</div>'
+   +'<p class="note">A bare code returns noise in most shops, so the second row searches on &ldquo;'+esc(city)
+   +'&rdquo; instead.</p>';
+}
 
-/* ------------------------------------------------- changes, seasons, fleet */
-function ev(){app.innerHTML='<h2>Everything that changed ('+D.events.length+')</h2>'+evTable(D.events);}
+/* ------------------------------------------------------------ changes ---- */
+const EVG={
+  routes:['Routes',k=>/^(ROUTE_|PAIR_|SUSPENDED|RESUMED)/.test(k)],
+  aircraft:['Aircraft',k=>/^TYPE_/.test(k)],
+  fleet:['Your fleet',k=>/^(MATCH_|SIMMABLE_)/.test(k)],
+  schedule:['Days and seasons',k=>/^(DOW_|SEASON_)/.test(k)],
+  other:['Other',k=>!/^(ROUTE_|PAIR_|SUSPENDED|RESUMED|TYPE_|MATCH_|SIMMABLE_|DOW_|SEASON_)/.test(k)]};
+let evG='all', evPage=1;
+function ev(){
+  SORTFN=null;
+  const all=D.events;
+  const cnt=g=>all.filter(e=>EVG[g][1](String(e.kind))).length;
+  const groups=Object.keys(EVG).filter(g=>cnt(g));
+  if(evG!=='all'&&!groups.includes(evG)) evG='all';
+  app.innerHTML=title('Changes','Every change the runs have recorded, newest first. Red marks a route or pair change, '
+   +'amber a change in aircraft or timing.')
+   +'<div class="toolbar"><div class="chips scrollx" id="evChips"><span class="chip'+(evG==='all'?' on':'')
+   +'" data-g="all">All <span class="n">'+nf(all.length)+'</span></span>'
+   +groups.map(g=>'<span class="chip'+(evG===g?' on':'')+'" data-g="'+g+'">'+EVG[g][0]+' <span class="n">'
+     +nf(cnt(g))+'</span></span>').join('')+'</div></div><div id="evt"></div>';
+  document.getElementById('evChips').addEventListener('click',e=>{
+    const c=e.target.closest('.chip'); if(!c) return;
+    evG=c.dataset.g; evPage=1;
+    document.querySelectorAll('#evChips .chip').forEach(x=>x.classList.toggle('on',x===c));
+    renderEV();
+  });
+  renderEV();
+}
+function renderEV(){
+  const list=evG==='all'?D.events:D.events.filter(e=>EVG[evG][1](String(e.kind)));
+  const shown=list.slice(0,100*evPage);
+  const more=shown.length<list.length?'<button class="more-btn" id="evMore">Show more &middot; '
+    +nf(shown.length)+' of '+nf(list.length)+'</button>':'';
+  document.getElementById('evt').innerHTML=evTable(shown,{after:more});
+  const mb=document.getElementById('evMore'); if(mb) mb.onclick=()=>{evPage++;renderEV();};
+}
 
+/* ------------------------------------------------------------ seasons ---- */
 function se(){
-  const s=D.summary;
-  app.innerHTML='<h2>Seasons</h2><p class="small">Current: <b>'+esc(s.season.label)+'</b>, '
-   +s.season.start+' through '+s.season.end+'. The opposite season is <b>'+esc(s.counter_season)+'</b>.</p>'
-   +'<p class="muted small">Airlines change their timetable twice a year. Summer runs from the last Sunday '
-   +'of March to the day before the last Sunday of October, winter covers the rest. RouteWatch works this '
-   +'out from the date, so future seasons need no configuration.</p>'
-   +'<h2>Season events</h2>'+evTable(D.events.filter(e=>String(e.kind).startsWith('SEASON')));
+  SORTFN=null;
+  const s=D.summary, a=new Date(s.season.start), b=new Date(s.season.end), now=new Date();
+  const f=Math.max(0,Math.min(1,(now-a)/(b-a)));
+  const left=Math.max(0,Math.ceil((b-now)/864e5));
+  const sev=D.events.filter(e=>String(e.kind).startsWith('SEASON'));
+  app.innerHTML=title('Seasons','Airlines change their timetable twice a year. Summer runs from the last Sunday of March '
+   +'to the day before the last Sunday of October; winter covers the rest.')
+   +'<div class="season-card">'
+   +'<div class="panel pad"><div class="lbl muted small">CURRENT SEASON</div><div class="val" style="font-size:26px;font-weight:750">'
+   +esc(s.season.label)+'</div><div class="muted small">'+esc(s.season.start)+' &rarr; '+esc(s.season.end)+'</div>'
+   +'<div class="meter"><i style="width:'+(f*100).toFixed(1)+'%;background:var(--accent)"></i></div>'
+   +'<div class="small muted">'+Math.round(f*100)+'% through &middot; '+left+' day'+(left===1?'':'s')+' left</div></div>'
+   +'<div class="panel pad"><div class="lbl muted small">NEXT SEASON</div><div class="val" style="font-size:26px;font-weight:750">'
+   +esc(s.counter_season)+'</div><div class="muted small">Starts '+esc(new Date(b.getTime()+864e5).toISOString().slice(0,10))+', when the clocks change</div></div>'
+   +'<div class="panel pad"><div class="lbl muted small">SEASON EVENTS</div><div class="val" style="font-size:26px;font-weight:750">'
+   +nf(sev.length)+'</div><div class="muted small">new, returning or swapped per season</div></div>'
+   +'</div>'
+   +'<h2 class="sec">Season changes</h2>'+evTable(sev,{empty:'No season changes recorded yet. They appear once a route '
+   +'is seen in two seasons.'})
+   +'<p class="note">RouteWatch works the season out from the date, so future seasons need no configuration.</p>';
 }
 
+/* -------------------------------------------------------------- fleet ---- */
 function fl(){
-  const al=D.airlines||{};
-  const codes=Object.keys(al).sort();
-  app.innerHTML='<h2>Aircraft you own</h2><div class="panel"><table>'
-   +head(['Key','Name','Role','Range','Counts as'])+'<tbody>'
-   +D.fleet.owned.map(f=>'<tr><td><code>'+esc(f.key)+'</code></td><td>'+esc(f.name)+'</td>'
-   +'<td>'+esc(f.role)+'</td><td class="num">'+nf(f.range_nm)+' NM</td>'
-   +'<td class="small">'+esc(f.types.map(prettyType).join(', '))+'</td></tr>').join('')
-   +'</tbody></table></div>'
-   +'<h2>Close-enough substitutes</h2>'
-   +'<p class="muted small">If the real flight uses an aircraft you do not own, RouteWatch checks '
-   +'whether something in your hangar is close enough to fly it anyway.</p>'
-   +'<div class="panel"><table>'
-   +head(['Real aircraft','You would fly','What you give up'])+'<tbody>'
-   +Object.entries(D.fleet.near_match).map(x=>'<tr><td>'+esc(prettyType(x[0]))+'</td>'
-   +'<td>'+esc(prettyType(x[1].substitute))+'</td><td class="small">'+esc(en(x[1].concession))+'</td></tr>').join('')
-   +'</tbody></table></div>'
-   +(codes.length?'<h2>Airlines seen on your network ('+codes.length+')</h2>'
-     +'<p class="muted small">This list is built by the run itself from the names the sources return, '
-     +'so it never needs editing by hand.</p>'
-     +'<div class="panel"><table>'+head(['Code','Airline'])+'<tbody>'
-     +codes.map(c=>'<tr><td><code>'+esc(c)+'</code></td><td>'+esc(al[c])+'</td></tr>').join('')
-     +'</tbody></table></div>':'')
-   +'<p class="muted small">Edit fleet and airports in the <a href="editor.html">Editor</a>, '
-   +'which produces valid JSON for config/collection.json.</p>';
+  SORTFN=null;
+  const al=D.airlines||{}, codes=Object.keys(al).sort();
+  app.innerHTML=title('Fleet','The aircraft in your hangar, and what RouteWatch counts as close enough when the real '
+   +'flight uses something else.')
+   +'<h2 class="sec">Aircraft you own <span class="count">'+D.fleet.owned.length+'</span></h2>'
+   +table([{l:'Aircraft',cls:'tt'},{l:'Role'},{l:'Range',cls:'r num'},{l:'Counts as',cls:'small'}],
+     D.fleet.owned.map(f=>({cells:[
+       esc(f.name)+' <span class="sub"><code>'+esc(f.key)+'</code></span>',
+       '<span class="tag'+(f.role==='cargo'?' acc':'')+'">'+esc(f.role)+'</span>',
+       nf(f.range_nm)+' NM',esc([...new Set(f.types.map(prettyType))].join(', '))]})))
+   +'<h2 class="sec">Close-enough substitutes</h2>'
+   +table([{l:'Real aircraft',cls:'tt'},{l:'You would fly'},{l:'What you give up',cls:'full small'}],
+     Object.entries(D.fleet.near_match||{}).map(x=>({cells:[
+       esc(prettyType(x[0])),esc(prettyType(x[1].substitute)),esc(en(x[1].concession))]})),
+     {empty:'No substitutes configured.'})
+   +(codes.length?'<h2 class="sec">Airlines seen on your network <span class="count">'+codes.length+'</span></h2>'
+     +'<div class="airl">'+codes.map(c=>'<div><code>'+esc(c)+'</code><span title="'+esc(al[c])+'">'+esc(al[c])
+       +'</span></div>').join('')+'</div>'
+     +'<p class="note">Built by each run from the names the sources return, so it never needs editing by hand.</p>':'')
+   +'<p class="note">Edit fleet and airports in the <a href="editor.html">Editor</a>.</p>';
 }
 
-const V={ov:ov,pr:pr,bu:bu,ev:ev,se:se,fl:fl};
-window.V=V;
-document.getElementById('nav').onclick=e=>{
-  if(e.target.tagName!=='A') return;
-  Array.from(document.querySelectorAll('#nav a')).forEach(a=>a.classList.toggle('on',a===e.target));
-  prPage=1; V[e.target.dataset.v]();
-};
+/* ------------------------------------------------------------- router ---- */
+const VIEWS={overview:ov,routes:pr,buy:bu,changes:ev,seasons:se,fleet:fl};
+const SCROLL={}; let curKey=null;
+function route(){
+  const h=decodeURIComponent(location.hash.replace(/^#/,''))||'overview';
+  const [v,arg]=h.split('/');
+  if(curKey) SCROLL[curKey]=window.scrollY;
+  const key=h;
+  if(v==='route'&&arg){RW.setActive('routes');pd(arg);}
+  else if(v==='buy'&&arg){RW.setActive('buy');cd(arg);}
+  else{const k=VIEWS[v]?v:'overview';RW.setActive(k);VIEWS[k]();}
+  const prev=curKey; curKey=key;
+  /* Coming back from a detail page lands where you left the list. */
+  const wasDetail=prev&&prev.includes('/');
+  window.scrollTo(0,wasDetail&&SCROLL[key]?SCROLL[key]:0);
+}
+window.addEventListener('hashchange',route);
 
 fetch('./data.json?'+Date.now()).then(r=>r.json()).then(d=>{
   D=d;
-  if(!d.summary.generated){app.innerHTML='<h2>No data yet</h2><p class="small">Open <b>Actions</b> in your '
-   +'repository, pick <b>RouteWatch</b>, click <b>Run workflow</b> and set backfill_days to <code>1</code>.</p>';return;}
-  document.getElementById('meta').innerHTML='<b>'+esc(d.summary.season.label)+'</b> &middot; updated '
-   +esc(d.summary.generated.slice(0,16))+' &middot; '+d.summary.pairs_served+'/'+d.summary.pairs_possible+' pairs served';
-  ov();
-}).catch(function(){app.innerHTML='<h2>No data yet</h2><p class="small">Actions &rarr; RouteWatch &rarr; '
-  +'Run workflow (backfill_days 1).</p>';});
+  APMAP=Object.fromEntries((d.airports||[]).map(a=>[a.icao,a]));
+  const s=d.summary||{};
+  if(!s.generated){app.innerHTML='<div class="panel empty-state"><b>No data yet</b>Open <b>Actions</b> in your '
+   +'repository, pick <b>RouteWatch</b>, click <b>Run workflow</b> and set backfill_days to <code>1</code>.</div>';return;}
+  RW.setMeta('<b>'+esc(s.season.label)+'</b><span title="'+esc(RW.when(s.generated))+'">&middot; '+esc(RW.ago(s.generated))
+   +'</span><span class="long">&middot; '+nf(s.pairs_served)+' of '+nf(s.pairs_possible)+' pairs served</span>',s.generated);
+  route();
+}).catch(()=>{app.innerHTML='<div class="panel empty-state"><b>No data yet</b>Actions &rarr; RouteWatch &rarr; '
+  +'Run workflow (backfill_days 1).</div>';});
+
 </script></body></html>

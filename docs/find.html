@@ -2,169 +2,120 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RouteWatch — Find a flight</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RouteWatch &middot; Find a flight</title>
+<meta name="theme-color" content="#0a0f16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RouteWatch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/rw.css?v=3">
 <style>
-  :root {
-    --bg: #0d1117;
-    --panel: #161b22;
-    --panel-2: #1c2129;
-    --line: #2b323c;
-    --text: #e6edf3;
-    --dim: #8b949e;
-    --accent: #4a9eff;
-    --own: #3fb950;
-    --warn: #d29922;
+  .fbar{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px;padding:14px;margin-bottom:14px}
+  .fbar .swap{display:none}
+  .fsum{display:flex;align-items:center;gap:10px;justify-content:space-between;margin:0 2px 12px;flex-wrap:wrap}
+  .fsum #summary{color:var(--dim);font-size:13.5px}
+  .fsum #summary b{color:var(--text)}
+  .flayout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:18px;align-items:start}
+  aside.fside{position:sticky;top:calc(var(--hdr) + 14px);max-height:calc(100vh - var(--hdr) - 28px);overflow-y:auto;padding:16px}
+  aside.fside fieldset{border:0;padding:0;margin:0 0 18px}
+  aside.fside legend{font-size:11.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin-bottom:6px;padding:0;font-weight:600}
+  label.opt{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:9px;cursor:pointer;font-size:13.5px;
+    -webkit-tap-highlight-color:transparent}
+  label.opt:hover{background:var(--s2)}
+  label.opt.zero{opacity:.4}
+  label.opt .count{margin-left:auto;color:var(--faint);font-size:12px;font-variant-numeric:tabular-nums}
+  label.opt .hint,.hint{color:var(--faint);font-size:12px}
+  input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px;flex:none;margin:0}
+  .sheet-head{display:none}
+  .sheet-foot{display:flex;gap:8px;margin-top:6px}
+  .sheet-foot .btn{flex:1}
+  #sheetGo{display:none}
+  .bucket-group{margin-bottom:22px}
+  .bucket-group>.panel{overflow-x:auto}
+  .bucket-head{display:flex;align-items:baseline;gap:10px;margin:0 2px 8px}
+  .bucket-head h2{font-size:15px;margin:0;letter-spacing:-.2px}
+  .bucket-head .n{margin-left:auto;color:var(--faint);font-size:12px}
+  .dest .dcode{font-weight:700;font-family:var(--mono);font-size:13.5px;letter-spacing:.3px}
+  .dest small{display:block;font-weight:400;color:var(--dim);font-size:12px}
+  .dblock{float:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .ops{color:var(--dim);font-size:12.5px}
+  .toggle{background:none;border:0;color:var(--accent);cursor:pointer;font:inherit;font-size:12px;padding:0;margin-top:4px;font-weight:600}
+  tr.open td{background:rgba(92,171,255,.04)}
+  tr.detailrow>td{background:var(--s2);padding:4px 12px 14px}
+  .detail-grid{display:flex;flex-wrap:wrap;gap:18px;padding:10px 2px 2px}
+  .detail-block{min-width:170px}
+  .detail-block.wide{flex:1 1 420px;min-width:0}
+  .detail-block h3{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);margin:0 0 6px;font-weight:650}
+  .fchips{display:flex;flex-wrap:wrap;gap:5px}
+  .fchip{font-size:11.5px;padding:2px 8px;border-radius:6px;border:1px solid var(--line);background:var(--s1);font-variant-numeric:tabular-nums}
+  .hscroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table.flights{border-collapse:collapse;font-size:12.5px;min-width:440px}
+  table.flights th{text-align:left;color:var(--faint);font-weight:500;padding:2px 12px 4px 0;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  table.flights td{padding:5px 12px 5px 0;border-top:1px solid var(--line-soft);white-space:nowrap}
+  .disclaimer{color:var(--faint);font-size:12px;margin-top:18px;max-width:900px}
+  @media (max-width:980px){.flayout{grid-template-columns:minmax(0,1fr)}}
+  @media (max-width:980px){
+    aside.fside{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:62;max-height:82vh;border-radius:20px 20px 0 0;
+      transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1);padding:10px 16px calc(16px + var(--safe-b));
+      border-bottom:0}
+    body.fopen aside.fside{transform:none}
+    .fsheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:61;opacity:0;pointer-events:none;transition:opacity .2s}
+    body.fopen .fsheet-bg{opacity:1;pointer-events:auto}
+    .sheet-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px}
+    .sheet-head b{font-size:16px}
+    #sheetGo{display:inline-flex}
+    .sheet-foot{position:sticky;bottom:0;background:var(--s1);padding-top:10px;z-index:3}
   }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--text);
-    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  @media (min-width:981px){#filtersBtn{display:none}.fsheet-bg{display:none}}
+  @media (max-width:760px){
+    .fbar{grid-template-columns:1fr;gap:10px;padding:12px}
+    .rt td.dest .toggle{display:inline-block;margin-top:6px}
+    .rt td[data-l="Block"]{display:none}
+    tr.detailrow>td{padding:0 14px 14px}
+    tr.detailrow{padding:0!important}
+    .detail-block{min-width:0;flex:1 1 100%}
   }
-  header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    align-items: baseline;
-  }
-  header h1 { font-size: 18px; margin: 0; font-weight: 600; }
-  header nav a { color: var(--dim); text-decoration: none; margin-right: 14px; font-size: 14px; }
-  header nav a:hover { color: var(--accent); }
-  .meta { color: var(--dim); font-size: 12px; margin-left: auto; }
-  main { display: grid; grid-template-columns: 300px 1fr; gap: 22px; padding: 22px; align-items: start; }
-  @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
-  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-  aside { position: sticky; top: 22px; max-height: calc(100vh - 44px); overflow-y: auto; }
-  fieldset { border: 0; padding: 0; margin: 0 0 20px; }
-  legend { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--dim); margin-bottom: 8px; padding: 0; }
-  label.opt {
-    display: flex; align-items: center; gap: 8px;
-    padding: 4px 6px; border-radius: 6px; cursor: pointer; font-size: 14px;
-  }
-  label.opt:hover { background: var(--panel-2); }
-  label.opt.zero { opacity: .38; }
-  label.opt .count { margin-left: auto; color: var(--dim); font-size: 12px; font-variant-numeric: tabular-nums; }
-  label.opt .hint { color: var(--dim); font-size: 12px; }
-  input[type=checkbox] { accent-color: var(--accent); width: 15px; height: 15px; }
-  select, input[type=search] {
-    width: 100%; background: var(--panel-2); border: 1px solid var(--line);
-    color: var(--text); border-radius: 6px; padding: 8px 9px; font-size: 14px;
-  }
-  .actions { display: flex; gap: 8px; margin-top: 4px; }
-  button {
-    font: inherit; border-radius: 6px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--line);
-    background: var(--panel-2); color: var(--text);
-  }
-  button.primary { background: var(--accent); border-color: var(--accent); color: #06131f; font-weight: 600; flex: 1; }
-  button:hover { filter: brightness(1.12); }
-  .bucket-group { margin-bottom: 26px; }
-  .bucket-head {
-    display: flex; align-items: baseline; gap: 10px;
-    border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;
-  }
-  .bucket-head h2 { font-size: 15px; margin: 0; }
-  .bucket-head .hint { color: var(--dim); font-size: 12px; }
-  .bucket-head .n { margin-left: auto; color: var(--dim); font-size: 12px; }
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  th { text-align: left; font-weight: 500; color: var(--dim); font-size: 12px; padding: 4px 8px; }
-  td { padding: 7px 8px; border-top: 1px solid var(--line); vertical-align: top; }
-  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .dest { font-weight: 600; }
-  .dest small { display: block; font-weight: 400; color: var(--dim); font-size: 12px; }
-  .tag {
-    display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px;
-    border: 1px solid var(--line); color: var(--dim); white-space: nowrap;
-  }
-  .tag.own { color: var(--own); border-color: #23502f; }
-  .tag.est { color: var(--warn); border-color: #4a3a12; }
-  .tag.obs { color: var(--own); border-color: #23502f; }
-  .ops { color: var(--dim); font-size: 13px; }
-  .empty { padding: 26px; text-align: center; color: var(--dim); }
-  .empty b { color: var(--text); }
-  .empty ul { list-style: none; padding: 0; margin: 12px 0 0; }
-  .empty li { margin: 5px 0; }
-  .empty a { color: var(--accent); cursor: pointer; text-decoration: none; }
-  .disclaimer { color: var(--dim); font-size: 12px; margin-top: 22px; border-top: 1px solid var(--line); padding-top: 12px; }
-  /* Observed detail panel */
-  .toggle {
-    background: none; border: 0; color: var(--accent); cursor: pointer;
-    font: inherit; font-size: 12px; padding: 0; margin-top: 4px;
-  }
-  tr.detailrow > td { background: var(--panel-2); border-top: 0; padding: 0 8px 12px; }
-  .detail-grid { display: flex; flex-wrap: wrap; gap: 18px; padding: 10px 2px 2px; }
-  .detail-block { min-width: 180px; }
-  .detail-block h3 {
-    font-size: 11px; text-transform: uppercase; letter-spacing: .07em;
-    color: var(--dim); margin: 0 0 6px; font-weight: 600;
-  }
-  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
-  .chip {
-    font-size: 11px; padding: 1px 7px; border-radius: 4px;
-    border: 1px solid var(--line); color: var(--text); background: var(--panel);
-    font-variant-numeric: tabular-nums;
-  }
-  table.flights { width: auto; min-width: 420px; font-size: 13px; }
-  table.flights th { padding: 2px 10px 2px 0; }
-  table.flights td { padding: 3px 10px 3px 0; border-top: 1px solid var(--line); }
-  table.flights td.mono { font-variant-numeric: tabular-nums; }
+  @media (min-width:761px){.dblock{display:none}}
 </style>
 </head>
-<body>
-<header>
-  <h1>RouteWatch · Find a flight</h1>
-  <nav>
-    <a href="index.html">Dashboard</a>
-    <a href="map.html">Map</a>
-    <a href="editor.html">Editor</a>
-  </nav>
-  <span class="meta" id="meta">loading…</span>
-</header>
+<body data-page="find">
+<script src="assets/rw-shell.js?v=3"></script>
+<main class="rw-main">
+  <div class="page-title"><div><h1>Find a flight</h1><p class="dk-only">Pick a departure and what you want to fly. Every destination is an airport in your network.</p></div></div>
+  <div class="panel fbar">
+    <label class="field"><span>From</span><select id="from"></select></label>
+    <label class="field"><span>To <em class="faint" style="font-style:normal;text-transform:none;letter-spacing:0">(empty = surprise me)</em></span>
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg><input type="search" id="toFilter" placeholder="ICAO or city" autocomplete="off"></div></label>
+  </div>
 
-<main>
-  <aside class="panel">
-    <fieldset>
-      <legend>Departure</legend>
-      <select id="from"></select>
-    </fieldset>
+  <div class="fsum">
+    <div id="summary">&nbsp;</div>
+    <button class="btn" id="filtersBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters <span class="badge" id="fcount" hidden></span></button>
+  </div>
 
-    <fieldset>
-      <legend>Destination <span class="hint">(empty = surprise me)</span></legend>
-      <input type="search" id="toFilter" placeholder="ICAO or city, optional">
-    </fieldset>
-
-    <fieldset>
-      <legend>Aircraft</legend>
-      <div id="acOpts"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Flight time</legend>
-      <div id="bucketOpts"></div>
-    </fieldset>
-
-    <fieldset>
-      <legend>Filters</legend>
-      <label class="opt"><input type="checkbox" id="ownOnly"> Only airports I own</label>
-      <label class="opt"><input type="checkbox" id="opsOnly"> Only routes with observed traffic</label>
-      <label class="opt"><input type="checkbox" id="cargoOnly"> Freighters on cargo routes only</label>
-    </fieldset>
-
-    <div class="actions">
-      <button class="primary" id="search">Search</button>
-      <button id="reset">Clear</button>
-    </div>
-  </aside>
-
-  <section>
-    <div id="results"></div>
-    <p class="disclaimer" id="disclaimer"></p>
-  </section>
+  <div class="flayout">
+    <aside class="panel fside" id="fside" aria-label="Filters">
+      <div class="sheet-head"><b>Filters</b><button class="btn ghost iconbtn" id="sheetClose" aria-label="Close">&times;</button></div>
+      <fieldset><legend>Aircraft</legend><div id="acOpts"></div></fieldset>
+      <fieldset><legend>Flight time</legend><div id="bucketOpts"></div></fieldset>
+      <fieldset><legend>Only show</legend>
+        <label class="opt"><input type="checkbox" id="ownOnly"> Airports I own at both ends</label>
+        <label class="opt"><input type="checkbox" id="opsOnly"> Routes with observed traffic</label>
+        <label class="opt"><input type="checkbox" id="cargoOnly"> Freighters on cargo routes only</label>
+      </fieldset>
+      <div class="sheet-foot"><button class="btn" id="reset">Clear filters</button><button class="btn pri" id="sheetGo">Show results</button></div>
+    </aside>
+    <section>
+      <div id="results"><div class="loading"><div class="spin"></div>Loading destinations&hellip;</div></div>
+      <p class="disclaimer" id="disclaimer"></p>
+    </section>
+  </div>
 </main>
-
+<div class="fsheet-bg" id="sheetBg"></div>
 <script>
 'use strict';
 
@@ -274,6 +225,7 @@ function renderResults() {
   const hits = state.data.routes.filter((r) => matches(r));
 
   if (!hits.length) {
+    state.nDest = 0;
     el('results').innerHTML = `<div class="panel empty"><b>No matches.</b>${relaxHints()}</div>`;
     el('results').querySelectorAll('a[data-relax]').forEach((a) => {
       a.addEventListener('click', () => {
@@ -309,17 +261,18 @@ function renderResults() {
   }
 
   const rows = [...byDest.values()];
+  state.nDest = rows.length;
   el('results').innerHTML = state.data.buckets.map((b) => {
     const group = rows.filter((r) => r.bucket === b.id).sort((x, y) => x.block_min - y.block_min);
     if (!group.length) return '';
-    return `<div class="bucket-group">
+    return `<section class="bucket-group">
       <div class="bucket-head"><h2>${esc(b.label)}</h2><span class="hint">${esc(b.hint)}</span>
         <span class="n">${group.length} destination${group.length === 1 ? '' : 's'}</span></div>
-      <table><thead><tr>
-        <th>Destination</th><th>Aircraft</th><th class="num">Distance</th><th class="num">Block</th><th>Scenery</th><th>Airlines</th>
+      <div class="panel"><table class="rt"><thead><tr>
+        <th>Destination</th><th>Aircraft</th><th class="r">Distance</th><th class="r">Block</th><th>Scenery</th><th>Airlines</th>
       </tr></thead><tbody>
       ${group.map(rowHtml).join('')}
-      </tbody></table></div>`;
+      </tbody></table></div></section>`;
   }).join('');
 
   el('results').querySelectorAll('button[data-open]').forEach((btn) => {
@@ -382,16 +335,16 @@ function rowHtml(r) {
   const key = `${r.from}-${r.to}`;
   const isOpen = state.open.has(key);
   const toggle = r.obs
-    ? `<button class="toggle" data-open="${key}">${isOpen ? '−' : '+'} observed traffic</button>`
+    ? `<button class="toggle" data-open="${key}" aria-expanded="${isOpen}">${isOpen ? 'Hide' : 'Show'} observed traffic</button>`
     : '';
 
-  const main = `<tr>
-    <td class="dest">${esc(r.to)}<small>${esc(ap.city || ap.name || '')}${ap.country ? ' · ' + esc(ap.country) : ''}</small>${toggle}</td>
-    <td>${alts.map(esc).join(' / ')}</td>
-    <td class="num">${dist}</td>
-    <td class="num">${fmtDuration(r.block_min)}${blockTag}</td>
-    <td>${scenery}</td>
-    <td class="ops">${ops}${freq}${cargo}</td>
+  const main = `<tr${isOpen ? ' class="open"' : ''}>
+    <td class="tt dest" data-l="Destination"><span class="v"><span class="dcode">${esc(r.to)}</span><span class="dblock mo">${fmtDuration(r.block_min)}</span><small>${esc(ap.city || ap.name || '')}${ap.country ? ' · ' + esc(ap.country) : ''}</small>${toggle}</span></td>
+    <td data-l="Aircraft"><span class="v">${alts.map(esc).join(' / ')}</span></td>
+    <td class="r num" data-l="Distance"><span class="v">${dist}</span></td>
+    <td class="r num" data-l="Block"><span class="v">${fmtDuration(r.block_min)}${blockTag}</span></td>
+    <td data-l="Scenery"><span class="v">${scenery}</span></td>
+    <td class="ops" data-l="Airlines"><span class="v">${ops}${freq}${cargo}</span></td>
   </tr>`;
 
   return isOpen && r.obs ? main + detailHtml(r) : main;
@@ -402,13 +355,13 @@ function detailHtml(r) {
   const blocks = [];
 
   const when = [];
-  if (o.time_bands.size) when.push(`<div class="chips">${[...o.time_bands].map((t) => `<span class="chip">${esc(t)}</span>`).join('')}</div>`);
+  if (o.time_bands.size) when.push(`<div class="fchips">${[...o.time_bands].map((t) => `<span class="fchip">${esc(t)}</span>`).join('')}</div>`);
   if (o.dow.size) {
     const days = [...o.dow].sort((a, b) => a - b).map(dowLabel);
-    when.push(`<div class="chips">${days.map((d) => `<span class="chip">${esc(d)}</span>`).join('')}</div>`);
+    when.push(`<div class="fchips">${days.map((d) => `<span class="fchip">${esc(d)}</span>`).join('')}</div>`);
   }
-  if (o.days_seen) when.push(`<div class="chips"><span class="chip">${o.days_seen} days observed</span></div>`);
-  if (o.cargo) when.push('<div class="chips"><span class="chip">cargo traffic</span></div>');
+  if (o.days_seen) when.push(`<div class="fchips"><span class="fchip">${o.days_seen} days observed</span></div>`);
+  if (o.cargo) when.push('<div class="fchips"><span class="fchip">cargo traffic</span></div>');
   if (when.length) blocks.push(`<div class="detail-block"><h3>When</h3>${when.join('')}</div>`);
 
   const seasonKeys = Object.keys(o.seasons).sort();
@@ -416,20 +369,20 @@ function detailHtml(r) {
     const rows = seasonKeys.map((s) => {
       const v = o.seasons[s] || {};
       const span = v.first && v.last ? `${esc(v.first)} → ${esc(v.last)}` : '';
-      return `<span class="chip">${esc(s)}: ${v.days ?? 0} d ${span}</span>`;
+      return `<span class="fchip">${esc(s)}: ${v.days ?? 0} d ${span}</span>`;
     }).join('');
-    blocks.push(`<div class="detail-block"><h3>Seasons</h3><div class="chips">${rows}</div></div>`);
+    blocks.push(`<div class="detail-block"><h3>Seasons</h3><div class="fchips">${rows}</div></div>`);
   }
 
   if (o.regs.size) {
-    blocks.push(`<div class="detail-block"><h3>Registrations</h3><div class="chips">${
-      [...o.regs].sort().map((g) => `<span class="chip">${esc(g)}</span>`).join('')
+    blocks.push(`<div class="detail-block"><h3>Registrations</h3><div class="fchips">${
+      [...o.regs].sort().map((g) => `<span class="fchip">${esc(g)}</span>`).join('')
     }</div></div>`);
   }
 
   if (o.types.size) {
-    blocks.push(`<div class="detail-block"><h3>Observed on</h3><div class="chips">${
-      [...o.types].sort().map((t) => `<span class="chip">${esc(t)}</span>`).join('')
+    blocks.push(`<div class="detail-block"><h3>Observed on</h3><div class="fchips">${
+      [...o.types].sort().map((t) => `<span class="fchip">${esc(t)}</span>`).join('')
     }</div></div>`);
   }
 
@@ -443,13 +396,13 @@ function detailHtml(r) {
       <td>${esc(f.status || '')}</td>
     </tr>`).join('');
     const more = o.flights.length > 40 ? `<tr><td colspan="6" class="hint">… and ${o.flights.length - 40} more</td></tr>` : '';
-    blocks.push(`<div class="detail-block" style="flex:1"><h3>Flights</h3>
+    blocks.push(`<div class="detail-block wide"><h3>Flights</h3><div class="hscroll">
       <table class="flights"><thead><tr>
         <th>Flight</th><th>STD</th><th>Days</th><th>#</th><th>Seen</th><th>Status</th>
-      </tr></thead><tbody>${rows}${more}</tbody></table></div>`);
+      </tr></thead><tbody>${rows}${more}</tbody></table></div></div>`);
   }
 
-  return `<tr class="detailrow"><td colspan="6"><div class="detail-grid">${blocks.join('')}</div></td></tr>`;
+  return `<tr class="detailrow"><td colspan="6" class="full"><div class="detail-grid">${blocks.join('')}</div></td></tr>`;
 }
 
 // For an empty result set, report how many options each single relaxation
@@ -504,6 +457,13 @@ function update() {
   renderFacets();
   renderResults();
   toUrl();
+  const n = state.ac.size + state.buckets.size + (state.ownOnly ? 1 : 0) + (state.opsOnly ? 1 : 0) + (state.cargoOnly ? 1 : 0);
+  el('fcount').textContent = n ? String(n) : '';
+  el('fcount').hidden = !n;
+  const ap = state.data.airports[state.from] || {};
+  el('summary').innerHTML = `<b>${state.nDest || 0}</b> destination${state.nDest === 1 ? '' : 's'} from <b>${esc(state.from)}</b>`
+    + `<span class="dk-only faint"> · ${esc(ap.city || ap.name || '')}</span>`;
+  el('sheetGo').textContent = `Show ${state.nDest || 0} destination${state.nDest === 1 ? '' : 's'}`;
 }
 
 /* ---------- boot ---------- */
@@ -526,7 +486,7 @@ async function boot() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
   } catch (err) {
-    el('meta').textContent = 'find.json not loaded';
+    RW.setMeta('find.json not loaded');
     el('results').innerHTML = `<div class="panel empty"><b>Could not load find.json.</b>
       <p>Run <code>node scripts/publish-find.mjs</code> and commit <code>docs/find.json</code>.</p>
       <p class="hint">${esc(err.message)}</p></div>`;
@@ -552,7 +512,11 @@ async function boot() {
   el('ownOnly').addEventListener('change', (e) => { state.ownOnly = e.target.checked; update(); });
   el('opsOnly').addEventListener('change', (e) => { state.opsOnly = e.target.checked; update(); });
   el('cargoOnly').addEventListener('change', (e) => { state.cargoOnly = e.target.checked; update(); });
-  el('search').addEventListener('click', update);
+  const openF = (v) => { document.body.classList.toggle('fopen', v); };
+  el('filtersBtn').addEventListener('click', () => openF(true));
+  el('sheetBg').addEventListener('click', () => openF(false));
+  el('sheetGo').addEventListener('click', () => { openF(false); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  el('sheetClose').addEventListener('click', () => openF(false));
   el('reset').addEventListener('click', () => {
     state.ac.clear();
     state.buckets.clear();
@@ -573,7 +537,7 @@ async function boot() {
     c.observed_rows ? `${c.observed_rows.toLocaleString('en-GB')} observed` : null,
     `updated ${data.generated_on}`,
   ].filter(Boolean);
-  el('meta').textContent = parts.join(' · ');
+  RW.setMeta(`<span>${esc(parts[parts.length - 1])}</span><span class="long">&middot; ${esc(parts.slice(0, -1).join(' · '))}</span>`);
   el('disclaimer').textContent = disclaimerText(data);
 
   update();

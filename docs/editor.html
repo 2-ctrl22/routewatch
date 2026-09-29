@@ -2,89 +2,87 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RouteWatch - Editor</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RouteWatch &middot; Editor</title>
+<meta name="theme-color" content="#0a0f16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RouteWatch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/rw.css?v=3">
 <style>
-  :root{--bg:#0b0f14;--p:#121820;--p2:#182029;--l:#243040;--t:#e6edf3;--d:#8b98a8;
-    --u:#58a6ff;--ok:#3fb950;--warn:#d29922;--bad:#f85149;--r:12px}
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{background:var(--bg);color:var(--t);
-    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased}
-  header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
-    border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:10}
-  header>b{font-size:16px}
-  header a{color:var(--u);text-decoration:none;font-size:13.5px}
-  header a:hover{text-decoration:underline}
-  header .here{color:var(--t);border-bottom:2px solid var(--u);padding-bottom:2px}
-  #state{margin-left:auto;background:var(--p2);border:1px solid var(--l);border-radius:9px;
-    padding:6px 12px;font-size:12px;color:var(--d)}
-  main{padding:22px;max-width:1500px}
-  h2{font-size:13px;color:var(--d);margin:0;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
-  .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
-  .head{display:flex;gap:12px;align-items:center;justify-content:space-between;
-    padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
+  .panel{margin-bottom:16px}
+  .head{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:12px 16px;
+    border-bottom:1px solid var(--line-soft);flex-wrap:wrap}
+  .head h2{margin:0;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;font-weight:650}
   .tabs{display:flex;gap:7px;flex-wrap:wrap}
   button{font-family:inherit;cursor:pointer}
-  button.tab{background:var(--p2);color:var(--d);border:1px solid var(--l);border-radius:999px;
-    padding:5px 13px;font-size:12.5px}
-  button.tab[aria-selected="true"]{color:var(--u);border-color:var(--u)}
-  button.tab:hover{color:var(--t)}
-  button.act{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:8px;
-    padding:6px 13px;font-size:13px}
-  button.act:hover{border-color:#31415a}
-  button.act.pri{border-color:var(--u);color:var(--u)}
-  button.act.ok2{border-color:var(--ok);color:var(--ok)}
+  button.tab{background:var(--s1);color:var(--dim);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px}
+  button.tab[aria-selected="true"]{color:var(--text);background:var(--accent-soft);border-color:rgba(92,171,255,.55)}
+  button.tab:hover{color:var(--text)}
+  button.act{background:var(--s2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:8px 14px;
+    font-size:13px;font-weight:550}
+  button.act:hover{border-color:#33455c;background:var(--s3)}
+  button.act.pri{border-color:rgba(92,171,255,.6);color:var(--accent)}
+  button.act.ok2{border-color:rgba(63,207,107,.6);color:var(--ok)}
+  button.act.ok2.pri{background:var(--ok);border-color:var(--ok);color:#04130a;font-weight:650}
   button.act:disabled{opacity:.45;cursor:not-allowed}
-  button.del{background:none;border:1px solid var(--l);color:var(--d);border-radius:6px;
-    width:24px;height:24px;line-height:1;font-size:14px}
+  button.del{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;width:30px;height:30px;
+    line-height:1;font-size:16px}
   button.del:hover{border-color:var(--bad);color:var(--bad)}
-  .wrap{overflow:auto;max-height:60vh}
-  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
-  th,td{text-align:left;padding:5px 10px;border-bottom:1px solid var(--l);white-space:nowrap}
-  th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-    background:var(--p2);position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--l)}
-  tbody tr:hover td{background:#151c25}
-  td input[type=text]{background:transparent;border:1px solid transparent;color:var(--t);
-    padding:3px 6px;border-radius:6px;font:inherit;font-size:12.5px;width:100%;min-width:80px}
-  td input[type=text]:hover{border-color:var(--l)}
-  td input[type=text]:focus{outline:none;border-color:var(--u);background:var(--p2)}
-  td.icao input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--u)}
+  .wrap{overflow:auto;max-height:62vh;-webkit-overflow-scrolling:touch}
+  .wrap table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+  .wrap th,.wrap td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line-soft);white-space:nowrap}
+  .wrap th{color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.5px;background:var(--s2);
+    position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--line)}
+  .wrap td:first-child,.wrap th:first-child{position:sticky;left:0;background:var(--s1);z-index:1}
+  .wrap th:first-child{z-index:3;background:var(--s2)}
+  .wrap tbody tr:hover td{background:rgba(92,171,255,.035)}
+  td input[type=text]{background:transparent;border:1px solid transparent;color:var(--text);padding:5px 8px;
+    border-radius:8px;font:inherit;font-size:13px;width:100%;min-width:90px;box-shadow:none}
+  td input[type=text]:hover{border-color:var(--line)}
+  td input[type=text]:focus{outline:none;border-color:var(--accent);background:var(--bg-2);box-shadow:none}
+  td.icao input{font-family:var(--mono);color:var(--accent);min-width:70px}
   td.num input{text-align:right}
+  td input[type=checkbox]{accent-color:var(--accent);width:18px;height:18px}
   .bad input{border-color:var(--bad)!important}
-  textarea{width:100%;min-height:300px;background:#0d131a;color:var(--t);border:none;
-    padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;
-    line-height:1.5;resize:vertical}
-  textarea:focus{outline:none}
-  .msg{padding:10px 16px;font-size:13px;border-top:1px solid var(--l)}
-  .msg.ok{color:var(--ok)}
-  .msg.bad{color:var(--bad)}
-  .msg.warn{color:var(--warn)}
-  .note{padding:14px 16px;color:var(--d);font-size:13px}
-  .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-  code{background:var(--p2);padding:1px 5px;border-radius:4px;font-size:12px}
+  textarea{width:100%;min-height:300px;background:var(--bg-2);color:var(--text);border:none;border-radius:0;
+    padding:14px 16px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;box-shadow:none}
+  textarea:focus{outline:none;box-shadow:none}
+  .msg{padding:10px 16px;font-size:13px;border-top:1px solid var(--line-soft)}
+  .msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}.msg.warn{color:var(--warn)}
+  .note{padding:14px 16px;color:var(--dim);font-size:13px;margin:0;max-width:none}
+  .note b{color:var(--text)}
+  .pill{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--dim)}
   ol{margin:6px 0 0 18px;padding:0}
   ol li{margin:3px 0}
-  footer{color:var(--d);font-size:12.5px;margin-top:8px}
-  input[type=password]{background:#0d131a;border:1px solid var(--l);color:var(--t);
-    border-radius:8px;padding:6px 10px;font:inherit;font-size:13px;min-width:280px}
-  input[type=password]:focus{outline:none;border-color:var(--u)}
-  label.tokLbl{font-size:12.5px;color:var(--d);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  footer{color:var(--faint);font-size:12.5px;margin-top:8px}
+  input[type=password]{max-width:360px}
+  label.tokLbl{font-size:12.5px;color:var(--dim);display:flex;align-items:center;gap:10px;flex-wrap:wrap;flex:1;min-width:0}
   .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  #state{font-size:12px;white-space:normal;max-width:100%}
+  @media (max-width:760px){
+    .head{padding:12px 14px}
+    .tabs{flex-wrap:nowrap;overflow-x:auto;width:100%;scrollbar-width:none}
+    .tabs::-webkit-scrollbar{display:none}
+    button.tab{white-space:nowrap}
+    .wrap{max-height:none;max-height:70vh}
+    td input[type=text]{font-size:16px}
+    input[type=password]{max-width:none}
+    label.tokLbl{width:100%}
+    .head>div{width:100%}
+    .head>div button.act{flex:1}
+  }
 </style>
 </head>
-<body>
-
-<header><b>RouteWatch</b>
-  <a href="index.html">Dashboard</a>
-  <a href="map.html">Map</a>
-  <span class="here">Editor</span><a href="find.html">Find</a>
-  <span id="state">loading config...</span>
-</header>
-
-<main>
+<body data-page="editor">
+<script src="assets/rw-shell.js?v=3"></script>
+<main class="rw-main">
+<div class="page-title"><div><h1>Editor</h1><p>Edit the airports, wishlist and fleet in <code>config/collection.json</code>, then commit or copy the result.</p></div>
+  <span class="tag" id="state">loading config...</span></div>
 
 <div class="panel">
   <div class="head">
@@ -130,7 +128,7 @@
   <textarea id="out" spellcheck="false" readonly></textarea>
   <div class="msg" id="outMsg"></div>
 
-  <div class="note">
+  <div class="note" style="border-top:1px solid var(--line-soft)">
     <b>Commit to GitHub automatically</b>
     <p style="margin:6px 0 10px">
       Paste a fine-grained Personal Access Token with <b>Contents: Read and write</b> on this repo.
@@ -148,11 +146,11 @@
     </div>
     <div class="row" style="margin-top:10px">
       <button class="act ok2 pri" id="commitBtn" disabled>Commit to main</button>
-      <span id="commitMsg" class="mono" style="color:var(--d)"></span>
+      <span id="commitMsg" class="mono" style="color:var(--dim)"></span>
     </div>
   </div>
 
-  <div class="note">
+  <div class="note" style="border-top:1px solid var(--line-soft)">
     <b>Manual fallback</b>
     <ol>
       <li>Press <b>Copy JSON</b>.</li>
@@ -171,6 +169,7 @@
 </main>
 
 <script>
+RW.setMeta('<span>config/collection.json</span>');
 const OWNER="2-ctrl22", REPO="routewatch", BRANCH="main", CFG_PATH="config/collection.json";
 const API_URL=`https://api.github.com/repos/${OWNER}/${REPO}/contents/${CFG_PATH}`;
 const RAW=`https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}/${CFG_PATH}`;

@@ -2,156 +2,132 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>RouteWatch - Map</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RouteWatch &middot; Map</title>
+<meta name="theme-color" content="#0a0f16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RouteWatch">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/rw.css?v=3">
 <style>
-  :root{
-    --bg:#0b0f14; --p:#121820; --p2:#182029; --l:#243040;
-    --t:#e6edf3; --d:#8b98a8;
-    --own:#3fb950; --pax:#d29922; --cargo:#58a6ff;
-    --match:#3fb950; --near:#d29922; --plain:#46566e;
-    --u:#58a6ff; --r:12px;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
-  body{background:var(--bg);color:var(--t);
-    font:14px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased}
-  header{display:flex;gap:20px;align-items:center;padding:12px 22px;background:var(--p);
-    border-bottom:1px solid var(--l);flex-wrap:wrap;position:sticky;top:0;z-index:5}
-  header>b{font-size:16px;letter-spacing:-.2px}
-  header a{color:var(--u);text-decoration:none;font-size:13.5px}
-  header a:hover{text-decoration:underline}
-  header .here{color:var(--t);border-bottom:2px solid var(--u);padding-bottom:2px}
-  #meta{margin-left:auto;background:var(--p2);border:1px solid var(--l);border-radius:9px;
-    padding:6px 12px;font-size:12px;color:var(--d)}
-  #meta b{color:var(--t)}
-  main{padding:22px;max-width:1500px}
-  h2{font-size:13px;color:var(--d);margin:0;text-transform:uppercase;letter-spacing:.7px;font-weight:600}
-  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
-  .card{background:var(--p);border:1px solid var(--l);border-radius:var(--r);padding:12px 15px}
-  .card b{display:block;font-size:24px;font-weight:650;letter-spacing:-.5px}
-  .card span{color:var(--d);font-size:11.5px;display:block;line-height:1.35;margin-top:2px}
-  .panel{background:var(--p);border:1px solid var(--l);border-radius:var(--r);overflow:hidden}
-  .head{display:flex;gap:14px;align-items:center;justify-content:space-between;
-    padding:11px 16px;border-bottom:1px solid var(--l);flex-wrap:wrap}
-  .toggles{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
-  button.t{background:var(--p2);color:var(--d);border:1px solid var(--l);
-    border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;font-family:inherit}
-  button.t[aria-pressed="true"]{color:var(--u);border-color:var(--u)}
-  button.t:hover{color:var(--t)}
-  button.t i{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px;
-    vertical-align:1px}
-  button.t .bar{width:14px;height:3px;border-radius:2px;display:inline-block;margin-right:6px;
-    vertical-align:3px}
-  .zoombar{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--d)}
-  button.z{background:var(--p2);color:var(--t);border:1px solid var(--l);border-radius:7px;
-    width:28px;height:26px;cursor:pointer;font:inherit;line-height:1}
-  button.z:hover{border-color:#31415a}
-  .mapwrap{position:relative}
-  #map{display:block;width:100%;height:auto;background:#0a0e13;cursor:grab;touch-action:none}
+  :root{--match:var(--ok);--near:var(--warn);--plain:#56657a}
+  .mappanel{overflow:hidden}
+  .maptools{display:flex;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line-soft)}
+  .maptools .chips{flex:1;min-width:0}
+  .mapwrap{position:relative;height:clamp(360px,64vh,760px);background:#070b10}
+  #map{display:block;width:100%;height:100%;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
   #map.drag{cursor:grabbing}
-  .land{fill:#151d27;stroke:#222d3b}
-  .grat{fill:none;stroke:#121a23}
-  .arc{fill:none;stroke-linecap:round}
-  .pt{cursor:pointer;stroke:#0a0e13}
-  .lbl{fill:#c2ccd8;font-size:9px;pointer-events:none;
-    font-family:ui-monospace,Menlo,monospace;paint-order:stroke;stroke:#0a0e13;stroke-width:2.5}
-  /* Focus mode: everything fades except the airport you point at. */
-  #map.focus .arc{opacity:.06}
-  #map.focus .arc.on{opacity:.95}
-  #map.focus .pt{opacity:.25}
+  .land{fill:#141d28;stroke:#233043}
+  .grat{fill:none;stroke:#0f1720}
+  .arc{fill:none;stroke-linecap:round;transition:opacity .15s}
+  .pt{stroke:#070b10}
+  .hit{fill:transparent;cursor:pointer;pointer-events:all}
+  .lbl{fill:#c9d3df;pointer-events:none;font-family:var(--mono);paint-order:stroke;stroke:#070b10;stroke-width:.3em;font-weight:600}
+  #map.focus .arc{opacity:.05}
+  #map.focus .arc.on{opacity:.98}
+  #map.focus .pt{opacity:.22}
   #map.focus .pt.on{opacity:1}
-  .note{padding:15px 16px;color:var(--d);font-size:13px;text-align:center}
-  .tip{position:fixed;pointer-events:none;opacity:0;transition:opacity .1s;
-    background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px 11px;
-    font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,.55);z-index:30;max-width:320px}
-  .tip b{display:block;margin-bottom:3px;font-size:13px}
-  .tip i{color:var(--d);font-style:normal;display:block}
-  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px;margin-top:18px}
-  @media(max-width:900px){.grid{grid-template-columns:1fr}}
-  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
-  th,td{text-align:left;padding:7px 14px;border-bottom:1px solid var(--l)}
-  thead th{color:var(--d);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-    background:var(--p2);position:sticky;top:0;z-index:2;box-shadow:inset 0 -1px 0 var(--l);
-    border-bottom:none}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr:hover td{background:#151c25}
-  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
-  .num{font-variant-numeric:tabular-nums;white-space:nowrap}
-  .op{border-bottom:1px dotted #3d4759;cursor:help}
-  .op.unk{border-bottom-color:#4a3a3a;color:#9aa4b1}
-  .pill{font-size:10.5px;padding:2px 8px;border-radius:999px;border:1px solid var(--l);color:var(--d)}
-  .scroll{max-height:430px;overflow:auto}
-  input{background:var(--p2);border:1px solid var(--l);color:var(--t);padding:5px 10px;
-    border-radius:7px;font:inherit;font-size:12.5px;min-width:150px}
-  input:focus{outline:none;border-color:var(--u)}
-  footer{margin-top:24px;color:var(--d);font-size:12.5px}
+  .mfloat{position:absolute;display:flex;gap:6px;z-index:5}
+  .mfloat.tl{top:12px;left:12px;right:12px;pointer-events:none}
+  .mfloat.tl .search{pointer-events:auto;max-width:280px}
+  .mfloat.br{right:12px;bottom:12px;flex-direction:column}
+  .mfloat.bl{left:12px;bottom:12px;align-items:center}
+  .mbtn{width:40px;height:40px;border-radius:11px;background:rgba(17,24,34,.88);border:1px solid var(--line);
+    color:var(--text);font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);-webkit-tap-highlight-color:transparent;font-weight:500}
+  .mbtn:hover{border-color:#33455c}
+  .mbtn.txt{width:auto;padding:0 12px;font-size:12.5px;font-weight:650}
+  .mfloat .search input{background:rgba(12,18,26,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .mfloat .search input.bad{border-color:var(--bad)}
+  #zlvl{font-size:11px;color:var(--faint);background:rgba(12,18,26,.8);border:1px solid var(--line-soft);
+    border-radius:8px;padding:3px 8px;font-variant-numeric:tabular-nums}
+  .mapfoot{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    padding:10px 14px;border-top:1px solid var(--line-soft);font-size:12.5px;color:var(--faint)}
+  .note-box{padding:14px 16px;color:var(--dim);font-size:13px;text-align:center;border-top:1px solid var(--line-soft)}
+  .apinfo{border-top:1px solid var(--line-soft);padding:14px 16px 16px;background:linear-gradient(var(--s2),var(--s1))}
+  .ap-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .ap-code{font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:.3px}
+  .ap-name{color:var(--dim);font-size:13.5px}
+  .rlist{display:flex;flex-direction:column;border:1px solid var(--line-soft);border-radius:var(--radius-s);
+    overflow:hidden;max-height:340px;overflow-y:auto}
+  .rrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:9px 12px;
+    color:var(--text);border-bottom:1px solid var(--line-soft);font-size:13px}
+  .rrow:last-child{border-bottom:none}
+  .rrow:hover{background:var(--s2);color:var(--text)}
+  .rrow .rn{color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  @media (max-width:760px){
+    .page-title.map-t{margin-bottom:10px}
+    .mappanel{margin:0 -14px;border-radius:0;border-left:0;border-right:0}
+    .mapwrap{height:58vh;min-height:320px}
+    .rrow{grid-template-columns:auto 1fr auto;gap:8px}
+    .rrow .rn{display:none}
+    .rrow .num{text-align:right}
+    .mfloat.tl .search{max-width:none}
+    .scrollx-m{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%}
+    .scrollx-m::-webkit-scrollbar{display:none}
+  }
 </style>
 </head>
-<body>
+<body data-page="map">
+<script src="assets/rw-shell.js?v=3"></script>
+<main class="rw-main">
+  <div class="page-title map-t"><div><h1>Map</h1><p class="dk-only">Your network as flown for real. Green you can fly, amber with a substitute.</p></div>
+    <div class="chips scrollx-m" id="sum"></div></div>
 
-<header><b>RouteWatch</b>
-  <a href="index.html">Dashboard</a>
-  <span class="here">Map</span>
-  <a href="editor.html">Editor</a><a href="find.html">Find</a>
-  <span id="meta">loading...</span>
-</header>
-
-<main>
-  <div class="cards" id="stats"></div>
-
-  <div class="panel">
-    <div class="head">
-      <h2>Network</h2>
-      <div class="toggles">
-        <button class="t" data-f="match" aria-pressed="true"><span class="bar" style="background:var(--match)"></span>You can fly it</button>
-        <button class="t" data-f="near" aria-pressed="true"><span class="bar" style="background:var(--near)"></span>Close substitute</button>
-        <button class="t" data-f="plain" aria-pressed="false"><span class="bar" style="background:var(--plain)"></span>Not in fleet</button>
-        <button class="t" data-f="sim" aria-pressed="false">Fits a session</button>
-        <button class="t" data-f="cargo" aria-pressed="false">Cargo only</button>
-        <button class="t" data-f="own" aria-pressed="true"><i style="background:var(--own)"></i>Airports</button>
-        <button class="t" data-f="cand" aria-pressed="true"><i style="background:var(--pax)"></i>Wishlist</button>
-        <button class="t" data-f="labels" aria-pressed="false">Labels</button>
-      </div>
-      <div class="zoombar">
-        <input id="find" placeholder="zoom to ICAO">
-        <button class="z" id="zin" title="Zoom in">+</button>
-        <button class="z" id="zout" title="Zoom out">&minus;</button>
-        <button class="z" id="zres" title="Reset" style="width:auto;padding:0 8px">Reset</button>
-        <span id="zlvl">1.0x</span>
+  <div class="panel mappanel">
+    <div class="maptools">
+      <div class="chips scrollx" id="toggles">
+        <button class="chip" data-f="match" aria-pressed="true"><i class="sw" style="background:var(--match)"></i>You can fly it</button>
+        <button class="chip" data-f="near" aria-pressed="true"><i class="sw" style="background:var(--near)"></i>Substitute</button>
+        <button class="chip" data-f="plain" aria-pressed="false"><i class="sw" style="background:var(--plain)"></i>Not in fleet</button>
+        <button class="chip" data-f="sim" aria-pressed="false">Fits a session</button>
+        <button class="chip" data-f="cargo" aria-pressed="false">Cargo only</button>
+        <button class="chip" data-f="own" aria-pressed="true"><i class="dt" style="background:var(--ok)"></i>My airports</button>
+        <button class="chip" data-f="cand" aria-pressed="true"><i class="dt" style="background:var(--warn)"></i>Wishlist</button>
+        <button class="chip" data-f="labels" aria-pressed="false">Labels</button>
       </div>
     </div>
     <div class="mapwrap">
-      <svg id="map" viewBox="0 0 960 480" role="img" aria-label="World map with airports and routes"></svg>
-    </div>
-    <div class="note" id="note" hidden></div>
-    <div class="note" style="border-top:1px solid var(--l);color:#6b7787" id="hint"></div>
-  </div>
-
-  <div class="grid">
-    <div class="panel">
-      <div class="head"><h2>Routes on the map</h2><span class="pill" id="cPairs"></span></div>
-      <div class="scroll">
-        <table><thead><tr><th>Route</th><th>Distance</th><th>Operators</th><th>Aircraft</th>
-        <th>Can you fly it?</th></tr></thead>
-        <tbody id="tPairs"></tbody></table>
+      <svg id="map" viewBox="0 0 960 480" preserveAspectRatio="none" role="img" aria-label="World map with airports and routes"></svg>
+      <div class="mfloat tl"><div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg><input id="find" type="search" placeholder="Go to airport (ICAO)" autocomplete="off" enterkeyhint="go"></div></div>
+      <div class="mfloat br">
+        <button class="mbtn" id="zin" title="Zoom in" aria-label="Zoom in">+</button>
+        <button class="mbtn" id="zout" title="Zoom out" aria-label="Zoom out">&minus;</button>
+      </div>
+      <div class="mfloat bl">
+        <button class="mbtn txt" id="zeu">Europe</button>
+        <button class="mbtn txt" id="zwo">World</button>
+        <span id="zlvl">1.0&times;</span>
       </div>
     </div>
-    <div class="panel">
-      <div class="head"><h2>Worth buying next</h2><span class="pill" id="cCand"></span></div>
-      <div class="scroll">
-        <table><thead><tr><th>Airport</th><th>Focus</th><th>New routes</th><th>Flyable</th></tr></thead>
-        <tbody id="tCand"></tbody></table>
-      </div>
-    </div>
+    <div class="apinfo" id="apinfo" hidden></div>
+    <div class="note-box" id="note" hidden></div>
+    <div class="mapfoot"><span id="hint"></span></div>
   </div>
 
-  <footer>
-    Everything here comes from <span class="mono">docs/data.json</span>, refreshed by RouteWatch on every run.
-    Routes flown by aircraft you do not own are hidden at first, because they are the large majority and
-    they bury the ones you can actually fly. Switch them back on with <b>Not in fleet</b>.
-  </footer>
+  <div class="grid2" style="margin-top:16px">
+    <div>
+      <h2 class="sec">Routes on the map <span class="count" id="cPairs"></span></h2>
+      <div class="panel"><div class="scroll" style="max-height:520px">
+        <table class="rt"><thead><tr><th>Route</th><th class="r">Distance</th><th>Operators</th><th>Aircraft</th>
+        <th>Your fleet</th></tr></thead><tbody id="tPairs"></tbody></table></div>
+        <button class="more-btn" id="pMore" hidden>Show more</button>
+      </div>
+    </div>
+    <div>
+      <h2 class="sec">Worth buying next <span class="count" id="cCand"></span></h2>
+      <div class="panel"><div class="scroll" style="max-height:520px">
+        <table class="rt"><thead><tr><th>Airport</th><th>Focus</th><th class="r">New routes</th><th class="r">Flyable</th></tr></thead>
+        <tbody id="tCand"></tbody></table></div></div>
+    </div>
+  </div>
+  <p class="note">Everything here comes from <span class="mono">docs/data.json</span>, refreshed on every run. Routes flown by
+    aircraft you do not own start hidden, because they are the large majority and bury the ones you can fly.
+    Switch them on with <b>Not in fleet</b>.</p>
 </main>
 
 <div class="tip" id="tip"></div>
@@ -170,7 +146,6 @@ const hide=()=>tip.style.opacity=0;
 const NOSVC=s=>{const v=String(s??"");return v==="GEEN VERBINDING"||v==="NO SERVICE";};
 const EN={"GEEN VERBINDING":"NO SERVICE","ONBEKEND":"UNKNOWN"};
 const tr=s=>EN[String(s||"")]||String(s||"");
-
 const TYPES={B733:"Boeing 737-300",B734:"Boeing 737-400",B735:"Boeing 737-500",
  B736:"Boeing 737-600",B737:"Boeing 737-700",B738:"Boeing 737-800",B739:"Boeing 737-900",
  B73H:"Boeing 737-800",B73Y:"Boeing 737-800 freighter",B738F:"Boeing 737-800 freighter",
@@ -197,7 +172,6 @@ function prettyType(s){
   return k.split(/\s+/).map(w=>w==="NEO"?"neo":/\d/.test(w)?w:w.charAt(0)+w.slice(1).toLowerCase())
           .join(" ").replace(/ neo/g,"neo");
 }
-
 /* Names come from data.json, built by the run itself. The short list is only a
  * fallback for codes the data has not named yet, mostly OpenSky callsigns. */
 const FALLBACK={KL:"KLM",KLM:"KLM",KLC:"KLM Cityhopper",HV:"Transavia",TRA:"Transavia",
@@ -234,7 +208,6 @@ const airlineName=c=>{const k=String(c||"").trim().toUpperCase();
 const opChip=c=>{const n=airlineName(c);
   return n?'<span class="op" title="'+esc(n)+'">'+esc(c)+'</span>'
          :'<span class="op unk" title="no name for '+esc(c)+' yet">'+esc(c)+'</span>';};
-
 /* Which of the three bands does a route belong to? */
 function band(s){
   const v=String(s||"");
@@ -243,84 +216,148 @@ function band(s){
   return "plain";
 }
 const BANDCOLOR={match:"var(--match)",near:"var(--near)",plain:"var(--plain)"};
+
+/* ================================================================ map ==== */
 function flyText(s){
   const v=String(s||"");
-  if(/^MATCH/.test(v)) return '<span style="color:var(--match)">Yes, you own it</span>';
-  if(/NEAR/.test(v)) return '<span style="color:var(--near)">Almost, substitute</span>';
-  if(/^NO-/.test(v)) return '<span style="color:#8b98a8">No, not in fleet</span>';
-  return '<span style="color:var(--d)">Unknown</span>';
+  if(/^MATCH/.test(v)) return '<span class="st m">You own it</span>';
+  if(/NEAR/.test(v)) return '<span class="st n">Substitute</span>';
+  if(/^NO-/.test(v)) return '<span class="st x">Not in fleet</span>';
+  return '<span class="st o">Unknown</span>';
 }
+const bandRank={match:3,near:2,plain:1};
 
 /* Grey routes are the large majority, so they start hidden: otherwise they bury
  * everything you can actually fly. */
-const active={match:true,near:true,plain:false,sim:false,cargo:false,
-              own:true,cand:true,labels:false};
-let AP={}, PAIRS=[], SUM={}, CAND=[], META={};
+const active={match:true,near:true,plain:false,sim:false,cargo:false,own:true,cand:true,labels:false};
+let AP={}, PAIRS=[], SUM={}, CAND=[], META={}, SEL=null;
+const isPhone=()=>matchMedia("(max-width:760px)").matches;
+const isServed=p=>p.status && !NOSVC(p.status);
 
 /* ------------------------------------------------------------- viewport --- */
+/* The map keeps a true 2:1 world, but the window onto it follows the shape of
+ * the screen: tall on a phone, wide on a monitor. Sizes of lines, dots and
+ * labels are set in screen pixels, so they look the same at every zoom level. */
 let view={x:0,y:0,k:1};
-const clamp=()=>{
-  view.k=Math.max(1,Math.min(12,view.k));
-  const maxX=W*(view.k-1)/view.k, maxY=H*(view.k-1)/view.k;
-  view.x=Math.max(0,Math.min(maxX,view.x));
-  view.y=Math.max(0,Math.min(maxY,view.y));
-};
+const rect=()=>svg.getBoundingClientRect();
+const aspect=()=>{const r=rect();return (r.height||1)/(r.width||1);};
+const kMin=()=>Math.max(1,W*aspect()/H);
+const vw=()=>W/view.k, vh=()=>W/view.k*aspect();
+function clamp(){
+  view.k=Math.max(kMin(),Math.min(28,view.k));
+  view.x=Math.max(0,Math.min(W-vw(),view.x));
+  view.y=Math.max(0,Math.min(H-vh(),view.y));
+}
 function applyView(){
   clamp();
-  svg.setAttribute("viewBox", view.x.toFixed(2)+" "+view.y.toFixed(2)+" "
-    +(W/view.k).toFixed(2)+" "+(H/view.k).toFixed(2));
-  document.getElementById("zlvl").textContent=view.k.toFixed(1)+"x";
-  const s=1/view.k;
-  /* Lines get a touch finer as you zoom in, so a dense cluster opens up
-     instead of turning into a solid block of colour. */
-  const fine=Math.pow(s,1.15);
-  gGrat.setAttribute("stroke-width",(0.5*s).toFixed(2));
-  gLand.setAttribute("stroke-width",(0.5*s).toFixed(2));
-  for(const g of [gPlain,gNear,gMatch])
-    for(const p of g.children) p.setAttribute("stroke-width",(p.dataset.w*fine).toFixed(2));
+  svg.setAttribute("viewBox",view.x.toFixed(2)+" "+view.y.toFixed(2)+" "+vw().toFixed(2)+" "+vh().toFixed(2));
+  const u=(rect().width||W)/vw();              // screen pixels per map unit
+  gGrat.setAttribute("stroke-width",(0.6/u).toFixed(3));
+  gLand.setAttribute("stroke-width",(0.7/u).toFixed(3));
+  for(const g of [gPlain,gNear,gMatch]) for(const p of g.children) p.setAttribute("stroke-width",(p.dataset.w/u).toFixed(3));
   for(const c of gPt.children){
-    if(c.tagName==="circle"){c.setAttribute("r",(c.dataset.r*Math.pow(s,.85)).toFixed(2));
-      c.setAttribute("stroke-width",(1*s).toFixed(2));}
-    else c.setAttribute("font-size",(9*s).toFixed(2));
+    if(c.tagName==="circle") c.setAttribute("r",(c.dataset.r/u).toFixed(3));
+    if(c.classList.contains("pt")) c.setAttribute("stroke-width",(1.2/u).toFixed(3));
+    if(c.tagName==="text"){c.setAttribute("font-size",(10.5/u).toFixed(3));
+      c.setAttribute("x",(+c.dataset.x+(+c.dataset.off)/u).toFixed(2));
+      c.setAttribute("y",(+c.dataset.y+3.5/u).toFixed(2));}
   }
+  document.getElementById("zlvl").textContent=(view.k/kMin()).toFixed(1)+"×";
 }
 function zoomAt(cx,cy,factor){
-  const k0=view.k; view.k=Math.max(1,Math.min(12,k0*factor));
-  view.x = cx - (cx-view.x)*(k0/view.k);
-  view.y = cy - (cy-view.y)*(k0/view.k);
-  applyView();
+  const k0=view.k, k1=Math.max(kMin(),Math.min(28,k0*factor));
+  view.x=cx-(cx-view.x)*(k0/k1); view.y=cy-(cy-view.y)*(k0/k1); view.k=k1; applyView();
 }
-const svgPoint=e=>{
-  const r=svg.getBoundingClientRect();
-  return [view.x + (e.clientX-r.left)/r.width*(W/view.k),
-          view.y + (e.clientY-r.top)/r.height*(H/view.k)];
-};
+function fit(lon1,lat1,lon2,lat2){
+  const [x1,y1]=proj(lon1,lat2), [x2,y2]=proj(lon2,lat1);
+  const bw=x2-x1, bh=y2-y1, A=aspect();
+  view.k=W/Math.max(bw,bh/A);
+  clamp();
+  view.x=(x1+x2)/2-vw()/2; view.y=(y1+y2)/2-vh()/2; applyView();
+}
+const europe=()=>fit(-24,27,36,67);
+const world=()=>{view={x:0,y:0,k:kMin()};
+  const [,yc]=proj(0,25); view.y=yc-vh()/2; applyView();};
+const toMap=(clientX,clientY)=>{const r=rect();
+  return [view.x+(clientX-r.left)/r.width*vw(), view.y+(clientY-r.top)/r.height*vh()];};
+
 svg.addEventListener("wheel",e=>{e.preventDefault();
-  const [cx,cy]=svgPoint(e); zoomAt(cx,cy, e.deltaY<0?1.18:1/1.18);},{passive:false});
-let drag=null;
-svg.addEventListener("pointerdown",e=>{drag={sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y};
-  svg.classList.add("drag"); svg.setPointerCapture(e.pointerId);});
-svg.addEventListener("pointermove",e=>{if(!drag)return;
-  const r=svg.getBoundingClientRect();
-  view.x=drag.vx-(e.clientX-drag.sx)/r.width*(W/view.k);
-  view.y=drag.vy-(e.clientY-drag.sy)/r.height*(H/view.k);
-  applyView();});
-svg.addEventListener("pointerup",()=>{drag=null;svg.classList.remove("drag");});
-svg.addEventListener("dblclick",()=>{view={x:0,y:0,k:1};applyView();});
-document.getElementById("zin").onclick=()=>zoomAt(view.x+W/view.k/2,view.y+H/view.k/2,1.5);
-document.getElementById("zout").onclick=()=>zoomAt(view.x+W/view.k/2,view.y+H/view.k/2,1/1.5);
-document.getElementById("zres").onclick=()=>{view={x:0,y:0,k:1};applyView();};
+  const [cx,cy]=toMap(e.clientX,e.clientY); zoomAt(cx,cy,e.deltaY<0?1.2:1/1.2);},{passive:false});
+
+/* Pointer events cover mouse, pen and touch: one finger pans, two fingers pinch,
+ * a tap without movement selects the airport under the finger. */
+const ptrs=new Map(); let drag=null, pinch=null;
+svg.addEventListener("pointerdown",e=>{
+  svg.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){drag={sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y,moved:false,type:e.pointerType};}
+  else if(ptrs.size===2){
+    const [a,b]=[...ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+    pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1,k:view.k,m:toMap(mx,my)}; drag=null;
+  }
+});
+svg.addEventListener("pointermove",e=>{
+  if(!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(pinch&&ptrs.size===2){
+    const [a,b]=[...ptrs.values()], mx=(a.x+b.x)/2, my=(a.y+b.y)/2, r=rect();
+    view.k=Math.max(kMin(),Math.min(28,pinch.k*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d));
+    view.x=pinch.m[0]-(mx-r.left)/r.width*vw(); view.y=pinch.m[1]-(my-r.top)/r.height*vh();
+    applyView(); return;
+  }
+  if(!drag) return;
+  if(Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>6){drag.moved=true;svg.classList.add("drag");hide();}
+  if(!drag.moved) return;
+  const r=rect();
+  view.x=drag.vx-(e.clientX-drag.sx)/r.width*vw(); view.y=drag.vy-(e.clientY-drag.sy)/r.height*vh();
+  applyView();
+});
+function endPtr(e){
+  const wasTap=drag&&!drag.moved&&ptrs.size===1;
+  ptrs.delete(e.pointerId);
+  if(ptrs.size<2) pinch=null;
+  if(ptrs.size===1){const [p]=[...ptrs.values()];drag={sx:p.x,sy:p.y,vx:view.x,vy:view.y,moved:true};}
+  if(!ptrs.size){svg.classList.remove("drag");
+    if(wasTap){
+      /* Pick the nearest airport on screen rather than whichever dot happens to
+         be drawn on top, so crowded clusters still select what you aimed at. */
+      const ic=nearestAirport(e.clientX,e.clientY,e.pointerType==="mouse"?12:24);
+      const t=ic?null:document.elementFromPoint(e.clientX,e.clientY);
+      if(ic) select(ic);
+      else if(t&&t.classList&&t.classList.contains("arc")&&t.dataset.pair) selectRoute(t.dataset.pair);
+      else if(e.pointerType!=="mouse") select(null);
+    }
+    drag=null;}
+}
+function nearestAirport(cx,cy,maxPx){
+  const r=rect(), u=r.width/vw(); let best=null, bd=maxPx;
+  for(const c of gPt.children){
+    if(!c.classList.contains("pt")) continue;
+    const sx=r.left+(+c.getAttribute("cx")-view.x)*u, sy=r.top+(+c.getAttribute("cy")-view.y)*u;
+    const d=Math.hypot(sx-cx,sy-cy);
+    if(d<bd){bd=d;best=c.dataset.icao;}
+  }
+  return best;
+}
+svg.addEventListener("pointerup",endPtr);
+svg.addEventListener("pointercancel",endPtr);
+svg.addEventListener("dblclick",e=>{const [cx,cy]=toMap(e.clientX,e.clientY);zoomAt(cx,cy,2);});
+document.getElementById("zin").onclick=()=>zoomAt(view.x+vw()/2,view.y+vh()/2,1.6);
+document.getElementById("zout").onclick=()=>zoomAt(view.x+vw()/2,view.y+vh()/2,1/1.6);
+document.getElementById("zeu").onclick=europe;
+document.getElementById("zwo").onclick=world;
 document.getElementById("find").addEventListener("keydown",e=>{
   if(e.key!=="Enter")return;
-  const a=AP[String(e.target.value||"").trim().toUpperCase()];
-  if(!a) return;
+  const v=String(e.target.value||"").trim().toUpperCase();
+  const a=AP[v]||Object.values(AP).find(x=>x.iata===v||String(x.name||"").toUpperCase().includes(v));
+  if(!a){e.target.classList.add("bad");setTimeout(()=>e.target.classList.remove("bad"),900);return;}
   const [x,y]=proj(a.lon,a.lat);
-  view.k=5; view.x=x-W/view.k/2; view.y=y-H/view.k/2; applyView();
+  view.k=Math.max(kMin(),10); clamp(); view.x=x-vw()/2; view.y=y-vh()/2; applyView();
+  select(a.icao); e.target.blur();
 });
+addEventListener("resize",()=>applyView());
 
 /* --------------------------------------------------------------- layers --- */
-/* Separate groups keep the drawing order fixed: grey at the bottom, amber above
- * it, green on top. Before this, a green arc could hide behind a grey one. */
 const gGrat=el("g",{class:"grat"}), gLand=el("g",{class:"land"}),
       gPlain=el("g",{}), gNear=el("g",{}), gMatch=el("g",{}), gPt=el("g",{});
 for(let lon=-180;lon<=180;lon+=30){const[x]=proj(lon,0);gGrat.appendChild(el("line",{x1:x,y1:0,x2:x,y2:H}));}
@@ -348,7 +385,6 @@ fetch("https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json")
     }
     applyView();
   }).catch(()=>{});
-
 /* -------------------------------------------------------- great circles --- */
 function gcPath(a,b){
   const R=Math.PI/180, la1=a.lat*R, lo1=a.lon*R, la2=b.lat*R, lo2=b.lon*R;
@@ -373,109 +409,174 @@ function gcPath(a,b){
   }
   return out;
 }
-const isServed=p=>p.status && !NOSVC(p.status);
 
-/* Hover an airport to isolate its routes. Much easier than hunting through a
- * dense cluster with filters. */
+/* -------------------------------------------------------- focus/select --- */
 function focusOn(icao){
   svg.classList.add("focus");
   for(const g of [gPlain,gNear,gMatch])
-    for(const p of g.children) p.classList.toggle("on", p.dataset.a===icao||p.dataset.b===icao);
-  for(const c of gPt.children)
-    if(c.tagName==="circle") c.classList.toggle("on", c.dataset.icao===icao);
+    for(const p of g.children) p.classList.toggle("on",p.dataset.a===icao||p.dataset.b===icao);
+  for(const c of gPt.children) if(c.classList.contains("pt")) c.classList.toggle("on",c.dataset.icao===icao);
+}
+function focusPair(pair){
+  svg.classList.add("focus");
+  for(const g of [gPlain,gNear,gMatch]) for(const p of g.children) p.classList.toggle("on",p.dataset.pair===pair);
+  const [a,b]=pair.split("-");
+  for(const c of gPt.children) if(c.classList.contains("pt")) c.classList.toggle("on",c.dataset.icao===a||c.dataset.icao===b);
 }
 function focusOff(){
+  if(SEL){ if(SEL.includes("-")) focusPair(SEL); else focusOn(SEL); return; }
   svg.classList.remove("focus");
   for(const g of [gPlain,gNear,gMatch]) for(const p of g.children) p.classList.remove("on");
   for(const c of gPt.children) c.classList.remove("on");
 }
+const info=document.getElementById("apinfo");
+function routeRow(p){
+  const [x,y]=String(p.pair).split("-");
+  return '<a class="rrow" href="index.html#route/'+esc(p.pair)+'"><span class="mono">'+esc(p.pair)+'</span>'
+    +'<span class="rn">'+esc(p.from??x)+' &ndash; '+esc(p.to??y)+'</span>'
+    +'<span class="num faint">'+nf(p.nm??0)+' NM</span>'+flyText(p.status)+'</a>';
+}
+function select(icao){
+  SEL=icao||null;
+  if(!icao){info.hidden=true;focusOff();return;}
+  focusOn(icao);
+  const a=AP[icao]||{}, m=META[icao]||{};
+  const mine=PAIRS.filter(p=>isServed(p)&&String(p.pair).split("-").includes(icao))
+    .sort((p,q)=>(bandRank[band(q.status)]-bandRank[band(p.status)])||((p.nm||0)-(q.nm||0)));
+  const fly=mine.filter(p=>band(p.status)==="match").length;
+  info.hidden=false;
+  info.innerHTML='<div class="ap-head"><div><div class="ap-code">'+esc(icao)+(a.iata?' <span class="faint">/ '+esc(a.iata)+'</span>':'')+'</div>'
+    +'<div class="ap-name">'+esc(a.name||"")+(a.country?' <span class="faint">&middot; '+esc(a.country)+'</span>':'')+'</div></div>'
+    +'<button class="btn ghost iconbtn" id="apx" aria-label="Close">&times;</button></div>'
+    +'<div class="chips" style="margin:8px 0 10px">'
+    +(a.candidate?'<span class="tag wish">wishlist &middot; '+esc(a.focus||"pax")+'</span>':'<span class="tag own">you own this airport</span>')
+    +'<span class="tag">'+mine.length+' routes with flights</span>'
+    +'<span class="tag own">'+fly+' flyable</span>'
+    +(m.longest_runway_ft?'<span class="tag">longest runway '+nf(m.longest_runway_ft)+' ft</span>':'')
+    +'</div>'
+    +(a.night?'<div class="small muted" style="margin-bottom:8px">Night: '+esc(tr(a.night))+'</div>':'')
+    +(mine.length?'<div class="rlist">'+mine.slice(0,40).map(routeRow).join('')+'</div>'
+      +(mine.length>40?'<div class="small faint" style="padding:8px 2px">+'+(mine.length-40)+' more in Routes</div>':'')
+      :'<div class="small muted">No routes with flights yet.</div>');
+  document.getElementById("apx").onclick=()=>select(null);
+  if(isPhone()) info.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function selectRoute(pair){
+  const p=PAIRS.find(x=>x.pair===pair); if(!p) return;
+  SEL=pair; focusPair(pair);
+  const ops=(p.operators||[]).map(o=>airlineName(o)||o);
+  info.hidden=false;
+  info.innerHTML='<div class="ap-head"><div><div class="ap-code">'+esc(pair)+'</div>'
+    +'<div class="ap-name">'+esc(p.from||"")+' &ndash; '+esc(p.to||"")+'</div></div>'
+    +'<button class="btn ghost iconbtn" id="apx" aria-label="Close">&times;</button></div>'
+    +'<div class="chips" style="margin:8px 0 10px">'+flyText(p.status)
+    +'<span class="tag">'+nf(p.nm??0)+' NM</span>'+(p.simmable?'<span class="tag own">fits a session</span>':'')
+    +(p.cargo?'<span class="tag acc">cargo</span>':'')+'</div>'
+    +'<dl class="kv"><dt>Airlines</dt><dd>'+esc(ops.slice(0,8).join(", ")||"-")+'</dd>'
+    +'<dt>Aircraft</dt><dd>'+esc([...new Set((p.types||[]).map(prettyType))].join(", ")||"-")+'</dd></dl>'
+    +'<a class="btn" style="margin-top:12px" href="index.html#route/'+esc(pair)+'">Flights and changes on this route</a>';
+  document.getElementById("apx").onclick=()=>select(null);
+  if(isPhone()) info.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
 
 /* ---------------------------------------------------------------- draw ---- */
+let SHOWN=[], listN=60;
 function draw(){
   gPlain.textContent=""; gNear.textContent=""; gMatch.textContent=""; gPt.textContent="";
   const served=PAIRS.filter(isServed);
-  const shown=served.filter(p=>{
+  SHOWN=served.filter(p=>{
     if(!active[band(p.status)]) return false;
     if(active.sim && !p.simmable) return false;
     if(active.cargo && !p.cargo) return false;
     return true;
   });
-
-  for(const p of shown){
+  const mouse=matchMedia("(hover:hover)").matches;
+  for(const p of SHOWN){
     const [x,y]=String(p.pair).split("-");
     const a=AP[x], b=AP[y];
     if(!a||!b) continue;
     const d=gcPath(a,b);
     if(!d) continue;
     const bnd=band(p.status);
-    /* Thinner than before, and a lower opacity for the grey band, so overlap
-       reads as depth instead of noise. */
-    const w=p.simmable?1.1:0.8;
-    const path=el("path",{d,class:"arc",stroke:BANDCOLOR[bnd],"stroke-width":w,
-      opacity:bnd==="plain"?0.28:(bnd==="near"?0.5:0.62)});
-    path.dataset.w=w; path.dataset.a=x; path.dataset.b=y;
+    const w=bnd==="plain"?1.1:(p.simmable?2:1.5);
+    const path=el("path",{d,class:"arc",stroke:BANDCOLOR[bnd],
+      opacity:bnd==="plain"?0.3:(bnd==="near"?0.6:0.75)});
+    path.dataset.w=w; path.dataset.a=x; path.dataset.b=y; path.dataset.pair=p.pair;
     if(p.cargo) path.setAttribute("stroke-dasharray","5 4");
-    const ops=(p.operators||[]).map(o=>airlineName(o)||o);
-    path.addEventListener("mousemove",e=>show(e,
-      "<b>"+esc(p.pair)+"</b><i>"+esc(p.from??x)+" - "+esc(p.to??y)+"</i>"+
-      "<i>"+nf(p.nm??0)+" NM"+(p.simmable?" &middot; fits a session":"")+
-      (p.cargo?" &middot; cargo":"")+"</i>"+
-      "<i>airlines: "+esc(ops.slice(0,6).join(", ")||"-")+"</i>"+
-      "<i>aircraft: "+esc((p.types||[]).map(prettyType).join(", ")||"-")+"</i>"));
-    path.addEventListener("mouseleave",hide);
+    if(mouse){
+      const ops=(p.operators||[]).map(o=>airlineName(o)||o);
+      path.addEventListener("mousemove",e=>show(e,
+        "<b>"+esc(p.pair)+"</b><i>"+esc(p.from??x)+" - "+esc(p.to??y)+"</i>"+
+        "<i>"+nf(p.nm??0)+" NM"+(p.simmable?" &middot; fits a session":"")+(p.cargo?" &middot; cargo":"")+"</i>"+
+        "<i>airlines: "+esc(ops.slice(0,6).join(", ")||"-")+"</i>"+
+        "<i>aircraft: "+esc([...new Set((p.types||[]).map(prettyType))].join(", ")||"-")+"</i>"));
+      path.addEventListener("mouseleave",hide);
+    }
     GROUP[bnd].appendChild(path);
   }
 
   const deg={};
   for(const p of served) for(const c of String(p.pair).split("-")) deg[c]=(deg[c]||0)+1;
-
   for(const a of Object.values(AP)){
     const cand=!!a.candidate;
     if(cand && !active.cand) continue;
     if(!cand && !active.own) continue;
     const focus=String(a.focus||"pax");
-    const fill=cand ? (focus.includes("cargo") && !focus.includes("pax") ? "var(--cargo)" : "var(--pax)")
-                    : "var(--own)";
+    const fill=cand?(focus.includes("cargo")&&!focus.includes("pax")?"var(--cargo)":"var(--warn)"):"var(--ok)";
     const [x,y]=proj(a.lon,a.lat);
     /* Size follows how many routes touch the airport, so hubs read as hubs. */
     const n=deg[a.icao]||0;
-    const r=(cand?3.4:3.0)+Math.min(2.6,Math.sqrt(n)*0.42);
-    const c=el("circle",{cx:x.toFixed(1),cy:y.toFixed(1),r,fill,class:"pt",
-      "stroke-width":1,"fill-opacity":.95});
+    const r=(cand?4:3.6)+Math.min(3.2,Math.sqrt(n)*0.5);
+    const c=el("circle",{cx:x.toFixed(2),cy:y.toFixed(2),fill,class:"pt","fill-opacity":.95});
     c.dataset.r=r; c.dataset.icao=a.icao;
-    const m=META[a.icao]||{};
-    c.addEventListener("mouseenter",()=>focusOn(a.icao));
-    c.addEventListener("mousemove",e=>show(e,
-      "<b>"+esc(a.icao)+(a.iata?" / "+esc(a.iata):"")+" - "+esc(a.name||"")+"</b>"+
-      "<i>"+(cand?"on your wishlist ("+esc(focus)+")":"you own this airport")+
-      " &middot; "+n+" routes with flights</i>"+
-      (m.longest_runway_ft?"<i>longest runway "+nf(m.longest_runway_ft)+" ft, "
-        +(m.runway_count||"?")+" runways</i>":"")+
-      (a.night?"<i>night: "+esc(tr(a.night))+"</i>":"")));
-    c.addEventListener("mouseleave",()=>{hide();focusOff();});
+    /* A bigger invisible target makes small dots easy to hit with a finger. */
+    const hit=el("circle",{cx:x.toFixed(2),cy:y.toFixed(2),class:"hit"});
+    hit.dataset.r=mouse?9:16; hit.dataset.icao=a.icao;
+    if(mouse){
+      const m=META[a.icao]||{};
+      hit.addEventListener("mouseenter",()=>focusOn(a.icao));
+      hit.addEventListener("mousemove",e=>show(e,
+        "<b>"+esc(a.icao)+(a.iata?" / "+esc(a.iata):"")+" - "+esc(a.name||"")+"</b>"+
+        "<i>"+(cand?"on your wishlist ("+esc(focus)+")":"you own this airport")+" &middot; "+n+" routes with flights</i>"+
+        (m.longest_runway_ft?"<i>longest runway "+nf(m.longest_runway_ft)+" ft, "+(m.runway_count||"?")+" runways</i>":"")+
+        "<i class='faint'>click for its routes</i>"));
+      hit.addEventListener("mouseleave",()=>{hide();focusOff();});
+    }
     gPt.appendChild(c);
     if(active.labels){
-      const tx=el("text",{x:(x+r+2).toFixed(1),y:(y+3).toFixed(1),class:"lbl","font-size":9});
+      const tx=el("text",{class:"lbl"});
+      tx.dataset.x=x; tx.dataset.y=y; tx.dataset.off=r+3;
       tx.textContent=a.icao;
       gPt.appendChild(tx);
     }
+    gPt.appendChild(hit);
   }
   applyView();
+  if(SEL){ if(SEL.includes("-")) focusPair(SEL); else focusOn(SEL); }
 
-  const hidden=served.length-shown.length;
-  document.getElementById("hint").innerHTML=
-    "Scroll to zoom, drag to pan, double-click to reset. Point at an airport to isolate its routes."
-    +(hidden>0?" <b>"+hidden+"</b> route"+(hidden===1?"":"s")+" hidden by the filters above.":"");
-
-  document.getElementById("cPairs").textContent=shown.length+" of "+served.length+" served";
-  document.getElementById("tPairs").innerHTML=shown.slice()
-    .sort((a,b)=>(b.nm||0)-(a.nm||0)).slice(0,300).map(p=>
-    '<tr><td class="mono">'+esc(p.pair)+'</td><td class="num">'+nf(p.nm??0)+' NM</td>'+
-    '<td>'+((p.operators||[]).slice(0,6).map(opChip).join(" ")||"-")+'</td>'+
-    '<td>'+esc((p.types||[]).slice(0,3).map(prettyType).join(", ")||"-")+'</td>'+
-    '<td>'+flyText(p.status)+'</td></tr>').join("")
-    || '<tr><td colspan="5" style="color:var(--d)">No routes match these filters.</td></tr>';
+  const hidden=served.length-SHOWN.length;
+  document.getElementById("hint").innerHTML=(isPhone()
+    ?"Drag to pan, pinch to zoom, tap an airport for its routes."
+    :"Scroll to zoom, drag to pan, double-click to zoom in. Point at an airport to isolate its routes, click it for the list.")
+    +(hidden>0?" <b>"+hidden+"</b> route"+(hidden===1?"":"s")+" hidden by the filters.":"");
+  listN=60; drawList();
 }
+function drawList(){
+  const cols=[["Route","tt"],["Distance","r num"],["Operators",""],["Aircraft",""],["Your fleet","nowrap"]];
+  const list=SHOWN.slice().sort((a,b)=>(bandRank[band(b.status)]-bandRank[band(a.status)])||((a.nm||0)-(b.nm||0)));
+  document.getElementById("cPairs").textContent=SHOWN.length+" of "+PAIRS.filter(isServed).length+" with flights";
+  document.getElementById("tPairs").innerHTML=list.slice(0,listN).map(p=>'<tr>'+[
+      '<a class="lnk" href="index.html#route/'+esc(p.pair)+'">'+esc(p.pair)+'</a><span class="sub mo">'+esc(p.from||"")+' &ndash; '+esc(p.to||"")+'</span>',
+      nf(p.nm??0)+' NM',
+      (p.operators||[]).slice(0,6).map(opChip).join(" ")||"-",
+      esc([...new Set((p.types||[]).map(prettyType))].slice(0,3).join(", ")||"-"),
+      flyText(p.status)].map((h,i)=>'<td class="'+cols[i][1]+'" data-l="'+cols[i][0]+'"><span class="v">'+h+'</span></td>').join('')+'</tr>').join("")
+    || '<tr><td class="empty" colspan="5">No routes match these filters.</td></tr>';
+  const mb=document.getElementById("pMore");
+  mb.hidden=list.length<=listN;
+  mb.textContent="Show more · "+Math.min(listN,list.length)+" of "+list.length;
+}
+document.getElementById("pMore").onclick=()=>{listN+=120;drawList();};
 
 /* ---------------------------------------------------------------- data ---- */
 Promise.all([
@@ -485,44 +586,41 @@ Promise.all([
   META=meta||{};
   SUM=d.summary||{}; PAIRS=d.pairs||[]; CAND=d.candidates||[]; AIRL=d.airlines||{};
   for(const a of d.airports||[]) if(a.icao) AP[a.icao]=a;
-
   const s=SUM;
-  document.getElementById("meta").innerHTML=
-    "<b>"+esc(s.season?.label||"")+"</b> &middot; updated "+esc(String(s.generated||"").slice(0,16));
-
-  const cards=[
-    [s.airports ?? Object.values(AP).filter(a=>!a.candidate).length,"Airports you own"],
-    [s.candidates ?? Object.values(AP).filter(a=>a.candidate).length,"Wishlist airports"],
-    [s.pairs_served ?? PAIRS.filter(isServed).length,"Pairs with real flights"],
-    [s.pairs_match ?? 0,"Flyable with your fleet"],
-    [s.pairs_simmable ?? 0,"Fits a sim session"],
-    [s.cargo_pairs ?? 0,"Flown by cargo aircraft"]];
-  if(s.airlines_known!==undefined) cards.push([s.airlines_known,"Airlines named automatically"]);
-  document.getElementById("stats").innerHTML=
-    cards.map(x=>'<div class="card"><b>'+x[0]+'</b><span>'+x[1]+'</span></div>').join("");
+  RW.setMeta('<b>'+esc(s.season?.label||"")+'</b><span title="'+esc(RW.when(s.generated))+'">&middot; '
+    +esc(RW.ago(s.generated))+'</span>',s.generated);
+  document.getElementById("sum").innerHTML=
+    '<span class="st m">'+nf(s.pairs_match??0)+' flyable</span>'
+    +'<span class="tag">'+nf(s.pairs_served??PAIRS.filter(isServed).length)+' routes with flights</span>'
+    +'<span class="tag">'+nf(s.airports??0)+' airports</span>'
+    +'<span class="tag wish">'+nf(s.candidates??0)+' wishlist</span>';
 
   document.getElementById("cCand").textContent=CAND.length+" airports";
-  document.getElementById("tCand").innerHTML=CAND.map(c=>
-    '<tr><td class="mono">'+esc(c.icao)+'</td><td style="color:var(--d)">'+esc(c.focus||"")+'</td>'+
-    '<td class="num">'+(c.gain?.new_pairs ?? 0)+'</td>'+
-    '<td class="num" style="color:var(--match)">'+(c.gain?.match_pairs ?? 0)+'</td></tr>')
-    .join("") || '<tr><td colspan="4" style="color:var(--d)">No wishlist airports in data.json.</td></tr>';
+  document.getElementById("tCand").innerHTML=CAND.slice().sort((a,b)=>(b.gain?.match_pairs||0)-(a.gain?.match_pairs||0)).map(c=>
+    '<tr><td class="tt" data-l="Airport"><span class="v"><a class="lnk" href="index.html#buy/'+esc(c.icao)+'">'+esc(c.icao)+'</a> '
+      +'<span class="faint">'+esc(c.name||"")+'</span></span></td>'
+    +'<td data-l="Focus"><span class="v"><span class="tag">'+esc(c.focus||"")+'</span></span></td>'
+    +'<td class="r num" data-l="New routes"><span class="v">'+(c.gain?.new_pairs ?? 0)+'</span></td>'
+    +'<td class="r num" data-l="Flyable"><span class="v m"><b>'+(c.gain?.match_pairs ?? 0)+'</b></span></td></tr>')
+    .join("") || '<tr><td class="empty" colspan="4">No wishlist airports in data.json.</td></tr>';
 
   if(!PAIRS.filter(isServed).length){
     note.hidden=false;
-    note.textContent="No routes with flights in data.json yet - airports are already plotted, arcs appear "
+    note.textContent="No routes with flights in data.json yet. Airports are plotted already; arcs appear "
       +"once RouteWatch has processed flights.";
   }
   draw();
+  if(isPhone()) europe(); else world();
 }).catch(()=>{
   note.hidden=false;
   note.textContent="Could not read data.json. Run the workflow and reload.";
 });
 
-document.querySelectorAll("button.t").forEach(b=>b.addEventListener("click",()=>{
+document.querySelectorAll("#toggles .chip").forEach(b=>b.addEventListener("click",()=>{
   const f=b.dataset.f; active[f]=!active[f];
   b.setAttribute("aria-pressed",String(active[f])); draw();
 }));
+
 </script>
 </body>
 </html>
