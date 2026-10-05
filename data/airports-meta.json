@@ -824,5 +824,69 @@
   "narrowbody_ok": true,
   "widebody_ok": true,
   "fetched": "2026-09-28"
+ },
+ "EDLP": {
+  "icao": "EDLP",
+  "iata": "PAD",
+  "name": "Paderborn Lippstadt",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 699,
+  "runway_count": 2,
+  "longest_runway_ft": 7139,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-10-05"
+ },
+ "EETN": {
+  "icao": "EETN",
+  "iata": "TLL",
+  "name": "Tallinn Lennart Meri",
+  "country": "Estonia",
+  "tz": "Europe/Tallinn",
+  "elevation_ft": 131,
+  "runway_count": 2,
+  "longest_runway_ft": 11388,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-10-05"
+ },
+ "LEPA": {
+  "icao": "LEPA",
+  "iata": "PMI",
+  "name": "Palma De Mallorca",
+  "country": "Spain",
+  "tz": "Europe/Madrid",
+  "elevation_ft": 27,
+  "runway_count": 4,
+  "longest_runway_ft": 10725,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-10-05"
+ },
+ "GCHI": {
+  "icao": "GCHI",
+  "iata": "VDE",
+  "name": "El Hierro Island Hierro",
+  "country": "Spain",
+  "tz": "Atlantic/Canary",
+  "elevation_ft": 103,
+  "runway_count": 2,
+  "longest_runway_ft": 4131,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": false,
+  "widebody_ok": false,
+  "fetched": "2026-10-05"
  }
 }

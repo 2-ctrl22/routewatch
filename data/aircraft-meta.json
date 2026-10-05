@@ -471,5 +471,165 @@
   "airline": "KLM",
   "built": "2000-11-08",
   "fetched": "2026-09-28"
+ },
+ "PH-BXC": {
+  "reg": "PH-BXC",
+  "model": "B738",
+  "typeCode": "Boeing 737-800",
+  "airline": "KLM",
+  "built": "1999-06-09",
+  "fetched": "2026-10-05"
+ },
+ "PH-BGA": {
+  "reg": "PH-BGA",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2008-03-27",
+  "fetched": "2026-10-05"
+ },
+ "PH-BGQ": {
+  "reg": "PH-BGQ",
+  "model": "B737",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2011-05-31",
+  "fetched": "2026-10-05"
+ },
+ "PH-BXH": {
+  "reg": "PH-BXH",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2000-07-28",
+  "fetched": "2026-10-05"
+ },
+ "PH-EXV": {
+  "reg": "PH-EXV",
+  "model": "E190",
+  "typeCode": "Embraer 190",
+  "airline": "KLM Cityhopper",
+  "built": "2018-02-01",
+  "fetched": "2026-10-05"
+ },
+ "PH-EXN": {
+  "reg": "PH-EXN",
+  "model": "E175",
+  "typeCode": "Embraer 175",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-10-05"
+ },
+ "PH-BGC": {
+  "reg": "PH-BGC",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2008-05-11",
+  "fetched": "2026-10-05"
+ },
+ "PH-BCG": {
+  "reg": "PH-BCG",
+  "model": "B738",
+  "typeCode": "Boeing 737-800",
+  "airline": "KLM",
+  "built": "2019-03-01",
+  "fetched": "2026-10-05"
+ },
+ "PH-NXG": {
+  "reg": "PH-NXG",
+  "model": "E190",
+  "typeCode": "Embraer 190",
+  "airline": "KLM Cityhopper",
+  "built": "2021-11-12",
+  "fetched": "2026-10-05"
+ },
+ "G-UZLO": {
+  "reg": "G-UZLO",
+  "model": "A20N",
+  "typeCode": "Airbus A320 NEO",
+  "airline": "easyJet",
+  "built": null,
+  "fetched": "2026-10-05"
+ },
+ "G-UZHA": {
+  "reg": "G-UZHA",
+  "model": "A20N",
+  "typeCode": "Airbus A320 (Sharklets)",
+  "airline": "easyJet",
+  "built": "2017-05-30",
+  "fetched": "2026-10-05"
+ },
+ "G-UZHB": {
+  "reg": "G-UZHB",
+  "model": "A20N",
+  "typeCode": "Airbus A320 (Sharklets)",
+  "airline": "easyJet",
+  "built": "2017-06-26",
+  "fetched": "2026-10-05"
+ },
+ "PH-BCH": {
+  "reg": "PH-BCH",
+  "model": "B738",
+  "typeCode": "Boeing 737-800",
+  "airline": "KLM",
+  "built": "2019-03-22",
+  "fetched": "2026-10-05"
+ },
+ "PH-BGB": {
+  "reg": "PH-BGB",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2008-04-18",
+  "fetched": "2026-10-05"
+ },
+ "PH-NXT": {
+  "reg": "PH-NXT",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-10-05"
+ },
+ "PH-BCL": {
+  "reg": "PH-BCL",
+  "model": "B738",
+  "typeCode": "Boeing 737-800",
+  "airline": "KLM",
+  "built": "2019-12-05",
+  "fetched": "2026-10-05"
+ },
+ "PH-HSD": {
+  "reg": "PH-HSD",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2011-03-02",
+  "fetched": "2026-10-05"
+ },
+ "PH-BXT": {
+  "reg": "PH-BXT",
+  "model": "B739",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2004-04-26",
+  "fetched": "2026-10-05"
+ },
+ "G-TTNH": {
+  "reg": "G-TTNH",
+  "model": "A20N",
+  "typeCode": "Airbus A320 (Sharklets)",
+  "airline": "British Airways",
+  "built": "2019-01-07",
+  "fetched": "2026-10-05"
+ },
+ "G-EUUZ": {
+  "reg": "G-EUUZ",
+  "model": "A320",
+  "typeCode": "Airbus A320",
+  "airline": "British Airways",
+  "built": "2008-09-30",
+  "fetched": "2026-10-05"
  }
 }

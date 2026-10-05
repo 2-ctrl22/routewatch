@@ -1,12 +1,12 @@
-# Enrichment 2026-09-28T11:37
+# Enrichment 2026-10-05T12:14
 
-- runway data: 51 of 68 airports (4 new) - section hit its sub-budget
-- aircraft registrations cached: 60 (20 new) - section hit its sub-budget
-- flight numbers in type history: 36 of 4570 candidates
-- rotation cursor: 36/4570, full rounds: 0
-- API units used this run: 60 of cap 60
-- units per section: runways 8/8, registrations 20/20, rotation 32/remainder
-- NOTE: run stopped early to protect your quota
+- runway data: 55 of 68 airports (4 new) - section hit its sub-budget
+- aircraft registrations cached: 80 (20 new) - section hit its sub-budget
+- flight numbers in type history: 37 of 2980 candidates - section hit 429
+- rotation cursor: 37/2980, full rounds: 0
+- API units used this run: 30 of cap 60
+- units per section: runways 8/8, registrations 20/20, rotation 2/remainder
+- completed
 
 ## Mixed fleet confirmed (28)
 - 3V5TR
