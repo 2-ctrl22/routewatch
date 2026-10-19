@@ -631,5 +631,110 @@
   "airline": "British Airways",
   "built": "2008-09-30",
   "fetched": "2026-10-05"
+ },
+ "G-EUYU": {
+  "reg": "G-EUYU",
+  "model": "A320",
+  "typeCode": "Airbus A320 (Sharklets)",
+  "airline": "British Airways",
+  "built": "2014-02-28",
+  "fetched": "2026-10-19"
+ },
+ "PH-BXE": {
+  "reg": "PH-BXE",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2000-04-28",
+  "fetched": "2026-10-19"
+ },
+ "PH-BXR": {
+  "reg": "PH-BXR",
+  "model": "B739",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2001-09-15",
+  "fetched": "2026-10-19"
+ },
+ "PH-BCB": {
+  "reg": "PH-BCB",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2011-05-19",
+  "fetched": "2026-10-19"
+ },
+ "F-GTAY": {
+  "reg": "F-GTAY",
+  "model": "A321",
+  "typeCode": "Airbus A321",
+  "airline": "Air France",
+  "built": "2010-03-18",
+  "fetched": "2026-10-19"
+ },
+ "F-HZUX": {
+  "reg": "F-HZUX",
+  "model": "BCS3",
+  "typeCode": "Airbus A220-300",
+  "airline": "Air France",
+  "built": "2023-04-12",
+  "fetched": "2026-10-19"
+ },
+ "F-HZUB": {
+  "reg": "F-HZUB",
+  "model": "BCS3",
+  "typeCode": "Airbus A220-300",
+  "airline": "Air France",
+  "built": "2021-10-17",
+  "fetched": "2026-10-19"
+ },
+ "PH-BXD": null,
+ "PH-AXI": {
+  "reg": "PH-AXI",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "KLM",
+  "built": null,
+  "fetched": "2026-10-19"
+ },
+ "PH-AXP": {
+  "reg": "PH-AXP",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "KLM",
+  "built": "2026-02-16",
+  "fetched": "2026-10-19"
+ },
+ "PH-BCD": {
+  "reg": "PH-BCD",
+  "model": "B738",
+  "typeCode": "Boeing 737-800",
+  "airline": "KLM",
+  "built": "2013-05-09",
+  "fetched": "2026-10-19"
+ },
+ "PH-AXB": {
+  "reg": "PH-AXB",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "KLM",
+  "built": "2024-09-18",
+  "fetched": "2026-10-19"
+ },
+ "PH-BXF": {
+  "reg": "PH-BXF",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2000-05-31",
+  "fetched": "2026-10-19"
+ },
+ "YL-CSM": {
+  "reg": "YL-CSM",
+  "model": "BCS3",
+  "typeCode": "Airbus A220-300",
+  "airline": "airBaltic",
+  "built": "2018-10-30",
+  "fetched": "2026-10-19"
  }
 }

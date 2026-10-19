@@ -888,5 +888,70 @@
   "narrowbody_ok": false,
   "widebody_ok": false,
   "fetched": "2026-10-05"
+ },
+ "BIKF": {
+  "icao": "BIKF",
+  "iata": "KEF",
+  "name": "Reykjavik Keflavik",
+  "country": "Iceland",
+  "tz": "Atlantic/Reykjavik",
+  "elevation_ft": 171,
+  "runway_count": 8,
+  "longest_runway_ft": 10056,
+  "surfaces": [
+   "Asphalt",
+   "Unknown"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-10-19"
+ },
+ "EDDL": {
+  "icao": "EDDL",
+  "iata": "DUS",
+  "name": "Düsseldorf",
+  "country": "Germany",
+  "tz": "Europe/Berlin",
+  "elevation_ft": 147,
+  "runway_count": 4,
+  "longest_runway_ft": 9823,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-10-19"
+ },
+ "LROP": {
+  "icao": "LROP",
+  "iata": "OTP",
+  "name": "Bucharest Henri Coandă",
+  "country": "Romania",
+  "tz": "Europe/Bucharest",
+  "elevation_ft": 314,
+  "runway_count": 4,
+  "longest_runway_ft": 11470,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-10-19"
+ },
+ "LGMK": {
+  "icao": "LGMK",
+  "iata": "JMK",
+  "name": "Mykonos Island Mikonos",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 405,
+  "runway_count": 2,
+  "longest_runway_ft": 6263,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": false,
+  "widebody_ok": false,
+  "fetched": "2026-10-19"
  }
 }
