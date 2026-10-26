@@ -2,9 +2,9 @@
  "_what_this_is": "RouteWatch community reference set. Reference data only: airline names, type aliases, airport coordinates and fleet definitions. Contains no flights, no flight numbers, no departure times and no schedule data of any kind.",
  "_why_it_is_shareable": "These are either public facts or user-authored configuration, not API Contents. That is why this file is independent of the AeroDataBox permission question tracked in issue #1.",
  "_how_to_contribute": "Open a pull request against docs/reference.json. Maintainers can preview a contribution with: node scripts/export-reference.mjs --merge <file>, which reports what it would add and flags any disagreement instead of applying it.",
- "generated": "2026-10-19T10:38:14.144Z",
+ "generated": "2026-10-26T10:53:02.850Z",
  "counts": {
-  "airlines": 182,
+  "airlines": 196,
   "airports": 68,
   "fleet": 7,
   "near_match": 12
@@ -13,7 +13,7 @@
   "HV": {
    "name": "Transavia",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -21,7 +21,7 @@
   "KL": {
    "name": "KLM",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -29,7 +29,7 @@
   "SK": {
    "name": "SAS",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -37,7 +37,7 @@
   "LX": {
    "name": "SWISS",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -45,7 +45,7 @@
   "U2": {
    "name": "easyJet",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -53,7 +53,7 @@
   "VY": {
    "name": "Vueling",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -68,8 +68,12 @@
   },
   "BA": {
    "name": "British",
+   "aka": [
+    "British",
+    "British Airways"
+   ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -77,7 +81,7 @@
   "IB": {
    "name": "Iberia",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -85,7 +89,7 @@
   "LH": {
    "name": "Lufthansa",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -93,15 +97,19 @@
   "AF": {
    "name": "Air France",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "LO": {
    "name": "LOT - Polish",
+   "aka": [
+    "LOT - Polish",
+    "LOT - Polish Airlines"
+   ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -109,7 +117,7 @@
   "NJE": {
    "name": "NetJets Europe",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -117,7 +125,7 @@
   "EK": {
    "name": "Emirates",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -125,7 +133,7 @@
   "UX": {
    "name": "Air Europa",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -133,7 +141,7 @@
   "AY": {
    "name": "Finnair",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -141,7 +149,7 @@
   "AZ": {
    "name": "ITA",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -149,7 +157,7 @@
   "CX": {
    "name": "Cathay Pacific",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -157,7 +165,7 @@
   "A3": {
    "name": "Aegean",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -165,7 +173,7 @@
   "DY": {
    "name": "Norwegian Air Shuttle",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -173,7 +181,7 @@
   "UA": {
    "name": "United",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -181,7 +189,7 @@
   "GQ": {
    "name": "Sky Express",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -189,15 +197,19 @@
   "QR": {
    "name": "Qatar",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "SN": {
    "name": "Brussels",
+   "aka": [
+    "Brussels",
+    "Brussels Airlines"
+   ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -205,7 +217,7 @@
   "TB": {
    "name": "TUI  Belgium",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -221,7 +233,7 @@
   "FR": {
    "name": "Ryanair",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -245,7 +257,7 @@
   "X3": {
    "name": "TUIfly",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -253,7 +265,7 @@
   "EW": {
    "name": "Eurowings",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -268,8 +280,12 @@
   },
   "VL": {
    "name": "Lufthansa City",
+   "aka": [
+    "Lufthansa City",
+    "Lufthansa City Airlines"
+   ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -277,7 +293,7 @@
   "XR": {
    "name": "Corendon  Europe",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -285,7 +301,7 @@
   "TO": {
    "name": "Transavia France",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -293,7 +309,7 @@
   "V7": {
    "name": "Volotea",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -309,7 +325,7 @@
   "VS": {
    "name": "Virgin Atlantic",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -317,19 +333,19 @@
   "LS": {
    "name": "Jet2",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "BY": {
-   "name": "TUI",
+   "name": "TUI Airways",
    "aka": [
     "TUI",
     "TUI Airways"
    ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -353,7 +369,7 @@
   "RK": {
    "name": "Ryanair UK",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -361,7 +377,7 @@
   "WK": {
    "name": "Edelweiss Air",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -369,7 +385,7 @@
   "CS": {
    "name": "Comlux Aruba",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-08-14",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -377,7 +393,7 @@
   "DE": {
    "name": "Condor",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -393,7 +409,7 @@
   "IU": {
    "name": "SW Italia",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-08-14",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -409,7 +425,7 @@
   "TP": {
    "name": "TAP Air Portugal",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -417,7 +433,7 @@
   "D0": {
    "name": "DHL Air",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -449,7 +465,7 @@
   "W4": {
    "name": "Wizz Air Malta",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -457,7 +473,7 @@
   "W6": {
    "name": "Wizz Air",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -473,7 +489,7 @@
   "W9": {
    "name": "Wizz Air UK",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-08-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -481,7 +497,7 @@
   "DL": {
    "name": "Delta Air Lines",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -489,7 +505,7 @@
   "A0": {
    "name": "BA Euroflyer",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -497,7 +513,7 @@
   "I2": {
    "name": "Iberia Express",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -549,7 +565,7 @@
     "Eurowings Discover"
    ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -573,7 +589,7 @@
   "ET": {
    "name": "Ethiopian",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -597,7 +613,7 @@
   "EN": {
    "name": "Air Dolomiti",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -613,7 +629,7 @@
   "QY": {
    "name": "EAT Leipzig",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -629,7 +645,7 @@
   "KU": {
    "name": "Kuwait",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-08-14",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -645,7 +661,7 @@
   "FX": {
    "name": "FedEx - Federal Express",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -693,7 +709,7 @@
   "FHM": {
    "name": "Freebird Airlines Europe",
    "first_seen": "2026-08-14",
-   "last_seen": "2026-08-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -705,7 +721,7 @@
     "3S"
    ],
    "first_seen": "2026-08-14",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -713,15 +729,18 @@
   "SQ": {
    "name": "Singapore",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "CZ": {
-   "name": "China Southern",
+   "name": "China Southern Airlines",
+   "aka": [
+    "China Southern"
+   ],
    "first_seen": "2026-08-24",
-   "last_seen": "2026-08-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -753,7 +772,7 @@
   "MH": {
    "name": "Malaysia",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -793,7 +812,7 @@
   "ABR": {
    "name": "ASL Airlines Ireland",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -801,19 +820,19 @@
   "TR": {
    "name": "Scoot",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "DK": {
-   "name": "Sunclass Airlines",
+   "name": "Sunclass",
    "aka": [
     "Sunclass Airlines",
     "Sunclass"
    ],
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -837,7 +856,7 @@
   "NZ": {
    "name": "Air New Zealand",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -861,7 +880,7 @@
   "WT": {
    "name": "Swiftair",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -893,7 +912,7 @@
   "E4": {
    "name": "Enter Air",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -941,7 +960,7 @@
   "TH": {
    "name": "Raya",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -957,7 +976,7 @@
   "UO": {
    "name": "Hong Kong Express",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -965,7 +984,7 @@
   "TG": {
    "name": "Thai  International",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -973,7 +992,7 @@
   "HX": {
    "name": "Hong Kong",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -989,7 +1008,7 @@
   "AK": {
    "name": "AirAsia",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1053,15 +1072,18 @@
   "OD": {
    "name": "Malindo Air",
    "first_seen": "2026-08-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "VZ": {
-   "name": "泰越捷航空",
+   "name": "Thai Vietjet Air",
+   "aka": [
+    "泰越捷航空"
+   ],
    "first_seen": "2026-08-24",
-   "last_seen": "2026-08-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1101,7 +1123,7 @@
   "BT": {
    "name": "airBaltic",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1109,7 +1131,7 @@
   "RO": {
    "name": "TAROM",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1117,7 +1139,7 @@
   "KM": {
    "name": "KM Malta",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1125,7 +1147,7 @@
   "AC": {
    "name": "Air Canada",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1133,7 +1155,7 @@
   "B6": {
    "name": "JetBlue",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1141,7 +1163,7 @@
   "AA": {
    "name": "American",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1157,7 +1179,7 @@
   "LG": {
    "name": "Luxair",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1165,7 +1187,7 @@
   "FI": {
    "name": "Icelandair",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1213,7 +1235,7 @@
   "QF": {
    "name": "Qantas",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1237,7 +1259,7 @@
   "CY": {
    "name": "Cyprus",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1245,7 +1267,7 @@
   "CYP": {
    "name": "CYP",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1261,7 +1283,7 @@
   "VA": {
    "name": "Virgin Australia",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1269,15 +1291,19 @@
   "Z0": {
    "name": "Norse Atlantic UK",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
   },
   "HJ": {
    "name": "Tasman Cargo Airlines",
+   "aka": [
+    "Tasman Cargo Airlines",
+    "Tasman Cargo"
+   ],
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1285,7 +1311,7 @@
   "WN": {
    "name": "Southwest",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1293,7 +1319,7 @@
   "AS": {
    "name": "Alaska",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1301,7 +1327,7 @@
   "F9": {
    "name": "Frontier",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1309,7 +1335,7 @@
   "RC": {
    "name": "Atlantic",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1397,7 +1423,7 @@
   "LD": {
    "name": "AHK Air Hong Kong Limited",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1405,10 +1431,11 @@
   "8K": {
    "name": "K-Mile Air",
    "aka": [
-    "8K"
+    "8K",
+    "K-Mile Air"
    ],
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1416,7 +1443,7 @@
   "RH": {
    "name": "Hong Kong Air Cargo Carrier",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1424,7 +1451,7 @@
   "CV": {
    "name": "Cargolux",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1432,7 +1459,7 @@
   "JQ": {
    "name": "Jetstar",
    "first_seen": "2026-09-24",
-   "last_seen": "2026-09-24",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
@@ -1481,6 +1508,118 @@
    "name": "Animawings",
    "first_seen": "2026-09-24",
    "last_seen": "2026-09-24",
+   "sources": [
+    "manual"
+   ]
+  },
+  "5Y": {
+   "name": "Atlas Air",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "BSF": {
+   "name": "BSF",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "DBT": {
+   "name": "DBT",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "P6": {
+   "name": "Privilege Style",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "QS": {
+   "name": "SmartWings",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "6B": {
+   "name": "TUIfly Nordic",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "BR": {
+   "name": "EVA Air",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "ELI": {
+   "name": "ELI",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "5C": {
+   "name": "C.A.L. Cargo Airlines",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "5O": {
+   "name": "ASL Airlines France",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "A5": {
+   "name": "HOP!",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "DI": {
+   "name": "Marabu",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "MS": {
+   "name": "EgyptAir",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
+   "sources": [
+    "manual"
+   ]
+  },
+  "K4": {
+   "name": "K4",
+   "first_seen": "2026-10-25",
+   "last_seen": "2026-10-25",
    "sources": [
     "manual"
    ]
