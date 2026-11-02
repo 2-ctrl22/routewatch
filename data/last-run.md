@@ -1,11 +1,11 @@
-## RouteWatch 2026-10-26T10:53
+## RouteWatch 2026-11-02T13:18
 
 - season **W26/27** (2026-10-25 through 2027-03-28)
 - pairs with a connection: **608** of 1891
 - with MATCH: **152** &middot; simmable: **449**
 - registrations known: **3231**
-- airlines named: **196** (14 new, 28 renamed)
-- new changes: **9934**
+- airlines named: **196** (0 new, 0 renamed)
+- new changes: **5864**
 
 ### Buy advice by network gain
 
@@ -16,43 +16,43 @@
 - **LEMD Madrid Barajas** (pax): +35 pairs, +1 with MATCH
 - **EBLG Liege** (cargo): +5 pairs, +1 with MATCH
 
-- `AIRLINE_RENAMED`  SN  - {"from":"Brussels","to":"Brussels Airlines"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British","to":"British Airways"}
-- `AIRLINE_RENAMED`  SN  - {"from":"Brussels Airlines","to":"Brussels"}
-- `AIRLINE_RENAMED`  SN  - {"from":"Brussels","to":"Brussels Airlines"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British Airways","to":"British"}
-- `AIRLINE_RENAMED`  BY  - {"from":"TUI","to":"TUI Airways"}
-- `AIRLINE_RENAMED`  BY  - {"from":"TUI Airways","to":"TUI"}
-- `AIRLINE_RENAMED`  SN  - {"from":"Brussels Airlines","to":"Brussels"}
-- `AIRLINE_RENAMED`  4Y  - {"from":"Eurowings Discover","to":"Flight Alaska"}
-- `AIRLINE_RENAMED`  DK  - {"from":"Sunclass Airlines","to":"Sunclass"}
-- `AIRLINE_RENAMED`  LO  - {"from":"LOT - Polish","to":"LOT - Polish Airlines"}
-- `AIRLINE_RENAMED`  LO  - {"from":"LOT - Polish Airlines","to":"LOT - Polish"}
-- `AIRLINE_RENAMED`  LO  - {"from":"LOT - Polish","to":"LOT - Polish Airlines"}
-- `AIRLINE_RENAMED`  LO  - {"from":"LOT - Polish Airlines","to":"LOT - Polish"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British","to":"British Airways"}
-- `AIRLINE_RENAMED`  4Y  - {"from":"Flight Alaska","to":"Eurowings Discover"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British Airways","to":"British"}
-- `AIRLINE_RENAMED`  VL  - {"from":"Lufthansa City","to":"Lufthansa City Airlines"}
-- `AIRLINE_RENAMED`  VL  - {"from":"Lufthansa City Airlines","to":"Lufthansa City"}
-- `AIRLINE_RENAMED`  8K  - {"from":"K-Mile Air","to":"8K"}
-- `AIRLINE_RENAMED`  3S  - {"from":"AeroLogic","to":"3S"}
-- `AIRLINE_RENAMED`  HJ  - {"from":"Tasman Cargo Airlines","to":"Tasman Cargo"}
-- `AIRLINE_RENAMED`  VZ  - {"from":"泰越捷航空","to":"Thai Vietjet Air"}
-- `AIRLINE_RENAMED`  CZ  - {"from":"China Southern","to":"China Southern Airlines"}
-- `AIRLINE_RENAMED`  3S  - {"from":"3S","to":"AeroLogic"}
-- `AIRLINE_RENAMED`  8K  - {"from":"8K","to":"K-Mile Air"}
-- `AIRLINE_RENAMED`  HJ  - {"from":"Tasman Cargo","to":"Tasman Cargo Airlines"}
-- `AIRLINE_RENAMED`  BY  - {"from":"TUI","to":"TUI Airways"}
-- `ROUTE_NEW` EHAM-LGSA HV HV5887 - {"nm":1302,"types":["AIRBUS A321 NEO"],"status":"NO-MATCH","candidate":false}
-- `ROUTE_NEW` EHAM-LEIB HV HV5675 - {"nm":819,"types":["BOEING 737"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-LEBL HV HV5135 - {"from":[5],"to":[5,0]}
-- `RESUMED` EHAM-LEBL HV HV5135 - {"resumed_on":"2026-10-25"}
-- `DOW_PATTERN_CHANGE` EHAM-LEZL HV HV6731 - {"from":[5],"to":[5,0]}
-- `RESUMED` EHAM-LEZL HV HV6731 - {"resumed_on":"2026-10-25"}
-- `MATCH_CHANGED` EHAM-LGIR HV HV6875 - {"from":"NO-MATCH","to":"MATCH+NO-MATCH","types":["AIRBUS A321","B738"]}
-- `SIMMABLE_CHANGED` EHAM-LGIR HV HV6875 - {"from":false,"to":true,"nm":1340}
-- `TYPE_NEW` EHAM-LGIR HV HV6875 - {"added":["B738"],"previously":["AIRBUS A321"]}
-- `TYPE_MIX_SHIFT` EHAM-LGIR HV HV6875 - {"type":"AIRBUS A321","share_from":1,"share_to":0.5}
-- `DOW_PATTERN_CHANGE` EHAM-LGIR HV HV6875 - {"from":[5],"to":[5,0]}
-- `RESUMED` EHAM-LGIR HV HV6875 - {"resumed_on":"2026-10-25"}
+- `SEASON_TIME_SHIFT` EHAM-LEMG HV HV6115 - {"W26/27":"06:40","S26":"06:45"}
+- `SEASON_TYPE_SWAP` EHAM-LSGG KL KL1929 - {"W26/27":["B738"],"S26":["EMBRAER 190","E195"]}
+- `SEASON_NOT_RETURNING` EHAM-LFPG KL KL1401 - {"previous":"2026-08-13 through 2026-08-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-ESSA KL KL1215 - {"previous":"2026-08-13 through 2026-08-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-EKCH SK SK550 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EBBR-EHAM KL KL1701 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-LEBL KL KL1497 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-LGIR HV HV6871 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_TYPE_SWAP` EHAM-EKCH KL KL1267 - {"W26/27":["A320"],"S26":["AIRBUS A321 NEO"]}
+- `SEASON_TIME_SHIFT` EHAM-EKCH KL KL1267 - {"W26/27":"07:40","S26":"07:10"}
+- `SEASON_TYPE_SWAP` EHAM-LEMD KL KL1501 - {"W26/27":["BOEING 737"],"S26":["AIRBUS A321 NEO"]}
+- `SEASON_TIME_SHIFT` EHAM-LEMD KL KL1501 - {"W26/27":"07:20","S26":"07:00"}
+- `SEASON_NOT_RETURNING` EGKK-EHAM U2 U28671 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-ENGM KL KL1197 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_TYPE_SWAP` EHAM-EPWA LO LO270 - {"W26/27":["E195"],"S26":["B38M","E175"]}
+- `SEASON_NOT_RETURNING` EHAM-LSZH KL KL1917 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EGLL-EHAM KL KL1001 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_TYPE_SWAP` EDDM-EHAM KL KL1849 - {"W26/27":["E175"],"S26":["EMBRAER 190"]}
+- `SEASON_TIME_SHIFT` EDDM-EHAM KL KL1849 - {"W26/27":"07:50","S26":"07:15"}
+- `SEASON_TYPE_SWAP` EHAM-LEMG U2 U27889 - {"W26/27":["AIRBUS A320 NEO"],"S26":["AIRBUS A320 NEO","AIRBUS A321 (SHARKLETS)"]}
+- `SEASON_TIME_SHIFT` EHAM-LEMG U2 U27889 - {"W26/27":"07:00","S26":"07:20"}
+- `SEASON_TYPE_SWAP` EHAM-LEMD IB IB740 - {"W26/27":["AIRBUS A321"],"S26":["AIRBUS A320 NEO","AIRBUS A320 (SHARKLETS)","A320"]}
+- `SEASON_TIME_SHIFT` EHAM-LEMD IB IB740 - {"W26/27":"07:10","S26":"07:20"}
+- `SEASON_TYPE_SWAP` EHAM-LFPG KL KL1403 - {"W26/27":["AIRBUS A321 NEO"],"S26":["BOEING 737"]}
+- `SEASON_TIME_SHIFT` EHAM-LIRF KL KL1601 - {"W26/27":"06:50","S26":"07:20"}
+- `SEASON_NOT_RETURNING` EHAM-LEMG HV HV6113 - {"previous":"2026-08-13 through 2026-08-13","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-LGKR OR OR1115 - {"previous":"2026-08-13 through 2026-08-13","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EHAM-LFLL KL KL1427 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_TIME_SHIFT` EHAM-LPPR HV HV6007 - {"W26/27":"09:20","S26":"07:20"}
+- `SEASON_NOT_RETURNING` EBBR-EHAM KL KL9857 - {"previous":"2026-08-13 through 2026-08-13","counter_season":"S26"}
+- `SEASON_NOT_RETURNING` EDDS-EHAM KL KL1827 - {"previous":"2026-08-13 through 2026-09-24","counter_season":"S26"}
+- `SEASON_TYPE_SWAP` EDDF-EHAM LH LH1003 - {"W26/27":["AIRBUS A320 (SHARKLETS)"],"S26":["A320","A319","AIRBUS A320 (SHARKLETS)"]}
+- `SEASON_TIME_SHIFT` EDDF-EHAM LH LH1003 - {"W26/27":"07:30","S26":"08:00"}
+- `SEASON_TYPE_SWAP` EDDM-EHAM LH LH2311 - {"W26/27":["A319"],"S26":["AIRBUS A320 (SHARKLETS)","A320"]}
+- `SEASON_TIME_SHIFT` EDDM-EHAM LH LH2311 - {"W26/27":"08:55","S26":"08:15"}
+- `SEASON_TYPE_SWAP` EGPH-EHAM KL KL923 - {"W26/27":["BOEING 737"],"S26":["E195","BOEING 737"]}
+- `SEASON_TIME_SHIFT` EGPH-EHAM KL KL923 - {"W26/27":"08:10","S26":"08:05"}
+- `SEASON_TYPE_SWAP` EGBB-EHAM KL KL1041 - {"W26/27":["BOEING 737"],"S26":["BOEING 737","E195"]}
+- `SEASON_TIME_SHIFT` EGBB-EHAM KL KL1041 - {"W26/27":"09:35","S26":"08:20"}
+- `SEASON_TYPE_SWAP` EHAM-LEBL KL KL1511 - {"W26/27":["BOEING 737"],"S26":["BOEING 737","B738"]}
