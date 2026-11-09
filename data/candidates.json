@@ -1,10 +1,48 @@
 {
+ "EGSS": {
+  "gain": {
+   "new_pairs": 27,
+   "match_pairs": 10,
+   "simmable_pairs": 24,
+   "cargo_pairs": 2,
+   "connects": [
+    "BIKF",
+    "EDDF",
+    "EETN",
+    "EFHK",
+    "EGBB",
+    "EGPH",
+    "EHAM",
+    "EKCH",
+    "ELLX",
+    "ENGM",
+    "ESSA",
+    "GCTS",
+    "LEBL",
+    "LEIB",
+    "LEMG",
+    "LEPA",
+    "LEZL",
+    "LFBZ",
+    "LGAV",
+    "LGIR",
+    "LIMC",
+    "LIRF",
+    "LMML",
+    "LPMA",
+    "LPPR",
+    "LROP",
+    "LSGG"
+   ]
+  },
+  "prices": null
+ },
  "LFPG": {
   "gain": {
-   "new_pairs": 46,
-   "match_pairs": 13,
-   "simmable_pairs": 34,
-   "cargo_pairs": 3,
+   "new_pairs": 48,
+   "match_pairs": 8,
+   "simmable_pairs": 39,
+   "cargo_pairs": 4,
    "connects": [
     "BIKF",
     "CYYZ",
@@ -24,10 +62,12 @@
     "ENGM",
     "EPWA",
     "ESSA",
+    "FACT",
     "GCTS",
     "KJFK",
     "KLAX",
     "KSFO",
+    "LCLK",
     "LEBL",
     "LEMG",
     "LEPA",
@@ -56,50 +96,17 @@
   },
   "prices": null
  },
- "EGSS": {
-  "gain": {
-   "new_pairs": 24,
-   "match_pairs": 12,
-   "simmable_pairs": 22,
-   "cargo_pairs": 2,
-   "connects": [
-    "BIKF",
-    "EFHK",
-    "EGBB",
-    "EGPH",
-    "EHAM",
-    "EKCH",
-    "ELLX",
-    "ENGM",
-    "ESSA",
-    "GCTS",
-    "LEBL",
-    "LEIB",
-    "LEMG",
-    "LEPA",
-    "LEZL",
-    "LFBZ",
-    "LGAV",
-    "LGIR",
-    "LIMC",
-    "LIRF",
-    "LMML",
-    "LPPR",
-    "LROP",
-    "LSGG"
-   ]
-  },
-  "prices": null
- },
  "EGKK": {
   "gain": {
-   "new_pairs": 38,
-   "match_pairs": 9,
-   "simmable_pairs": 33,
+   "new_pairs": 40,
+   "match_pairs": 4,
+   "simmable_pairs": 36,
    "cargo_pairs": 0,
    "connects": [
     "BIKF",
+    "CYYZ",
     "EDDF",
+    "EDDL",
     "EDDM",
     "EFHK",
     "EGPH",
@@ -142,10 +149,10 @@
  },
  "EDDP": {
   "gain": {
-   "new_pairs": 26,
+   "new_pairs": 27,
    "match_pairs": 3,
    "simmable_pairs": 7,
-   "cargo_pairs": 7,
+   "cargo_pairs": 8,
    "connects": [
     "EBBR",
     "EDDF",
@@ -159,6 +166,7 @@
     "ENGM",
     "EPWA",
     "ESSA",
+    "GCTS",
     "KJFK",
     "LEBL",
     "LEPA",
@@ -179,9 +187,9 @@
  },
  "LEMD": {
   "gain": {
-   "new_pairs": 35,
+   "new_pairs": 38,
    "match_pairs": 1,
-   "simmable_pairs": 26,
+   "simmable_pairs": 29,
    "cargo_pairs": 2,
    "connects": [
     "BIKF",
@@ -195,10 +203,13 @@
     "EGPH",
     "EHAM",
     "EKCH",
+    "ELLX",
     "ENGM",
     "EPWA",
     "ESSA",
+    "GCTS",
     "KJFK",
+    "KLAX",
     "LEBL",
     "LEIB",
     "LEMG",
@@ -225,16 +236,18 @@
  },
  "EBLG": {
   "gain": {
-   "new_pairs": 5,
+   "new_pairs": 7,
    "match_pairs": 1,
    "simmable_pairs": 1,
-   "cargo_pairs": 4,
+   "cargo_pairs": 5,
    "connects": [
+    "EBBR",
     "EDDM",
     "EKCH",
     "KJFK",
     "LIMC",
-    "LIRF"
+    "LIRF",
+    "VHHH"
    ]
   },
   "prices": null
