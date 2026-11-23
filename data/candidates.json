@@ -1,16 +1,15 @@
 {
  "EGSS": {
   "gain": {
-   "new_pairs": 27,
-   "match_pairs": 10,
-   "simmable_pairs": 24,
+   "new_pairs": 25,
+   "match_pairs": 9,
+   "simmable_pairs": 22,
    "cargo_pairs": 2,
    "connects": [
     "BIKF",
     "EDDF",
     "EETN",
     "EFHK",
-    "EGBB",
     "EGPH",
     "EHAM",
     "EKCH",
@@ -19,15 +18,14 @@
     "ESSA",
     "GCTS",
     "LEBL",
-    "LEIB",
     "LEMG",
     "LEPA",
     "LEZL",
     "LFBZ",
+    "LFLL",
     "LGAV",
     "LGIR",
     "LIMC",
-    "LIRF",
     "LMML",
     "LPMA",
     "LPPR",
@@ -40,8 +38,8 @@
  "LFPG": {
   "gain": {
    "new_pairs": 48,
-   "match_pairs": 8,
-   "simmable_pairs": 39,
+   "match_pairs": 7,
+   "simmable_pairs": 38,
    "cargo_pairs": 4,
    "connects": [
     "BIKF",
@@ -98,9 +96,9 @@
  },
  "EGKK": {
   "gain": {
-   "new_pairs": 40,
-   "match_pairs": 4,
-   "simmable_pairs": 36,
+   "new_pairs": 38,
+   "match_pairs": 3,
+   "simmable_pairs": 33,
    "cargo_pairs": 0,
    "connects": [
     "BIKF",
@@ -118,7 +116,6 @@
     "GCTS",
     "LCLK",
     "LEBL",
-    "LEIB",
     "LEMG",
     "LEPA",
     "LEZL",
@@ -131,17 +128,16 @@
     "LGKR",
     "LGMK",
     "LGSA",
-    "LGSR",
     "LIMC",
     "LIRF",
     "LMML",
     "LOWI",
     "LPMA",
     "LPPR",
-    "LROP",
     "LSGG",
     "LSZH",
     "OTHH",
+    "VTBS",
     "WSSS"
    ]
   },
@@ -149,10 +145,10 @@
  },
  "EDDP": {
   "gain": {
-   "new_pairs": 27,
-   "match_pairs": 3,
-   "simmable_pairs": 7,
-   "cargo_pairs": 8,
+   "new_pairs": 26,
+   "match_pairs": 2,
+   "simmable_pairs": 4,
+   "cargo_pairs": 9,
    "connects": [
     "EBBR",
     "EDDF",
@@ -175,7 +171,6 @@
     "LGIR",
     "LGSA",
     "LIMC",
-    "LPMA",
     "LROP",
     "LSGG",
     "VHHH",
@@ -185,14 +180,37 @@
   },
   "prices": null
  },
+ "EBLG": {
+  "gain": {
+   "new_pairs": 11,
+   "match_pairs": 2,
+   "simmable_pairs": 2,
+   "cargo_pairs": 7,
+   "connects": [
+    "BIKF",
+    "EBBR",
+    "EDDM",
+    "EKCH",
+    "KJFK",
+    "LEBL",
+    "LGAV",
+    "LIMC",
+    "LIRF",
+    "LSGG",
+    "VHHH"
+   ]
+  },
+  "prices": null
+ },
  "LEMD": {
   "gain": {
    "new_pairs": 38,
    "match_pairs": 1,
    "simmable_pairs": 29,
-   "cargo_pairs": 2,
+   "cargo_pairs": 3,
    "connects": [
     "BIKF",
+    "CYYZ",
     "EBBR",
     "EDDF",
     "EDDL",
@@ -219,7 +237,6 @@
     "LFLL",
     "LFMN",
     "LGAV",
-    "LGKR",
     "LIMC",
     "LIRF",
     "LMML",
@@ -229,24 +246,6 @@
     "LSGG",
     "LSZH",
     "OTHH",
-    "VHHH"
-   ]
-  },
-  "prices": null
- },
- "EBLG": {
-  "gain": {
-   "new_pairs": 7,
-   "match_pairs": 1,
-   "simmable_pairs": 1,
-   "cargo_pairs": 5,
-   "connects": [
-    "EBBR",
-    "EDDM",
-    "EKCH",
-    "KJFK",
-    "LIMC",
-    "LIRF",
     "VHHH"
    ]
   },

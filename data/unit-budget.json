@@ -1,30 +1,15 @@
 {
  "_what_this_is": "Units and requests per subscription period. Two independent limits: units are tier-weighted, requests are raw call counts.",
  "_period_verified": "Verified on 20 August 2026 against the RapidAPI Subscriptions view: AeroDataBox Basic, Active, Date Subscribed 18 aug 2026 19:19. RapidAPI resets per subscription period, so the next reset is 18 September 2026 19:19, not the first of the month.",
- "period_start": "2026-10-18",
- "period_days": 31,
+ "period_start": "2026-11-18",
+ "period_days": 30,
  "seeded_units": 0,
  "seeded_calls": 0,
  "runs": [
   {
-   "at": "2026-10-19",
-   "calls": 90,
-   "units": 158
-  },
-  {
-   "at": "2026-10-26",
-   "calls": 68,
-   "units": 136
-  },
-  {
-   "at": "2026-11-02",
-   "calls": 68,
-   "units": 136
-  },
-  {
-   "at": "2026-11-09",
-   "calls": 68,
-   "units": 136
+   "at": "2026-11-23",
+   "calls": 128,
+   "units": 196
   }
  ],
  "unit_limit": 600,

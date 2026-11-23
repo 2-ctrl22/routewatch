@@ -1,14 +1,14 @@
-# Enrichment 2026-10-19T10:39
+# Enrichment 2026-11-23T15:51
 
-- runway data: 59 of 68 airports (4 new) - section hit its sub-budget
-- aircraft registrations cached: 94 (14 new)
-- flight numbers in type history: 37 of 2980 candidates
-- rotation cursor: 37/2980, full rounds: 0
-- API units used this run: 22 of cap 22
-- units per section: runways 8/8, registrations 14/20, rotation 0/remainder
+- runway data: 63 of 68 airports (4 new) - section hit its sub-budget
+- aircraft registrations cached: 114 (20 new) - section hit its sub-budget
+- flight numbers in type history: 54 of 4673 candidates
+- rotation cursor: 54/4673, full rounds: 0
+- API units used this run: 60 of cap 60
+- units per section: runways 8/8, registrations 20/20, rotation 32/remainder
 - NOTE: run stopped early to protect your quota
 
-## Mixed fleet confirmed (28)
+## Mixed fleet confirmed (42)
 - 3V5TR
 - A088UA
 - A09UQ
@@ -37,6 +37,18 @@
 - AF1205
 - AF1240
 - AF1241
+- AF1750
+- AF1751
+- AF7371
+- AF7431
+- AF7520
+- AY1141
+- AY1142
+- AY1301
+- AY1331
+- AY1332
+- AY1401
+- AY1402
 
 These flight numbers switch aircraft type within one week. That is exactly the
 category your inventory marks as "to be confirmed per date".

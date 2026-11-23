@@ -736,5 +736,165 @@
   "airline": "airBaltic",
   "built": "2018-10-30",
   "fetched": "2026-10-19"
+ },
+ "PH-YHW": {
+  "reg": "PH-YHW",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "Transavia",
+  "built": "2024-04-30",
+  "fetched": "2026-11-23"
+ },
+ "PH-YHY": {
+  "reg": "PH-YHY",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "Transavia",
+  "built": "2024-03-18",
+  "fetched": "2026-11-23"
+ },
+ "PH-YHB": {
+  "reg": "PH-YHB",
+  "model": "A21N",
+  "typeCode": "Airbus A321 NEO",
+  "airline": "Transavia",
+  "built": "2024-06-06",
+  "fetched": "2026-11-23"
+ },
+ "HB-JCD": {
+  "reg": "HB-JCD",
+  "model": "BCS3",
+  "typeCode": "Airbus A220-300",
+  "airline": "SWISS",
+  "built": "2017-08-28",
+  "fetched": "2026-11-23"
+ },
+ "HB-JCI": {
+  "reg": "HB-JCI",
+  "model": "BCS3",
+  "typeCode": "Airbus A220-300",
+  "airline": "Delta Air Lines",
+  "built": "2018-02-22",
+  "fetched": "2026-11-23"
+ },
+ "HB-JBA": {
+  "reg": "HB-JBA",
+  "model": "BCS1",
+  "typeCode": "Airbus A220-100",
+  "airline": "Delta Air Lines",
+  "built": "2016-06-16",
+  "fetched": "2026-11-23"
+ },
+ "PH-BXV": {
+  "reg": "PH-BXV",
+  "model": "B738",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2007-02-27",
+  "fetched": "2026-11-23"
+ },
+ "PH-NXV": {
+  "reg": "PH-NXV",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "PH-NXR": {
+  "reg": "PH-NXR",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "PH-NXW": {
+  "reg": "PH-NXW",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "EI-SIS": {
+  "reg": "EI-SIS",
+  "model": "A20N",
+  "typeCode": "Airbus A320 NEO",
+  "airline": "SAS Ireland",
+  "built": "2022-09-22",
+  "fetched": "2026-11-23"
+ },
+ "EI-SIN": {
+  "reg": "EI-SIN",
+  "model": "A20N",
+  "typeCode": "Airbus A320 NEO",
+  "airline": "SAS Ireland",
+  "built": "0202-07-01",
+  "fetched": "2026-11-23"
+ },
+ "YR-ABC": {
+  "reg": "YR-ABC",
+  "model": "A320",
+  "typeCode": "Airbus A320",
+  "airline": "Carpatair",
+  "built": "2008-12-02",
+  "fetched": "2026-11-23"
+ },
+ "PH-BXP": {
+  "reg": "PH-BXP",
+  "model": "B739",
+  "typeCode": "Boeing 737",
+  "airline": "KLM",
+  "built": "2001-08-07",
+  "fetched": "2026-11-23"
+ },
+ "PH-NXK": {
+  "reg": "PH-NXK",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": "2022-03-29",
+  "fetched": "2026-11-23"
+ },
+ "SP-LNI": {
+  "reg": "SP-LNI",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "LOT - Polish Airlines",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "SP-LIQ": {
+  "reg": "SP-LIQ",
+  "model": "E175",
+  "typeCode": "Embraer 175",
+  "airline": "LOT - Polish Airlines",
+  "built": "2012-02-27",
+  "fetched": "2026-11-23"
+ },
+ "PH-NXZ": {
+  "reg": "PH-NXZ",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "PH-NXP": {
+  "reg": "PH-NXP",
+  "model": "E195",
+  "typeCode": "Embraer 195",
+  "airline": "KLM Cityhopper",
+  "built": null,
+  "fetched": "2026-11-23"
+ },
+ "OE-LST": {
+  "reg": "OE-LST",
+  "model": "A20N",
+  "typeCode": "Airbus A320 NEO",
+  "airline": "EasyJet Europe",
+  "built": null,
+  "fetched": "2026-11-23"
  }
 }

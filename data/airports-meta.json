@@ -953,5 +953,70 @@
   "narrowbody_ok": false,
   "widebody_ok": false,
   "fetched": "2026-10-19"
+ },
+ "LGSA": {
+  "icao": "LGSA",
+  "iata": "CHQ",
+  "name": "Souda Chania",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 490,
+  "runway_count": 4,
+  "longest_runway_ft": 10978,
+  "surfaces": [
+   "Asphalt",
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-11-23"
+ },
+ "LGSR": {
+  "icao": "LGSR",
+  "iata": "JTR",
+  "name": "Santorini Island Santorini",
+  "country": "Greece",
+  "tz": "Europe/Athens",
+  "elevation_ft": 127,
+  "runway_count": 4,
+  "longest_runway_ft": 6988,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-11-23"
+ },
+ "CYYZ": {
+  "icao": "CYYZ",
+  "iata": "YYZ",
+  "name": "Toronto Pearson",
+  "country": "Canada",
+  "tz": "America/Toronto",
+  "elevation_ft": 569,
+  "runway_count": 10,
+  "longest_runway_ft": 11115,
+  "surfaces": [
+   "Concrete"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": true,
+  "fetched": "2026-11-23"
+ },
+ "ENSB": {
+  "icao": "ENSB",
+  "iata": "LYR",
+  "name": "Longyearbyen Longyear",
+  "country": "Norway",
+  "tz": "Arctic/Longyearbyen",
+  "elevation_ft": 88,
+  "runway_count": 2,
+  "longest_runway_ft": 8097,
+  "surfaces": [
+   "Asphalt"
+  ],
+  "narrowbody_ok": true,
+  "widebody_ok": false,
+  "fetched": "2026-11-23"
  }
 }

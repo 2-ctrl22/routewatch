@@ -1,58 +1,58 @@
-## RouteWatch 2026-11-09T13:44
+## RouteWatch 2026-11-23T15:48
 
 - season **W26/27** (2026-10-25 through 2027-03-28)
-- pairs with a connection: **672** of 1891
-- with MATCH: **143** &middot; simmable: **516**
-- registrations known: **3851**
-- airlines named: **214** (18 new, 13 renamed)
-- new changes: **12966**
+- pairs with a connection: **618** of 1891
+- with MATCH: **131** &middot; simmable: **469**
+- registrations known: **4148**
+- airlines named: **220** (6 new, 13 renamed)
+- new changes: **11549**
 
 ### Buy advice by network gain
 
-- **EGSS London Stansted** (cargo): +27 pairs, +10 with MATCH
-- **LFPG Paris Charles de Gaulle** (cargo): +48 pairs, +8 with MATCH
-- **EGKK London Gatwick** (pax): +40 pairs, +4 with MATCH
-- **EDDP Leipzig/Halle** (cargo): +27 pairs, +3 with MATCH
+- **EGSS London Stansted** (cargo): +25 pairs, +9 with MATCH
+- **LFPG Paris Charles de Gaulle** (cargo): +48 pairs, +7 with MATCH
+- **EGKK London Gatwick** (pax): +38 pairs, +3 with MATCH
+- **EDDP Leipzig/Halle** (cargo): +26 pairs, +2 with MATCH
+- **EBLG Liege** (cargo): +11 pairs, +2 with MATCH
 - **LEMD Madrid Barajas** (pax): +38 pairs, +1 with MATCH
-- **EBLG Liege** (cargo): +7 pairs, +1 with MATCH
 
-- `AIRLINE_RENAMED`  CZ  - {"from":"China Southern Airlines","to":"China Southern"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British","to":"British Airways"}
-- `AIRLINE_RENAMED`  BA  - {"from":"British Airways","to":"British"}
-- `AIRLINE_RENAMED`  BY  - {"from":"TUI Airways","to":"TUI"}
-- `AIRLINE_RENAMED`  4Y  - {"from":"Eurowings Discover","to":"Flight Alaska"}
-- `AIRLINE_RENAMED`  4Y  - {"from":"Flight Alaska","to":"Eurowings Discover"}
-- `AIRLINE_RENAMED`  VL  - {"from":"Lufthansa City","to":"Lufthansa City Airlines"}
-- `AIRLINE_RENAMED`  VL  - {"from":"Lufthansa City Airlines","to":"Lufthansa City"}
+- `AIRLINE_RENAMED`  3V  - {"from":"ASL  Belgium","to":"ASL Airlines Belgium"}
+- `AIRLINE_RENAMED`  N0  - {"from":"Norse Atlantic","to":"Norse Atlantic Airways"}
+- `AIRLINE_RENAMED`  SQ  - {"from":"Singapore","to":"Singapore Airlines"}
+- `AIRLINE_RENAMED`  SQ  - {"from":"Singapore Airlines","to":"Singapore"}
+- `AIRLINE_RENAMED`  T7  - {"from":"Twinjet","to":"Twin Jet"}
+- `AIRLINE_RENAMED`  8K  - {"from":"K-Mile Air","to":"8K"}
 - `AIRLINE_RENAMED`  3S  - {"from":"AeroLogic","to":"3S"}
+- `AIRLINE_RENAMED`  HJ  - {"from":"Tasman Cargo Airlines","to":"Tasman Cargo"}
 - `AIRLINE_RENAMED`  3V  - {"from":"ASL Airlines Belgium","to":"ASL  Belgium"}
 - `AIRLINE_RENAMED`  3S  - {"from":"3S","to":"AeroLogic"}
-- `AIRLINE_RENAMED`  TK  - {"from":"Turkish Airlines","to":"Turkish"}
-- `AIRLINE_RENAMED`  VZ  - {"from":"Thai Vietjet Air","to":"Airtours International"}
-- `ROUTE_NEW` EHAM-GCTS HV HV6951 - {"nm":1741,"types":["B738"],"status":"MATCH","candidate":false}
-- `TYPE_NEW` EHAM-ESSA KL KL1215 - {"added":["E295"],"previously":["B738","AIRBUS A321 NEO"]}
-- `RESUMED` EHAM-ESSA KL KL1215 - {"resumed_on":"2026-11-06"}
-- `TYPE_NEW` EHAM-LSZH KL KL1917 - {"added":["AIRBUS A321 NEO"],"previously":["BOEING 737","B738"]}
-- `DOW_PATTERN_CHANGE` EDDL-EHAM KL KL1797 - {"from":[0,4],"to":[4,0,5]}
-- `TYPE_NEW` EHAM-LSGG KL KL1929 - {"added":["BOEING 737"],"previously":["EMBRAER 190","E195","B738"]}
-- `MATCH_CHANGED` EHAM-EKCH SK SK550 - {"from":"NEAR-MATCH","to":"NEAR-MATCH+NO-MATCH","types":["A319","AIRBUS A320 NEO"]}
-- `TYPE_NEW` EHAM-EKCH SK SK550 - {"added":["AIRBUS A320 NEO"],"previously":["A319"]}
-- `TYPE_NEW` EHAM-LFPG KL KL1401 - {"added":["EMBRAER 190"],"previously":["BOEING 737"]}
-- `TYPE_MIX_SHIFT` EHAM-LFPG KL KL1401 - {"type":"BOEING 737","share_from":1,"share_to":0.75}
-- `DOW_PATTERN_CHANGE` EHAM-LFPG KL KL1401 - {"from":[1,4],"to":[4,1,5]}
-- `RESUMED` EHAM-LFPG KL KL1401 - {"resumed_on":"2026-11-06"}
-- `DOW_PATTERN_CHANGE` EBBR-EHAM KL KL1701 - {"from":[1,4],"to":[4,1,5]}
-- `TYPE_NEW` EHAM-LMML U2 U27903 - {"added":["AIRBUS A320 NEO"],"previously":["AIRBUS A321-200 (SHARKLETS)"]}
-- `TYPE_MIX_SHIFT` EHAM-LMML U2 U27903 - {"type":"AIRBUS A321-200 (SHARKLETS)","share_from":1,"share_to":0.5}
-- `DOW_PATTERN_CHANGE` EHAM-LMML U2 U27903 - {"from":[0],"to":[0,5]}
-- `TYPE_NEW` EGLL-EHAM BA BA449 - {"added":["AIRBUS A321 (SHARKLETS)"],"previously":["AIRBUS A320 (SHARKLETS)"]}
-- `TYPE_MIX_SHIFT` EGLL-EHAM BA BA449 - {"type":"AIRBUS A320 (SHARKLETS)","share_from":1,"share_to":0.5}
-- `DOW_PATTERN_CHANGE` EGLL-EHAM BA BA449 - {"from":[0],"to":[0,5]}
-- `MATCH_CHANGED` EGSS-EHAM U2 U27839 - {"from":"NEAR-MATCH","to":"NEAR-MATCH+NO-MATCH","types":["A319","AIRBUS A321 (SHARKLETS)"]}
-- `TYPE_NEW` EGSS-EHAM U2 U27839 - {"added":["AIRBUS A321 (SHARKLETS)"],"previously":["A319"]}
-- `TYPE_MIX_SHIFT` EGSS-EHAM U2 U27839 - {"type":"A319","share_from":1,"share_to":0.67}
-- `DOW_PATTERN_CHANGE` EGSS-EHAM U2 U27839 - {"from":[0,1],"to":[1,0,5]}
-- `DOW_PATTERN_CHANGE` EHAM-LEBL VY VY1051 - {"from":[0],"to":[0,5]}
-- `ROUTE_NEW` EHAM-ELLX CV CV6823 - {"nm":170,"types":["BOEING 747-400"],"status":"NO-MATCH","candidate":false}
-- `DOW_PATTERN_CHANGE` EHAM-EPWA LO LO270 - {"from":[0,4],"to":[4,0,5]}
-- `ROUTE_NEW` EGBB-EHAM U2 U27849 - {"nm":239,"types":["AIRBUS A321-200 (SHARKLETS)"],"status":"NO-MATCH","candidate":false}
+- `AIRLINE_RENAMED`  8K  - {"from":"8K","to":"K-Mile Air"}
+- `AIRLINE_RENAMED`  VZ  - {"from":"Airtours International","to":"Thai Vietjet Air"}
+- `AIRLINE_RENAMED`  N0  - {"from":"Norse Atlantic Airways","to":"Norse Atlantic"}
+- `DOW_PATTERN_CHANGE` EHAM-LEMG HV HV6115 - {"from":[0,1,4,5],"to":[4,5,1,0,3]}
+- `DOW_PATTERN_CHANGE` EHAM-LEBL VY VY1051 - {"from":[0,5],"to":[0,5,3]}
+- `DOW_PATTERN_CHANGE` EHAM-ENGM KL KL1197 - {"from":[1,4,5],"to":[4,5,1,3]}
+- `DOW_PATTERN_CHANGE` EHAM-LIRF KL KL1601 - {"from":[0,1,4,5],"to":[4,5,1,0,3]}
+- `DOW_PATTERN_CHANGE` EHAM-EKCH SK SK550 - {"from":[1,4,5],"to":[4,5,1,3]}
+- `TYPE_NEW` EHAM-ESSA KL KL1215 - {"added":["E195"],"previously":["B738","AIRBUS A321 NEO","E295"]}
+- `DOW_PATTERN_CHANGE` EHAM-ESSA KL KL1215 - {"from":[1,4,5],"to":[4,5,1,3]}
+- `DOW_PATTERN_CHANGE` EBBR-EHAM KL KL1701 - {"from":[1,4,5],"to":[4,1,5,3]}
+- `DOW_PATTERN_CHANGE` EHAM-LPMA HV HV6631 - {"from":[5],"to":[5,3]}
+- `DOW_PATTERN_CHANGE` EHAM-GCTS HV HV6673 - {"from":[5],"to":[5,3]}
+- `TYPE_NEW` EHAM-LFPG KL KL1401 - {"added":["E195"],"previously":["BOEING 737","EMBRAER 190"]}
+- `DOW_PATTERN_CHANGE` EHAM-LFPG KL KL1401 - {"from":[1,4,5],"to":[4,1,5,3]}
+- `MATCH_CHANGED` EGLL-EHAM BA BA449 - {"from":"NO-MATCH","to":"MATCH+NO-MATCH","types":["AIRBUS A320 (SHARKLETS)","AIRBUS A321 (SHARKLETS)","A320"]}
+- `SIMMABLE_CHANGED` EGLL-EHAM BA BA449 - {"from":false,"to":true,"nm":200}
+- `TYPE_NEW` EGLL-EHAM BA BA449 - {"added":["A320"],"previously":["AIRBUS A320 (SHARKLETS)","AIRBUS A321 (SHARKLETS)"]}
+- `DOW_PATTERN_CHANGE` EGLL-EHAM BA BA449 - {"from":[0,5],"to":[0,5,3]}
+- `DOW_PATTERN_CHANGE` EDDL-EHAM KL KL1797 - {"from":[0,4,5],"to":[4,0,5,3]}
+- `MATCH_CHANGED` EHAM-LSZH LX LX737 - {"from":"MATCH","to":"MATCH+NEAR-MATCH","types":["BCS3","BCS1"]}
+- `TYPE_NEW` EHAM-LSZH LX LX737 - {"added":["BCS1"],"previously":["BCS3"]}
+- `DOW_PATTERN_CHANGE` EHAM-LSZH LX LX737 - {"from":[0,1,4,5],"to":[4,5,1,0,3]}
+- `DOW_PATTERN_CHANGE` EHAM-LEBL HV HV5131 - {"from":[4,5],"to":[4,5,3]}
+- `ROUTE_NEW` EHAM-LEIB HV HV5673 - {"nm":819,"types":["B738"],"status":"MATCH","candidate":false}
+- `ROUTE_NEW` EBBR-EHAM KL KL9863 - {"nm":85,"types":["BOEING 737"],"status":"NO-MATCH","candidate":false}
+- `TYPE_NEW` EGPH-EHAM U2 U27835 - {"added":["AIRBUS A320 (SHARKLETS)"],"previously":["AIRBUS A320 NEO"]}
+- `TYPE_MIX_SHIFT` EGPH-EHAM U2 U27835 - {"type":"AIRBUS A320 NEO","share_from":1,"share_to":0.5}
+- `DOW_PATTERN_CHANGE` EGPH-EHAM U2 U27835 - {"from":[5],"to":[5,3]}
+- `DOW_PATTERN_CHANGE` EHAM-LEZL HV HV6727 - {"from":[1,4,5],"to":[4,1,5,3]}

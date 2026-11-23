@@ -1397,5 +1397,691 @@
   }
  },
  "AF1300": {},
- "AF1330": {}
+ "AF1330": {},
+ "AF1750": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EKCH-LFPG",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A220-300",
+     "reg": "F-HPNJ"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "F-GKXR"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "F-HEPE"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "F-GKXC"
+    },
+    "2026-11-22": {
+     "type": "Airbus A220-300",
+     "reg": null
+    }
+   },
+   "type_count": {
+    "Airbus A220-300": 3,
+    "Airbus A320": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AF1751": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EKCH-LFPG",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A220-300",
+     "reg": "F-HPNJ"
+    },
+    "2026-11-17": {
+     "type": "Airbus A220-300",
+     "reg": null
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "F-GKXR"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "F-HEPE"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "F-GKXC"
+    },
+    "2026-11-21": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-11-22": {
+     "type": "Airbus A220-300",
+     "reg": null
+    }
+   },
+   "type_count": {
+    "Airbus A220-300": 3,
+    "Airbus A320": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AF7371": {
+  "2026-11-16_2026-11-22": {
+   "pair": "LFLL-LFPG",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A321",
+     "reg": "F-GTAU"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "F-HBNJ"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "F-GKXN"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "F-GKXC"
+    },
+    "2026-11-20": {
+     "type": "Airbus A321",
+     "reg": "F-GTAM"
+    },
+    "2026-11-21": {
+     "type": "Airbus A321",
+     "reg": "F-GTAU"
+    },
+    "2026-11-22": {
+     "type": "Airbus A321",
+     "reg": "F-GTAM"
+    }
+   },
+   "type_count": {
+    "Airbus A321": 4,
+    "Airbus A320": 3
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AF7430": {
+  "2026-11-16_2026-11-22": {
+   "pair": "LFBD-LFPG",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "F-HEPI"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "F-GKXY"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "F-HEPK"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "F-GKXZ"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "F-HEPC"
+    },
+    "2026-11-21": {
+     "type": "Airbus A320",
+     "reg": "F-GKXN"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "F-HEPK"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 7
+   },
+   "mixed_fleet": false,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AF7431": {
+  "2026-11-16_2026-11-22": {
+   "pair": "LFBD-LFPG",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "F-HEPI"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "F-GKXY"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "F-HEPK"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "F-GKXZ"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": null
+    },
+    "2026-11-21": {
+     "type": "Airbus A220-300",
+     "reg": "F-HOZB"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "F-HEPK"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 6,
+    "Airbus A220-300": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AF7520": {
+  "2026-11-16_2026-11-22": {
+   "pair": "LFPG-LFRB",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "F-HEPD"
+    },
+    "2026-11-17": {
+     "type": "Airbus A318",
+     "reg": "F-GUGN"
+    },
+    "2026-11-18": {
+     "type": "Airbus A220-300",
+     "reg": "F-HZUX"
+    },
+    "2026-11-19": {
+     "type": "Airbus A220-300",
+     "reg": "F-HZUV"
+    },
+    "2026-11-20": {
+     "type": "Embraer 190",
+     "reg": null
+    },
+    "2026-11-21": {
+     "type": "Embraer 190",
+     "reg": null
+    },
+    "2026-11-22": {
+     "type": "Embraer 190",
+     "reg": null
+    }
+   },
+   "type_count": {
+    "Airbus A320": 1,
+    "Airbus A318": 1,
+    "Airbus A220-300": 2,
+    "Embraer 190": 3
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1141": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EPWA",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    },
+    "2026-11-17": {
+     "type": "Airbus A319",
+     "reg": "OH-LXL"
+    },
+    "2026-11-18": {
+     "type": "Airbus A319",
+     "reg": "OH-LVC"
+    },
+    "2026-11-19": {
+     "type": "Airbus A319",
+     "reg": "OH-LVC"
+    },
+    "2026-11-20": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    },
+    "2026-11-21": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    },
+    "2026-11-22": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 1,
+    "Airbus A319": 6
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1142": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EPWA",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "OH-LXL"
+    },
+    "2026-11-18": {
+     "type": "Airbus A319",
+     "reg": "OH-LVC"
+    },
+    "2026-11-19": {
+     "type": "Airbus A319",
+     "reg": "OH-LVC"
+    },
+    "2026-11-20": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    },
+    "2026-11-21": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    },
+    "2026-11-22": {
+     "type": "Airbus A319",
+     "reg": "OH-LVH"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 2,
+    "Airbus A319": 5
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1143": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EPWA",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Embraer 190",
+     "reg": "OH-LKL"
+    },
+    "2026-11-17": {
+     "type": "Embraer 190",
+     "reg": "OH-LKF"
+    },
+    "2026-11-18": {
+     "type": "Embraer 190",
+     "reg": "OH-LKM"
+    },
+    "2026-11-19": {
+     "type": "Embraer 190",
+     "reg": "OH-LKM"
+    },
+    "2026-11-20": {
+     "type": "Embraer 190",
+     "reg": "OH-LKF"
+    },
+    "2026-11-21": {
+     "type": "Embraer 190",
+     "reg": "OH-LKR"
+    },
+    "2026-11-22": {
+     "type": "Embraer 190",
+     "reg": "OH-LKR"
+    }
+   },
+   "type_count": {
+    "Embraer 190": 7
+   },
+   "mixed_fleet": false,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1301": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EHAM",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LZU"
+    },
+    "2026-11-17": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWP"
+    },
+    "2026-11-18": {
+     "type": "Airbus A350",
+     "reg": "OH-LWL"
+    },
+    "2026-11-19": {
+     "type": "Airbus A350",
+     "reg": "OH-LWK"
+    },
+    "2026-11-20": {
+     "type": "Airbus A321",
+     "reg": "OH-LZS"
+    },
+    "2026-11-21": {
+     "type": "Airbus A321",
+     "reg": "OH-LZM"
+    },
+    "2026-11-22": {
+     "type": "Airbus A319",
+     "reg": "OH-LVL"
+    }
+   },
+   "type_count": {
+    "Airbus A350-900": 2,
+    "Airbus A350": 2,
+    "Airbus A321": 2,
+    "Airbus A319": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1331": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EGLL",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWF"
+    },
+    "2026-11-17": {
+     "type": "Airbus A350",
+     "reg": "OH-LWO"
+    },
+    "2026-11-18": {
+     "type": "Airbus A350",
+     "reg": "OH-LWM"
+    },
+    "2026-11-19": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWH"
+    },
+    "2026-11-20": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWE"
+    },
+    "2026-11-21": {
+     "type": "Airbus A350",
+     "reg": "OH-LWO"
+    },
+    "2026-11-22": {
+     "type": "Airbus A350",
+     "reg": "OH-LWL"
+    }
+   },
+   "type_count": {
+    "Airbus A350-900": 3,
+    "Airbus A350": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1332": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-EGLL",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWF"
+    },
+    "2026-11-17": {
+     "type": "Airbus A350",
+     "reg": "OH-LWO"
+    },
+    "2026-11-18": {
+     "type": "Airbus A350",
+     "reg": "OH-LWM"
+    },
+    "2026-11-19": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWH"
+    },
+    "2026-11-20": {
+     "type": "Airbus A350-900",
+     "reg": "OH-LWE"
+    },
+    "2026-11-21": {
+     "type": "Airbus A350",
+     "reg": "OH-LWO"
+    },
+    "2026-11-22": {
+     "type": "Airbus A350",
+     "reg": "OH-LWL"
+    }
+   },
+   "type_count": {
+    "Airbus A350-900": 3,
+    "Airbus A350": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1401": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EDDM-EFHK",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "OH-LXM"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "OH-LXD"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "OH-LXH"
+    },
+    "2026-11-19": {
+     "type": "Airbus A320",
+     "reg": "OH-LVI"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "OH-LXH"
+    },
+    "2026-11-21": {
+     "type": "Airbus A321",
+     "reg": "OH-LZP"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "OH-LXM"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 6,
+    "Airbus A321": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1402": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EDDM-EFHK",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A320",
+     "reg": "OH-LXM"
+    },
+    "2026-11-17": {
+     "type": "Airbus A320",
+     "reg": "OH-LXD"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "OH-LXH"
+    },
+    "2026-11-19": {
+     "type": "Airbus A319",
+     "reg": "OH-LVI"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "OH-LXH"
+    },
+    "2026-11-21": {
+     "type": "Airbus A320",
+     "reg": "OH-LZP"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "OH-LXM"
+    }
+   },
+   "type_count": {
+    "Airbus A320": 6,
+    "Airbus A319": 1
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1511": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-LSZH",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A319",
+     "reg": "OH-LVL"
+    },
+    "2026-11-17": {
+     "type": "Airbus A321 (Sharklets)",
+     "reg": "OH-LZG"
+    },
+    "2026-11-18": {
+     "type": "Airbus A321",
+     "reg": "OH-LXC"
+    },
+    "2026-11-19": {
+     "type": "Airbus A319",
+     "reg": "OH-LVD"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "OH-LXB"
+    },
+    "2026-11-21": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    }
+   },
+   "type_count": {
+    "Airbus A319": 2,
+    "Airbus A321 (Sharklets)": 1,
+    "Airbus A321": 1,
+    "Airbus A320": 3
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1512": {
+  "2026-11-16_2026-11-22": {
+   "pair": "EFHK-LSZH",
+   "prio": 0,
+   "legs": 7,
+   "per_day": {
+    "2026-11-16": {
+     "type": "Airbus A319",
+     "reg": "OH-LVL"
+    },
+    "2026-11-17": {
+     "type": "Airbus A321 (Sharklets)",
+     "reg": "OH-LZG"
+    },
+    "2026-11-18": {
+     "type": "Airbus A320",
+     "reg": "OH-LXC"
+    },
+    "2026-11-19": {
+     "type": "Airbus A319",
+     "reg": "OH-LVD"
+    },
+    "2026-11-20": {
+     "type": "Airbus A320",
+     "reg": "OH-LXB"
+    },
+    "2026-11-21": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    },
+    "2026-11-22": {
+     "type": "Airbus A320",
+     "reg": "OH-LXK"
+    }
+   },
+   "type_count": {
+    "Airbus A319": 2,
+    "Airbus A321 (Sharklets)": 1,
+    "Airbus A320": 4
+   },
+   "mixed_fleet": true,
+   "fetched": "2026-11-23"
+  }
+ },
+ "AY1541": {}
 }
